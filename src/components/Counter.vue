@@ -83,9 +83,9 @@
                         <count-up
                             class="pb-2.5 text-4xl font-black leading-none transition dark:text-white dark:group-hover:text-black"
                             :startVal="0"
-                            :end-val="120"
+                            :end-val="33"
                             :duration="10"
-                            :options="{ suffix: '+' }"
+                            :options="{ suffix: '' }"
                         ></count-up>
                         <span class="font-bold text-black transition dark:text-gray dark:group-hover:text-black">Team Members</span>
                     </div>
@@ -126,7 +126,7 @@
                         <count-up
                             class="pb-2.5 text-4xl font-black leading-none transition dark:text-white dark:group-hover:text-black"
                             :startVal="0"
-                            :end-val="350"
+                            :end-val="5000"
                             :duration="10"
                             :options="{ suffix: '+' }"
                         ></count-up>
@@ -169,7 +169,7 @@
                         <count-up
                             class="pb-2.5 text-4xl font-black leading-none transition dark:text-white dark:group-hover:text-black"
                             :startVal="0"
-                            :end-val="1254"
+                            :end-val="10000"
                             :duration="10"
                             :options="{ suffix: '+' }"
                         ></count-up>

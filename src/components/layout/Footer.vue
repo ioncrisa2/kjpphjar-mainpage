@@ -3,7 +3,7 @@
         <div class="container">
             <div class="grid gap-y-10 gap-x-4 py-14 sm:grid-cols-3 lg:grid-cols-5 lg:py-[100px]">
                 <div class="relative">
-                    <img src="/assets/images/logo.png" alt="plurk" class="h-7" />
+                    <img src="/assets/images/h-logo.png" alt="plurk" class="h-7" width="30"/>
                     <ul class="mt-12 flex items-center gap-8">
                         <li>
                             <a href="javascript:">
@@ -76,19 +76,19 @@
                             <router-link to="/" class="inline-block transition hover:scale-110 hover:text-secondary">Home</router-link>
                         </li>
                         <li>
-                            <router-link to="/portfolio" class="inline-block transition hover:scale-110 hover:text-secondary">Portfolio</router-link>
+                            <router-link to="/portfolio" class="inline-block transition hover:scale-110 hover:text-secondary">Tentang Kami</router-link>
                         </li>
                         <li>
-                            <router-link to="/services" class="inline-block transition hover:scale-110 hover:text-secondary">Service</router-link>
+                            <router-link to="/services" class="inline-block transition hover:scale-110 hover:text-secondary">Jasa Layanan</router-link>
                         </li>
                         <li>
-                            <router-link to="/team" class="inline-block transition hover:scale-110 hover:text-secondary">Team</router-link>
+                            <router-link to="/team" class="inline-block transition hover:scale-110 hover:text-secondary">Rekan dan Klien</router-link>
                         </li>
                         <li>
-                            <router-link to="/about-us" class="inline-block transition hover:scale-110 hover:text-secondary">About Us</router-link>
+                            <router-link to="/about-us" class="inline-block transition hover:scale-110 hover:text-secondary">Galeri Kegiatan</router-link>
                         </li>
                         <li>
-                            <router-link to="/career" class="inline-block transition hover:scale-110 hover:text-secondary">Career</router-link>
+                            <router-link to="/career" class="inline-block transition hover:scale-110 hover:text-secondary">Hubungi Kami</router-link>
                         </li>
                     </ul>
                 </div>
@@ -96,22 +96,19 @@
                     <ul class="flex flex-col gap-3 font-bold">
                         <li class="mb-3 text-lg font-extrabold text-black dark:text-white">Services</li>
                         <li>
-                            <router-link to="/services-detail" class="inline-block transition hover:scale-110 hover:text-secondary">UI/UX Design</router-link>
+                            <router-link to="/services-detail" class="inline-block transition hover:scale-110 hover:text-secondary">
+                                Jasa Penilaian
+                            </router-link>
                         </li>
                         <li>
-                            <router-link to="/services-detail" class="inline-block transition hover:scale-110 hover:text-secondary"
-                                >Web Development</router-link
-                            >
+                            <router-link to="/services-detail" class="inline-block transition hover:scale-110 hover:text-secondary">
+                                Jasa Konsultasi
+                            </router-link>
                         </li>
                         <li>
-                            <router-link to="/services-detail" class="inline-block transition hover:scale-110 hover:text-secondary"
-                                >Digital Marketing</router-link
-                            >
-                        </li>
-                        <li>
-                            <router-link to="/services-detail" class="inline-block transition hover:scale-110 hover:text-secondary"
-                                >App Development</router-link
-                            >
+                            <router-link to="/services-detail" class="inline-block transition hover:scale-110 hover:text-secondary">
+                                Penilaian Spesialisasi
+                            </router-link>
                         </li>
                     </ul>
                 </div>
@@ -137,9 +134,9 @@
                 <div>
                     <ul class="flex flex-col gap-3 font-bold">
                         <li class="mb-3 text-lg font-extrabold text-black dark:text-white">Information</li>
-                        <li>164 Brighton Ave, Allston, Maine, U.S. - 02134</li>
+                        <li>Ruko Terminal, Jl. Sako Raya Jl. Siaran No.18, Sialang, Kec. Sako, Kota Palembang, Sumatera Selatan 30163</li>
                         <li>
-                            <a href="tel:+(617) 254-2333" class="inline-block transition hover:scale-110 hover:text-secondary">+(617) 254-2333</a>
+                            <a href="tel:+(62711) 5615793" class="inline-block transition hover:scale-110 hover:text-secondary">0711-561-579-3</a>
                         </li>
                     </ul>
                 </div>
@@ -150,7 +147,7 @@
                 <div class="flex flex-col items-center justify-between text-center font-bold dark:text-white md:flex-row">
                     <div>
                         Copyright© {{ new Date().getFullYear() }}
-                        <a href="javascript:" class="text-primary transition hover:text-secondary">Plurk Technologies Pvt. Ltd.</a>
+                        <a href="javascript:" class="text-primary transition hover:text-secondary">KJPP Henricus Judi Adrianto dan Rekan</a>
                     </div>
                     <div>
                         Need help? Visit the
