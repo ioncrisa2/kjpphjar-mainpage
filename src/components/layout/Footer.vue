@@ -136,7 +136,7 @@
                         <li class="mb-3 text-lg font-extrabold text-black dark:text-white">Information</li>
                         <li>Ruko Terminal, Jl. Sako Raya Jl. Siaran No.18, Sialang, Kec. Sako, Kota Palembang, Sumatera Selatan 30163</li>
                         <li>
-                            <a href="tel:+(62711) 5615793" class="inline-block transition hover:scale-110 hover:text-secondary">0711-561-579-3</a>
+                            <a href="tel:+(62711) 5615793" class="inline-block transition hover:scale-110 hover:text-secondary">0711 5615793</a>
                         </li>
                     </ul>
                 </div>
