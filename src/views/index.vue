@@ -21,6 +21,19 @@ import MonitoringIcon from "@/components/icons/MonitoringIcon.vue";
 const dialog: any = ref(null);
 const store = useAppStore();
 
+interface ChooseUs {
+    title:string;
+    desc:string;
+    image:string;
+}
+
+const chooseUs : Array<ChooseUs> = [
+    {title:"Team",desc:"Didukung tim manajemen yang solid dan berkualitas",image:"/assets/images/team.jpg"},
+    {title:"Scala",desc:"Siap menjadi pilihan dari perusahaan berskala kecil, menengah hingga besar.",image:"/assets/images/scale.jpg"},
+    {title:"Efektif & Efisien",desc:"Menggunakan schedule kerja yang jelas, terukur dan dilakukan secara efektif dan efisien",image:"/assets/images/efektif&efisien.jpg"},
+    {title:"Kerahasiaan",desc:"Kami menjamin bahwa konsultan kami akan menjaga kerahasiaan data anda sesuai dengan pakta integritas.",image:"/assets/images/rahasia.jpg"},
+]
+
 </script>
 
 <template>
@@ -115,85 +128,22 @@ const store = useAppStore();
                 </div>
                 <div class="mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-1 lg:grid-cols-2" data-aos="zoom-in"
                     data-aos-duration="1000">
-                    <div class="group">
+                    <div class="group" v-for="item in chooseUs">
                         <div class="overflow-hidden">
-                            <img src="/assets/images/team.jpg"
+                            <img :src="item.image"
                                 class="w-full duration-200 group-hover:rotate-2 group-hover:scale-110" alt="" />
                         </div>
                         <div
                             class="relative mx-4 -mt-10 space-y-2.5 bg-gray-dark px-4 pt-[22px] text-center dark:bg-black md:px-[26px]">
                             <h5 class="text-2xl font-bold text-primary group-hover:text-secondary">
-                                Team
+                                {{ item.title }}
                             </h5>
                             <div class="mx-auto h-1 w-[50px] bg-secondary duration-200 group-hover:bg-primary"></div>
                             <p class="pb-[60px] text-lg font-semibold">
-                                Didukung tim manajemen yang solid dan berkualitas
+                                {{ item.desc }}
                             </p>
-                            <span class="absolute bottom-0 opacity-20 ltr:right-0 rtl:left-0">
-                                <img src="/assets/images/consulting/services-icon1.svg" alt="" />
-                            </span>
                         </div>
                     </div>
-                    <div class="group">
-                        <div class="overflow-hidden">
-                            <img src="/assets/images/scale.jpg"
-                                class="w-full duration-200 group-hover:rotate-2 group-hover:scale-110" alt="" />
-                        </div>
-                        <div
-                            class="relative mx-4 -mt-10 space-y-2.5 bg-gray-dark px-4 pt-[22px] text-center dark:bg-black md:px-[26px]">
-                            <h5 class="text-2xl font-bold text-primary group-hover:text-secondary">
-                                Scala
-                            </h5>
-                            <div class="mx-auto h-1 w-[50px] bg-secondary duration-200 group-hover:bg-primary"></div>
-                            <p class="pb-[60px] text-lg font-semibold">
-                                Siap menjadi pilihan dari perusahaan berskala kecil, menengah hingga
-                                besar.
-                            </p>
-                            <span class="absolute bottom-0 opacity-20 ltr:right-0 rtl:left-0">
-                                <img src="/assets/images/consulting/services-icon2.svg" alt="" />
-                            </span>
-                        </div>
-                    </div>
-                    <div class="group">
-                        <div class="overflow-hidden">
-                            <img src="/assets/images/efektif&efisien.jpg"
-                                class="w-full duration-200 group-hover:rotate-2 group-hover:scale-110" alt="" />
-                        </div>
-                        <div
-                            class="relative mx-4 -mt-10 space-y-2.5 bg-gray-dark px-4 pt-[22px] text-center dark:bg-black md:px-[26px]">
-                            <h5 class="text-2xl font-bold text-primary group-hover:text-secondary">
-                                Efektif & Efisien
-                        </h5>
-                        <div class="mx-auto h-1 w-[50px] bg-secondary duration-200 group-hover:bg-primary"></div>
-                        <p class="pb-[60px] text-lg font-semibold">
-                            Menggunakan schedule kerja yang jelas, terukur dan dilakukan secara
-                            efektif dan efisien
-                        </p>
-                        <span class="absolute bottom-0 opacity-20 ltr:right-0 rtl:left-0">
-                            <img src="/assets/images/consulting/services-icon3.svg" alt="" />
-                        </span>
-                    </div>
-                </div>
-                <div class="group">
-                    <div class="overflow-hidden">
-                        <img src="/assets/images/rahasia.jpg"
-                            class="w-full duration-200 group-hover:rotate-2 group-hover:scale-110" alt="" />
-                    </div>
-                    <div
-                        class="relative mx-4 -mt-10 space-y-2.5 bg-gray-dark px-4 pt-[22px] text-center dark:bg-black md:px-[26px]">
-                        <h5 class="text-2xl font-bold text-primary group-hover:text-secondary">
-                            Kerahasiaan
-                        </h5>
-                        <div class="mx-auto h-1 w-[50px] bg-secondary duration-200 group-hover:bg-primary"></div>
-                        <p class="pb-[60px] text-lg font-semibold">
-                            Kami menjamin bahwa konsultan kami akan menjaga kerahasiaan data anda
-                            sesuai dengan pakta integritas.
-                        </p>
-                        <span class="absolute bottom-0 opacity-20 ltr:right-0 rtl:left-0">
-                            <img src="/assets/images/consulting/services-icon3.svg" alt="" />
-                        </span>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
