@@ -1,4 +1,6 @@
+import { submitContactForm } from '@/services/contact';
 import { defineStore } from 'pinia';
+
 export const useAppStore = defineStore('app', {
     state: () => ({
         theme: 'light',
@@ -28,6 +30,8 @@ export const useAppStore = defineStore('app', {
         toggleMainLoader(payload: boolean = false) {
             this.isShowMainLoader = payload || false;
         },
+        submitContact(){
+        }
     },
     getters: {},
 });

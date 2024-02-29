@@ -165,11 +165,12 @@
                             </li>
                         </ul>
                     </div>
-                    <form action="" class="rounded-3xl bg-white px-4 py-12 dark:bg-gray-dark lg:w-2/3 lg:px-8">
+                    <form @submit.prevent="submitForm" class="rounded-3xl bg-white px-4 py-12 dark:bg-gray-dark lg:w-2/3 lg:px-8">
                         <div class="grid gap-10 sm:grid-cols-2">
                             <div class="relative">
                                 <input
                                     type="text"
+                                    v-model="form.fullname"
                                     name="name"
                                     class="w-full rounded-2xl border-2 border-gray/20 bg-transparent p-4 font-bold outline-none transition focus:border-secondary ltr:pr-12 rtl:pl-12"
                                 />
@@ -200,6 +201,7 @@
                             <div class="relative">
                                 <input
                                     type="email"
+                                    v-model="form.email"
                                     name="email"
                                     class="w-full rounded-2xl border-2 border-gray/20 bg-transparent p-4 font-bold outline-none transition focus:border-secondary ltr:pr-12 rtl:pl-12"
                                 />
@@ -232,6 +234,7 @@
                             <div class="relative">
                                 <input
                                     type="text"
+                                    v-model="form.phone"
                                     name="mobile"
                                     class="w-full rounded-2xl border-2 border-gray/20 bg-transparent p-4 font-bold outline-none transition focus:border-secondary ltr:pr-12 rtl:pl-12"
                                 />
@@ -257,6 +260,7 @@
                             <div class="relative">
                                 <input
                                     type="text"
+                                    v-model="form.city"
                                     name="city"
                                     class="w-full rounded-2xl border-2 border-gray/20 bg-transparent p-4 font-bold outline-none transition focus:border-secondary ltr:pr-12 rtl:pl-12"
                                 />
@@ -289,6 +293,7 @@
                         <div class="relative mt-10">
                             <textarea
                                 name="message"
+                                v-model="form.message"
                                 class="w-full rounded-2xl border-2 border-gray/20 bg-transparent p-4 font-bold outline-none transition focus:border-secondary ltr:pr-12 rtl:pl-12"
                             ></textarea>
                             <label for="" class="absolute -top-3 bg-white px-2 font-bold ltr:left-6 rtl:right-6 dark:bg-gray-dark dark:text-white"
@@ -314,7 +319,7 @@
                             </svg>
                         </div>
                         <div class="mt-10 text-center ltr:lg:text-right rtl:lg:text-left">
-                            <button type="button" class="btn bg-gray px-12 capitalize text-white dark:bg-white dark:text-black dark:hover:bg-secondary">
+                            <button class="btn bg-gray px-12 capitalize text-white dark:bg-white dark:text-black dark:hover:bg-secondary">
                                 Submit
                             </button>
                         </div>
@@ -448,7 +453,15 @@
     import {ref,onMounted} from "vue";
     import "leaflet/dist/leaflet.css";
     import * as L from "leaflet";
-    const store = useAppStore();
+    import {submitContactForm} from '@/services/contact';
+
+    const form = ref({
+        fullname:'',
+        email:'',
+        phone:'',
+        city:'',
+        message:''
+    });
 
     const Braches = [
         {
@@ -501,5 +514,22 @@
            L.marker([branch.latitute,branch.longtitude]).addTo(mapRefs.value);
         });
     });
+
+    async function submitForm(){
+        try{
+            // console.log(form.value)
+            await submitContactForm(form.value);
+
+            form.value = {
+                fullname:'',
+                email: '',
+                phone: '',
+                city: '',
+                message: '',
+            }
+        }catch(error){
+            console.error("something error",error);
+        }
+    }
 
 </script>
