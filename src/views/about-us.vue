@@ -15,16 +15,16 @@ interface Leader {
 }
 
 const missions : Array<Mission> = [
-    {id:'01',text:'MENCIPTAKAN BRAND IMAGE DAN BRAND LOYALTY BAGI PENGGUNA JASA.'},
-    {id:'02',text:'MENCIPTAKAN BRAND IMAGE DAN BRAND LOYALTY BAGI PENGGUNA JASA.'},
-    {id:'03',text:'MENCIPTAKAN BRAND IMAGE DAN BRAND LOYALTY BAGI PENGGUNA JASA.'},
-    {id:'04',text:'MENCIPTAKAN BRAND IMAGE DAN BRAND LOYALTY BAGI PENGGUNA JASA.'}
+    {id:'01',text:'Menciptakan Brand Image dan Brand Loyalty bagi pengguna jasa.'},
+    {id:'02',text:'Peningkatan Profesionalisme Personil.'},
+    {id:'03',text:'Menjalankan Sistem Pengendalian Mutu, KEPI, SPI dan Peraturan lainnya dengan tertib.'},
+    {id:'04',text:'Perencanaan, Pengorganisasi Pelaksanaan dan Pengawasan Terintegrasi Dengan Baik.'}
 ];
 
 const leaders : Array<Leader> = [
     {
         id:1,
-        image:'/assets/images/pimpinan/leader.jpg',
+        image:'/assets/images/pimpinan/leader.png',
         name:'Dr. Henricus Judi Adrianto S.E., M.Ec.Dev., M.H., MAPPI(Cert.)',
         position:'Pimpinan Rekan'
     },
@@ -87,16 +87,10 @@ const leaders : Array<Leader> = [
         </section>
 
         <section class="relative py-14 lg:py-[100px] xl:-mt-[100px]">
-            <!-- <div
-                class="absolute top-0 z-[1] h-full w-full bg-white ltr:left-0 rtl:right-0 dark:bg-black xl:w-[85%] xl:rounded-r-[32px]">
-            </div>
-            <div
-                class="absolute -top-3 hidden h-full w-full rounded-r-[32px] bg-white/50 ltr:left-3 rtl:right-3 dark:bg-gray-dark xl:inline-block xl:w-[85%]">
-            </div> -->
             <div class="container relative">
                 <div class="lg:w-full">
                     <div class="heading text-center ltr:lg:text-left rtl:lg:text-right">
-                        <h6 class="!text-black !text-lg font-bold">Visi & Misi Kami</h6>
+                        <h6 class="!text-black !text-lg font-bold">Visi Kami </h6>
                         <h4>Menjadi Perusahaan Penilai yang terpercaya dan lebih baik di Indonesia.</h4>
                     </div>
                     <p class="pb-3 text-center text-lg font-semibold leading-[30px] ltr:lg:text-left rtl:lg:text-right">
