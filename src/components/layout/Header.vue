@@ -1,4 +1,19 @@
-<!-- eslint-disable max-len -->
+<script lang="ts" setup>
+import { ref } from 'vue';
+import { useAppStore } from '@/stores/index';
+const store = useAppStore();
+const showMenu = ref(false);
+// Mobile menu js
+const toggleMenu = () => {
+    if (window.innerWidth < 1024) {
+        showMenu.value = !showMenu.value;
+    } else {
+        showMenu.value = false;
+    }
+};
+
+</script>
+
 <template>
     <header class="sticky top-0 z-50 bg-black/10 transition duration-300">
         <div class="container">
@@ -17,79 +32,9 @@
                             </button>
                         </div>
                         <ul @click="showMenu = false">
-                            <li><router-link to="/"> Home </router-link></li>
-                            <!-- <li class="group relative" @click.stop>
-                                <a href="javascript:;" :class="{
-                                    active:
-                                        $route.name === 'crypto' ||
-                                        $route.name === 'modern-saas' ||
-                                        $route.name === 'real-estate' ||
-                                        $route.name === 'healthcare' ||
-                                        $route.name === 'marketing' ||
-                                        $route.name === 'application' ||
-                                        $route.name === 'hotel-resort' ||
-                                        $route.name === 'nft' ||
-                                        $route.name === 'online-courses' ||
-                                        $route.name === 'restaurant' ||
-                                        $route.name === 'consulting' ||
-                                        $route.name === 'creative-agency' ||
-                                        $route.name === 'insurance' ||
-                                        $route.name === 'photography' ||
-                                        $route.name === 'construction' ||
-                                        $route.name === 'blog-landing' ||
-                                        $route.name === 'event-concert' ||
-                                        $route.name === 'gym' ||
-                                        $route.name === 'job-placement' ||
-                                        $route.name === 'online-payments' ||
-                                        $route.name === 'personal-portfolio' ||
-                                        $route.name === 'portfolio-landing',
-                                }">
-                                    Landing
-                                    <div class="transition duration-500 group-hover:rotate-180 ltr:ml-2 rtl:mr-2">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M19 9L12 15L10.25 13.5M5 9L7.33333 11" stroke="currentColor"
-                                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </div>
-                                </a>
-                                <div class="submenu" @click="showMenu = false">
-                                    <router-link to="/crypto">Crypto Currency</router-link>
-                                    <router-link to="/modern-saas"> Modern Saas </router-link>
-                                    <router-link to="/real-estate"> Real Estate </router-link>
-                                    <router-link to="/healthcare"> Health Care </router-link>
-                                    <router-link to="/marketing"> Sales Marketing </router-link>
-                                    <router-link to="/application"> Application </router-link>
-                                    <router-link to="/hotel-resort"> Hotel & Resort </router-link>
-                                    <router-link to="/nft"> NFT Marketplace </router-link>
-                                    <router-link to="/online-courses"> Online Courses </router-link>
-                                    <router-link to="/restaurant"> Restaurant </router-link>
-                                    <router-link to="/consulting"> Consulting </router-link>
-                                    <router-link to="/creative-agency"> Creative Agency </router-link>
-                                    <router-link to="/insurance"> Insurance </router-link>
-                                    <router-link to="/photography"> Photography </router-link>
-                                    <router-link to="/construction"> Construction </router-link>
-                                    <router-link to="/blog-landing"> Blog </router-link>
-                                    <router-link to="/event-concert">
-                                        Event Concert
-                                    </router-link>
-                                    <router-link to="/gym">
-                                        GYM
-                                    </router-link>
-                                    <router-link to="/job-placement">
-                                        Job Placement
-                                    </router-link>
-                                    <router-link to="/online-payments">
-                                        Online Payments
-                                    </router-link>
-                                    <router-link to="/personal-portfolio">
-                                        Personal Portfolio
-                                    </router-link>
-                                    <router-link to="/portfolio-landing">
-                                        Portfolio
-                                    </router-link>
-                                </div>
-                            </li> -->
+                            <li>
+                                <router-link to="/"> Home </router-link>
+                            </li>
                             <li>
                                 <router-link to="/about-us"
                                     :class="{ active: $route.name === 'about-us' }">Tentang Kami</router-link>
@@ -154,23 +99,4 @@
         </div>
     </header>
 </template>
-<script lang="ts" setup>
-import { ref } from 'vue';
-import { useAppStore } from '@/stores/index';
-const store = useAppStore();
-const showMenu = ref(false);
-const showSearch = ref(false);
-// Mobile menu js
-const toggleMenu = () => {
-    if (window.innerWidth < 1024) {
-        showMenu.value = !showMenu.value;
-    } else {
-        showMenu.value = false;
-    }
-};
 
-// Search Bar - Header
-const toggleSearch = () => {
-    showSearch.value = !showSearch.value;
-};
-</script>
