@@ -67,12 +67,6 @@ const routes: RouteRecordRaw[] = [
         meta: { title: "Blog Details | KJPP HJA'R" },
     },
     {
-        path: '/nft',
-        name: 'nft',
-        component: () => import(/* webpackChunkName: "nft" */ '../views/nft.vue'),
-        meta: { title: "NFT | KJPP HJA'R" },
-    },
-    {
         path: '/creative-agency',
         name: 'creative-agency',
         component: () => import(/* webpackChunkName: "creative-agency" */ '../views/creative-agency.vue'),
