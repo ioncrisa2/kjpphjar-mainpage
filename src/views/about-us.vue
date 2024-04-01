@@ -125,7 +125,7 @@ const leaders : Array<Leader> = [
                     <h6>Meet Our Leader</h6>
                     <h4>KJPP Henricus Judi Adrianto dan Rekan</h4>
                 </div>
-                <div class="grid gap-8 xs:grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                <div class="grid gap-4 xs:grid-cols-2 xm:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
                     <div class="group cursor-pointer text-center" v-for="leader in leaders" :key="leader.id">
                         <div
                             class="relative h-[280px] rounded-3xl transition-all duration-500 group-hover:shadow-[0_0_25px_#979797]">
