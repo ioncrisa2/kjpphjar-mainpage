@@ -119,8 +119,6 @@
 </template>
 <script setup lang="ts">
     import { ref } from 'vue';
-    import ContactUs from '@/components/ContactUs.vue';
-    import OfficeSwiper from '@/components/OfficeSwiper.vue';
     import VueEasyLightbox from 'vue-easy-lightbox';
 
     import { useAppStore } from '@/stores/index';
