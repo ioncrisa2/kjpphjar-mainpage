@@ -16,13 +16,13 @@
         <section class="bg-gradient-to-t from-white/[54%] to-transparent py-14 dark:bg-none lg:py-[100px]">
             <div class="container">
                 <div class="heading text-center">
-                    <h6>Our Culture</h6>
-                    <h4>Be Great. Do Good. Have Fun.</h4>
+                    <h6>Emphasizes the importance of accurate appraisals</h6>
+                    <h4>Valuing What Matters</h4>
                 </div>
                 <div class="grid gap-4 md:gap-6">
                     <div class="flex flex-col gap-4 sm:flex-row md:gap-6">
                         <div
-                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[43%]"
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
                             data-aos="fade-up"
                             data-aos-duration="1000"
                             @click="
@@ -31,13 +31,13 @@
                             "
                         >
                             <img
-                                src="/assets/images/gallery-1.png"
+                                src="/assets/images/galeri/galeri-1.jpg"
                                 alt="gallery-1"
-                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:rotate-12 hover:scale-125"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
                             />
                         </div>
                         <div
-                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[35%]"
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
                             data-aos="fade-up"
                             data-aos-duration="1000"
                             @click="
@@ -46,13 +46,13 @@
                             "
                         >
                             <img
-                                src="/assets/images/gallery-2.png"
+                                src="/assets/images/galeri/galeri-2.jpg"
                                 alt="gallery-2"
-                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:rotate-12 hover:scale-125"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
                             />
                         </div>
                         <div
-                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[22%]"
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
                             data-aos="fade-up"
                             data-aos-duration="1000"
                             @click="
@@ -61,15 +61,15 @@
                             "
                         >
                             <img
-                                src="/assets/images/gallery-3.png"
+                                src="/assets/images/galeri/galeri-3.jpg"
                                 alt="gallery-3"
-                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:rotate-12 hover:scale-125"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
                             />
                         </div>
                     </div>
                     <div class="flex flex-col gap-4 sm:flex-row md:gap-6">
                         <div
-                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-3/5"
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
                             data-aos="fade-up"
                             data-aos-duration="1000"
                             @click="
@@ -78,13 +78,13 @@
                             "
                         >
                             <img
-                                src="/assets/images/gallery-4.png"
-                                alt="gallery-4"
-                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:rotate-12 hover:scale-125"
+                                src="/assets/images/galeri/galeri-4.jpg"
+                                alt="gallery-1"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
                             />
                         </div>
                         <div
-                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-2/5"
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
                             data-aos="fade-up"
                             data-aos-duration="1000"
                             @click="
@@ -93,9 +93,118 @@
                             "
                         >
                             <img
-                                src="/assets/images/gallery-5.png"
-                                alt="gallery-5"
-                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:rotate-12 hover:scale-125"
+                                src="/assets/images/galeri/galeri-5.jpg"
+                                alt="gallery-2"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
+                            />
+                        </div>
+                        <div
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
+                            data-aos="fade-up"
+                            data-aos-duration="1000"
+                            @click="
+                                visible = true;
+                                index = 5;
+                            "
+                        >
+                            <img
+                                src="/assets/images/galeri/galeri-6.jpg"
+                                alt="gallery-3"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
+                            />
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4 sm:flex-row md:gap-6">
+                        <div
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
+                            data-aos="fade-up"
+                            data-aos-duration="1000"
+                            @click="
+                                visible = true;
+                                index = 6;
+                            "
+                        >
+                            <img
+                                src="/assets/images/galeri/galeri-7.jpg"
+                                alt="gallery-1"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
+                            />
+                        </div>
+                        <div
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
+                            data-aos="fade-up"
+                            data-aos-duration="1000"
+                            @click="
+                                visible = true;
+                                index = 7;
+                            "
+                        >
+                            <img
+                                src="/assets/images/galeri/galeri-8.jpg"
+                                alt="gallery-2"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
+                            />
+                        </div>
+                        <div
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
+                            data-aos="fade-up"
+                            data-aos-duration="1000"
+                            @click="
+                                visible = true;
+                                index = 8;
+                            "
+                        >
+                            <img
+                                src="/assets/images/galeri/galeri-9.jpg"
+                                alt="gallery-3"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
+                            />
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4 sm:flex-row md:gap-6">
+                        <div
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
+                            data-aos="fade-up"
+                            data-aos-duration="1000"
+                            @click="
+                                visible = true;
+                                index = 9;
+                            "
+                        >
+                            <img
+                                src="/assets/images/galeri/galeri-10.jpg"
+                                alt="gallery-1"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
+                            />
+                        </div>
+                        <div
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
+                            data-aos="fade-up"
+                            data-aos-duration="1000"
+                            @click="
+                                visible = true;
+                                index = 10;
+                            "
+                        >
+                            <img
+                                src="/assets/images/galeri/galeri-11.png"
+                                alt="gallery-2"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
+                            />
+                        </div>
+                        <div
+                            class="mx-auto w-full cursor-pointer overflow-hidden rounded-[32px] sm:w-[33%]"
+                            data-aos="fade-up"
+                            data-aos-duration="1000"
+                            @click="
+                                visible = true;
+                                index = 11;
+                            "
+                        >
+                            <img
+                                src="/assets/images/galeri/galeri-12.png"
+                                alt="gallery-3"
+                                class="h-full w-full rounded-[32px] object-cover transition duration-500 hover:scale-125"
                             />
                         </div>
                     </div>
@@ -127,11 +236,18 @@
     const visible = ref(false);
     const index: any = ref(null);
     const items = ref([
-        { src: '/assets/images/gallery-1.png' },
-        { src: '/assets/images/gallery-2.png' },
-        { src: '/assets/images/gallery-3.png' },
-        { src: '/assets/images/gallery-4.png' },
-        { src: '/assets/images/gallery-5.png' },
+        { src: '/assets/images/galeri/galeri-1.jpg' },
+        { src: '/assets/images/galeri/galeri-2.jpg' },
+        { src: '/assets/images/galeri/galeri-3.jpg' },
+        { src: '/assets/images/galeri/galeri-4.jpg' },
+        { src: '/assets/images/galeri/galeri-5.jpg' },
+        { src: '/assets/images/galeri/galeri-6.jpg' },
+        { src: '/assets/images/galeri/galeri-7.jpg' },
+        { src: '/assets/images/galeri/galeri-8.jpg' },
+        { src: '/assets/images/galeri/galeri-9.jpg' },
+        { src: '/assets/images/galeri/galeri-10.jpg' },
+        { src: '/assets/images/galeri/galeri-11.png' },
+        { src: '/assets/images/galeri/galeri-12.png' },
     ]);
     const activeTab = ref('all');
 </script>
