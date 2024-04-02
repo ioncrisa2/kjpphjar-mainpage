@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { RouterLink } from "vue-router";
-import LogoSlider from "@/components/LogoSlider.vue";
 import CountUp from "vue-countup-v3";
 import Modal from "@/components/Modal.vue";
 import VueCollapsible from "vue-height-collapsible/vue3";
@@ -10,7 +9,6 @@ import { Swiper, SwiperSlide } from "swiper/vue";
 import { Navigation, Autoplay } from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
-import ServiceItem from "@/components/ServiceItem.vue";
 import ConsultingIcon from "@/components/icons/ConsultingIcon.vue";
 import FeasibilityStudyIcon from "@/components/icons/FeasibilityStudyIcon.vue";
 import ProjectSupervisionIcon from "@/components/icons/ProjectSupervisionIcon.vue";
@@ -74,7 +72,7 @@ const chooseUs : Array<ChooseUs> = [
                         </RouterLink>
                     </div>
                     <div class="mx-auto w-full max-w-[386px] hidden lg:block">
-                        <img src="\assets\images\pak henricus.png" alt="" />
+                        <img src="@public\assets\images\pak-henricus.png" alt="" />
                     </div>
                 </div>
             </div>
@@ -128,7 +126,7 @@ const chooseUs : Array<ChooseUs> = [
                 </div>
                 <div class="mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-1 lg:grid-cols-2" data-aos="zoom-in"
                     data-aos-duration="1000">
-                    <div class="group" v-for="item in chooseUs">
+                    <div class="group" v-for="(item, index) in chooseUs" :key="index">
                         <div class="overflow-hidden">
                             <img :src="item.image"
                                 class="w-full duration-200 group-hover:rotate-2 group-hover:scale-110" alt="" />
