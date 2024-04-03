@@ -39,18 +39,14 @@ const toggleMenu = () => {
                                 <router-link to="/about-us"
                                     :class="{ active: $route.name === 'about-us' }">Tentang Kami</router-link>
                             </li>
-                            <!-- <li>
-                                <router-link to="/services"
-                                    :class="{ active: $route.name === 'services-detail' }">Jasa Layanan</router-link>
-                            </li> -->
                             <li>
                                 <router-link to="/team" :class="{active:$route.name === '/team'}" >Rekan dan Klien</router-link>
                             </li>
                             <li>
-                                <router-link to="/career" :class="{active:$route.name === '/team'}" >Galeri</router-link>
+                                <router-link to="/gallery" :class="{active:$route.name === '/gallery'}" >Galeri</router-link>
                             </li>
                             <li>
-                                <router-link to="/contact-us" :class="{active:$route.name === '/team'}">Contact Us</router-link>
+                                <router-link to="/contact-us" :class="{active:$route.name === '/contact-us'}">Contact Us</router-link>
                             </li>
 
                         </ul>
