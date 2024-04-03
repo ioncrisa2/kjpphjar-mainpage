@@ -40,7 +40,7 @@ const toggleMenu = () => {
                                     :class="{ active: $route.name === 'about-us' }">Tentang Kami</router-link>
                             </li>
                             <li>
-                                <router-link to="/team" :class="{active:$route.name === '/team'}" >Rekan dan Klien</router-link>
+                                <router-link to="/team" :class="{active:$route.name === '/rekan-klien'}" >Rekan dan Klien</router-link>
                             </li>
                             <li>
                                 <router-link to="/gallery" :class="{active:$route.name === '/gallery'}" >Galeri</router-link>
