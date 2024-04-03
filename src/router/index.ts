@@ -7,24 +7,6 @@ const routes: RouteRecordRaw[] = [
     // dashboard
     { path: '/', name: 'home', component: HomeView, meta: { title: "Homepage | KJPP HJA'R" } },
     {
-        path: '/services',
-        name: 'services',
-        component: () => import(/* webpackChunkName: "services" */ '../views/services/index.vue'),
-        meta: { title: "Services | KJPP HJA'R" },
-    },
-    {
-        path: '/services-detail',
-        name: 'services-detail',
-        component: () => import(/* webpackChunkName: "services" */ '../views/services/detail.vue'),
-        meta: { title: "Services Detail | KJPP HJA'R" },
-    },
-    {
-        path: '/services-penilaian',
-        name: 'services-penilaian',
-        component: () => import(/* webpackChunkName: "services" */ '../views/services/penilaian.vue'),
-        meta: { title: "Services Detail Penilaian | KJPP HJA'R" },
-    },
-    {
         path: '/team',
         name: 'team',
         component: () => import(/* webpackChunkName: "team" */ '../views/team.vue'),
@@ -59,24 +41,6 @@ const routes: RouteRecordRaw[] = [
         name: 'FAQs',
         component: () => import(/* webpackChunkName: "FAQs" */ '../views/faq.vue'),
         meta: { title: "FAQs | KJPP HJA'R" },
-    },
-    {
-        path: '/blog',
-        name: 'blog',
-        component: () => import(/* webpackChunkName: "blog" */ '../views/blog/index.vue'),
-        meta: { title: "Blog | KJPP HJA'R" },
-    },
-    {
-        path: '/blog-details',
-        name: 'blog-details',
-        component: () => import(/* webpackChunkName: "blog" */ '../views/blog/details.vue'),
-        meta: { title: "Blog Details | KJPP HJA'R" },
-    },
-    {
-        path: '/creative-agency',
-        name: 'creative-agency',
-        component: () => import(/* webpackChunkName: "creative-agency" */ '../views/creative-agency.vue'),
-        meta: { title: "Creative Agency | KJPP HJA'R" },
     },
     {
         path: '/:catchAll(.*)',
