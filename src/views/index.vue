@@ -43,9 +43,9 @@ const chooseUs : Array<ChooseUs> = [
                 <div class="flex flex-col gap-7 pt-6 md:flex-row md:gap-0">
                     <div class="space-y-5 pt-24 pb-10 text-center ltr:md:text-left rtl:md:text-right">
                         <h5 class="text-xl font-bold">Selamat Datang</h5>
-                        <h2 class="text-4xl font-black uppercase sm:text-3xl sm:leading-tight">
+                        <h1 class="text-4xl font-black uppercase sm:text-3xl sm:leading-tight">
                             KJPP Henricus Judi Adrianto dan Rekan
-                        </h2>
+                        </h1>
                         <p class="text-xl font-semibold">
                             KJPP Henricus Judi Adrianto dan Rekan (KJPP HJA'R) merupakan perusahaan jasa
                             penilai publik dan konsultan independen yang menawarkan berbagai layanan
