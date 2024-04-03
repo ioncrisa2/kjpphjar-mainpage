@@ -19,10 +19,10 @@ const routes: RouteRecordRaw[] = [
         meta: { title: "About Us | KJPP HJA'R" },
     },
     {
-        path: '/career',
-        name: 'career',
-        component: () => import(/* webpackChunkName: "career" */ '../views/career.vue'),
-        meta: { title: "Career | KJPP HJA'R" },
+        path: '/gallery',
+        name: 'gallery',
+        component: () => import(/* webpackChunkName: "career" */ '../views/gallery.vue'),
+        meta: { title: "Gallery | KJPP HJA'R" },
     },
     {
         path: '/contact-us',
