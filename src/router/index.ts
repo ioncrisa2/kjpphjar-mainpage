@@ -31,12 +31,6 @@ const routes: RouteRecordRaw[] = [
         meta: { title: "Contact Us | KJPP HJA'R" },
     },
     {
-        path: '/faq',
-        name: 'FAQs',
-        component: () => import(/* webpackChunkName: "FAQs" */ '../views/faq.vue'),
-        meta: { title: "FAQs | KJPP HJA'R" },
-    },
-    {
         path: '/:catchAll(.*)',
         name: "404 | KJPP HJA'R",
         component: () => import(/* webpackChunkName: "404" */ '../layouts/error.vue'),
