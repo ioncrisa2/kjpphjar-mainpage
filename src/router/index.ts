@@ -7,10 +7,10 @@ const routes: RouteRecordRaw[] = [
     // dashboard
     { path: '/', name: 'home', component: HomeView, meta: { title: "Homepage | KJPP HJA'R" } },
     {
-        path: '/team',
-        name: 'team',
-        component: () => import(/* webpackChunkName: "team" */ '../views/team.vue'),
-        meta: { title: "Team | KJPP HJA'R" },
+        path: '/rekan-klien',
+        name: 'rekan-klien',
+        component: () => import(/* webpackChunkName: "team" */ '../views/client.vue'),
+        meta: { title: "Rekan dan Klien | KJPP HJA'R" },
     },
     {
         path: '/about-us',
@@ -29,12 +29,6 @@ const routes: RouteRecordRaw[] = [
         name: 'contact-us',
         component: () => import(/* webpackChunkName: "contact-us" */ '../views/contact-us.vue'),
         meta: { title: "Contact Us | KJPP HJA'R" },
-    },
-    {
-        path: '/terms-conditions',
-        name: 'terms-conditions',
-        component: () => import(/* webpackChunkName: "terms-conditions" */ '../views/terms-conditions.vue'),
-        meta: { title: "Terms Conditions | KJPP HJA'R" },
     },
     {
         path: '/faq',
