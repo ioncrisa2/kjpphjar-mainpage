@@ -15,6 +15,7 @@ import ProjectSupervisionIcon from "@/components/icons/ProjectSupervisionIcon.vu
 import AsetValuationIcon from "@/components/icons/AssetValuation.vue";
 import ProjectValuationIcon from "@/components/icons/ProjectValuationIcon.vue";
 import MonitoringIcon from "@/components/icons/MonitoringIcon.vue";
+import ServiceItem from "@/components/ServiceItem.vue";
 
 const dialog: any = ref(null);
 const store = useAppStore();
