@@ -1,0 +1,115 @@
+@font-face {
+    font-family: 'reey';
+    src: url('/assets/fonts/reey-regular-webfont.woff2') format('woff2'),
+         url('/assets/fonts/reey-regular-webfont.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .btn {
+        @apply inline-block rounded-2xl bg-primary py-4 px-7 text-center text-sm font-extrabold uppercase text-black transition hover:scale-105 hover:bg-secondary hover:text-white;
+    }
+    .heading {
+        @apply mb-10 lg:mb-14;
+    }
+    .heading h6 {
+        @apply mb-3 text-lg font-extrabold text-primary sm:mb-4;
+    }
+    .heading h4 {
+        @apply text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px];
+    }
+
+    /* Header */
+    header .menus {
+        @apply fixed top-0 z-[52] h-screen w-full max-w-sm gap-9 bg-white transition-all duration-500 ltr:-right-full rtl:-left-full dark:bg-gray-dark lg:static lg:h-auto lg:max-w-none lg:bg-transparent dark:lg:bg-transparent;
+    }
+    header .menus > ul {
+        @apply relative flex flex-col divide-y divide-gray/10 font-bold text-black lg:flex-row lg:items-center lg:gap-11 lg:divide-y-0 lg:p-0 lg:text-white;
+    }
+    header .menus > ul li > a {
+        @apply flex items-center justify-between py-4 px-4 transition hover:text-secondary dark:text-white dark:hover:text-secondary lg:px-0 lg:py-10 hover:lg:scale-110;
+    }
+    header .menus > ul li > a.router-link-active,
+    header .menus > ul li > a.active {
+        @apply text-secondary lg:scale-110;
+    }
+
+    /* Sticky header */
+    .sticky-header {
+        @apply bg-black shadow-lg;
+    }
+
+    /* Filter animations */
+    .project.hidden {
+        animation: hide 0.5s ease forwards;
+    }
+    .project.block {
+        animation: show 0.5s ease forwards;
+    }
+
+    @keyframes hide {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(0); opacity: 0; }
+    }
+    @keyframes show {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Admin panel utilities */
+    .admin-sidebar-link {
+        @apply flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-semibold text-gray transition-all duration-200 hover:bg-primary/10 hover:text-primary;
+    }
+    .admin-sidebar-link.active {
+        @apply bg-primary/10 text-primary;
+    }
+    .admin-card {
+        @apply rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-dark;
+    }
+    .admin-input {
+        @apply w-full rounded-xl border border-gray/20 bg-white px-4 py-3 text-sm text-black outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:bg-gray-dark dark:text-white;
+    }
+    .admin-label {
+        @apply mb-1.5 block text-sm font-semibold text-black dark:text-white;
+    }
+    .admin-btn-primary {
+        @apply inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-black transition hover:bg-secondary hover:text-white;
+    }
+    .admin-btn-danger {
+        @apply inline-flex items-center gap-2 rounded-xl bg-red-500 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-red-600;
+    }
+    .admin-btn-ghost {
+        @apply inline-flex items-center gap-2 rounded-xl border border-gray/20 px-5 py-2.5 text-sm font-bold text-black transition hover:border-primary hover:text-primary dark:text-white;
+    }
+
+    /* Toast */
+    .toast {
+        @apply fixed bottom-6 right-6 z-[9999] flex items-center gap-3 rounded-2xl px-5 py-4 shadow-lg;
+    }
+    .toast-success {
+        @apply bg-green-500 text-white;
+    }
+    .toast-error {
+        @apply bg-red-500 text-white;
+    }
+}
+
+/* Responsive menu */
+header .menus.open-menus {
+    @apply overflow-y-auto ltr:right-0 rtl:left-0;
+}
+
+/* Lightbox override */
+.vel-modal {
+    z-index: 9999 !important;
+}
+
+/* Rotate utility */
+.rotate-y-180 {
+    transform: rotateY(180deg);
+}
