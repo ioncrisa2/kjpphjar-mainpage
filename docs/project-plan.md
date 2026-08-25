@@ -11,7 +11,7 @@
 | | |
 |---|---|
 | **Nama Proyek** | KJPP Henricus Judi Adrianto dan Rekan — Website + CMS |
-| **Status Saat Ini** | Static SPA (Vue 3 + Vite) |
+| **Status Saat Ini** | Full-stack CMS (Nuxt 3 + MongoDB) |
 | **Target** | Full-stack CMS (Nuxt 3 + MongoDB) |
 | **Developer** | 1 orang (pemilik proyek) |
 | **Deployment Target** | Hostinger Node.js Hosting |
@@ -21,8 +21,8 @@
 
 ## 🎯 Tujuan Migrasi
 
-Web saat ini adalah SPA statis dimana **semua data hardcoded** langsung di dalam file `.vue`.
-Setiap perubahan kecil (tambah foto, update nama pimpinan, tambah cabang baru) harus melalui perubahan kode.
+Baseline sebelum migrasi adalah SPA statis dengan **semua data hardcoded** langsung di dalam file `.vue`.
+Implementasi saat ini sudah memindahkan konten operasional ke CMS dan database.
 
 Migrasi ini bertujuan untuk:
 
@@ -62,9 +62,9 @@ Migrasi ini bertujuan untuk:
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │             File Storage (Local Disk)                 │   │
-│  │    /public/uploads/gallery/ → foto galeri             │   │
-│  │    /public/uploads/leaders/ → foto pimpinan          │   │
-│  │    /public/uploads/clients/ → logo klien             │   │
+│  │    ${UPLOADS_DIR}/gallery/ → foto galeri             │   │
+│  │    ${UPLOADS_DIR}/leaders/ → foto pimpinan           │   │
+│  │    ${UPLOADS_DIR}/clients/ → logo klien              │   │
 │  └──────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
                           │
@@ -434,7 +434,7 @@ Hanya 1 user (developer), credential disimpan di `.env`.
 ### Environment Variables untuk Auth
 ```env
 ADMIN_USERNAME=your_username
-ADMIN_PASSWORD_HASH=bcrypt_hash_dari_password_anda
+ADMIN_PASSWORD=password_bootstrap_minimal_12_karakter
 JWT_SECRET=random_string_panjang_minimal_32_karakter
 JWT_EXPIRES_IN=7d
 ```
@@ -488,8 +488,8 @@ MAIL_TO=email-penerima@domain-anda.com  # email kantor yang menerima notifikasi
    b. Validasi ukuran maksimal (contoh: max 10MB)
    c. Generate nama file unik: {timestamp}-{uuid}.{ext}
 4. Server (Sharp):
-   a. Simpan original ke: /public/uploads/gallery/original/
-   b. Resize ke 800px width → simpan ke: /public/uploads/gallery/thumbnails/
+   a. Simpan original ke: `${UPLOADS_DIR}/gallery/original/`
+   b. Resize ke 800px width → simpan ke: `${UPLOADS_DIR}/gallery/thumbnails/`
    c. Convert ke WebP untuk efisiensi (opsional)
 5. Simpan metadata ke collection galleries
 6. Return URL foto ke frontend
@@ -560,15 +560,21 @@ Semua variabel berikut perlu diset di panel Hostinger:
 # App
 NODE_ENV=production
 NUXT_PUBLIC_BASE_URL=https://domain-anda.com
+HOST=0.0.0.0
+PORT=3000
+UPLOADS_DIR=/home/USERNAME/domains/DOMAIN/uploads
+TRUST_PROXY=true
 
 # Database
 MONGODB_URI=mongodb+srv://user:pass@cluster.atlas.mongodb.net/kjpphjar
 
 # Auth Admin
 ADMIN_USERNAME=xxx
-ADMIN_PASSWORD_HASH=xxx
+ADMIN_PASSWORD=minimum-12-karakter
 JWT_SECRET=xxx
 JWT_EXPIRES_IN=7d
+ANALYTICS_HASH_SECRET=xxx
+SEED_DEMO_DATA=false
 
 # Email (SMTP Hostinger)
 SMTP_HOST=smtp.hostinger.com
@@ -585,8 +591,11 @@ MAIL_TO=email-penerima@domain-anda.com
 npm run build
 
 # Start (untuk Hostinger Node.js)
-node .output/server/index.mjs
+npm run start
 ```
+
+Gunakan Node.js 22 atau 24. `UPLOADS_DIR` harus dibuat sebagai direktori persisten
+di luar folder build `/home/{username}/domains/{domain}/nodejs`.
 
 ---
 
@@ -597,7 +606,7 @@ node .output/server/index.mjs
 NODE_ENV=development
 MONGODB_URI=mongodb://localhost:27017/kjpphjar_dev
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD_HASH=...   # generate dengan bcrypt
+ADMIN_PASSWORD=minimum-12-karakter   # hanya untuk bootstrap akun pertama
 JWT_SECRET=dev-secret-minimum-32-characters-long
 JWT_EXPIRES_IN=7d
 SMTP_HOST=smtp.hostinger.com
@@ -725,5 +734,11 @@ Selain yang sudah direncanakan, berikut beberapa fitur yang direkomendasikan unt
 
 ---
 
+## 📌 Dokumen Terkait
+- [Checklist Implementasi Utama](./implementation-checklist.md)
+- [Roadmap & Rencana Fitur Lanjutan (App Settings, Advanced Blog, Analytics)](./fitur-lanjutan-plan.md)
+
+---
+
 *Dokumen ini akan diupdate seiring progress pengerjaan.*
-*Last updated: 2026-08-24*
+*Last updated: 2026-08-25*

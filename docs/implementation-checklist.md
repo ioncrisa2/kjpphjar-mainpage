@@ -34,15 +34,9 @@
 - [x] Install `@types/jsonwebtoken`: `npm install -D @types/jsonwebtoken`
 - [x] Install bcryptjs: `npm install bcryptjs`
 - [x] Install `@types/bcryptjs`: `npm install -D @types/bcryptjs`
-- [x] Install uuid: `npm install uuid`
-- [x] Install `@types/uuid`: `npm install -D @types/uuid`
 - [x] Install VueUse: `npm install @vueuse/nuxt @vueuse/core`
-- [x] Install AOS: `npm install aos`
-- [x] Install Swiper: `npm install swiper`
 - [x] Install Leaflet: `npm install leaflet`
 - [x] Install `@types/leaflet`: `npm install -D @types/leaflet`
-- [x] Install Vue Easy Lightbox: `npm install vue-easy-lightbox`
-- [x] Install vue-countup-v3: `npm install vue-countup-v3`
 - [x] Install slugify (untuk auto-generate slug): `npm install slugify`
 - [x] Install nuxt sitemap module: `npm install @nuxtjs/sitemap`
 
@@ -52,15 +46,13 @@
 - [x] Tambahkan konfigurasi TailwindCSS via `postcss`
 - [x] Setup `runtimeConfig` untuk environment variables:
   - `mongodbUri`
-  - `adminUsername`
-  - `adminPasswordHash`
   - `jwtSecret`
   - `jwtExpiresIn`
   - `smtpHost`, `smtpPort`, `smtpSecure`, `smtpUser`, `smtpPass`
   - `mailTo`
   - `public.baseUrl`
 - [x] Set `ssr: true` (default, tapi pastikan eksplisit)
-- [x] Tambahkan `nitro.publicAssets` untuk folder `/public/uploads/` agar bisa diakses sebagai static
+- [x] Sediakan route `/uploads/*` yang membaca media dari direktori persisten `UPLOADS_DIR`
 
 ### 0.4 — Setup TailwindCSS
 
@@ -107,12 +99,8 @@
 - [x] Buat folder `composables/`
 - [x] Buat folder `middleware/`
 - [x] Buat folder `layouts/`
-- [x] Buat folder `public/uploads/gallery/original/`
-- [x] Buat folder `public/uploads/gallery/thumbnails/`
-- [x] Buat folder `public/uploads/leaders/`
-- [x] Buat folder `public/uploads/clients/`
-- [x] Buat folder `public/uploads/blog/`
-- [x] Tambahkan `/public/uploads/` ke `.gitignore` (foto tidak di-commit)
+- [x] Gunakan struktur runtime `uploads/gallery`, `uploads/leaders`, `uploads/clients`, dan `uploads/blog`
+- [x] Tambahkan `/uploads/` ke `.gitignore` dan gunakan `UPLOADS_DIR` absolut pada production
 - [x] Salin semua aset dari proyek Vue lama (`/public/assets/`) ke Nuxt baru
 
 ---
@@ -173,7 +161,7 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
   - Template email yang informatif (nama, email, pesan, waktu submit)
 - [ ] Buat `server/utils/upload.ts`
   - Setup Multer dengan storage `diskStorage`
-  - Konfigurasi destination ke `/public/uploads/` sesuai jenis file
+  - Konfigurasi destination ke `UPLOADS_DIR` sesuai jenis file
   - Validasi file type (jpg, jpeg, png, webp saja)
   - Validasi max size: 10MB
   - Generate nama file unik: `${Date.now()}-${uuidv4()}.${ext}`
@@ -245,7 +233,7 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
   - Sort by `order` asc
 - [ ] Buat `server/api/leaders/index.post.ts` (ADMIN)
   - Handle upload foto pimpinan via Multer
-  - Simpan ke `/public/uploads/leaders/`
+  - Simpan ke `${UPLOADS_DIR}/leaders/`
   - Tidak perlu thumbnail untuk foto pimpinan
   - Simpan ke MongoDB
 - [ ] Buat `server/api/leaders/[id].put.ts` (ADMIN)
@@ -298,7 +286,7 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
 - [ ] Buat `server/api/blog/index.post.ts` (ADMIN)
   - Auto-generate `slug` dari `title`
   - Jika `excerpt` kosong, auto-generate dari 160 karakter pertama `content`
-  - Handle upload `coverImage` via Multer ke `/public/uploads/blog/`
+  - Handle upload `coverImage` via Multer ke `${UPLOADS_DIR}/blog/`
 - [ ] Buat `server/api/blog/[id].put.ts` (ADMIN)
   - Handle update termasuk replace cover image
   - Jika cover image baru diupload, hapus yang lama
@@ -522,10 +510,10 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
 
 ### 3.5 — Halaman Rekan & Klien (`pages/rekan-klien.vue`)
 
-- [ ] Fetch data: clients
-- [ ] Filter by kategori
-- [ ] Grid logo klien
-- [ ] `useHead()` dengan meta SEO
+- [x] Fetch data: clients
+- [x] Filter by kategori
+- [x] Grid logo klien
+- [x] `useHead()` dengan meta SEO
 
 ### 3.6 — Halaman Contact Us (`pages/contact-us.vue`)
 
@@ -542,11 +530,11 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
 
 ### 3.7 — Halaman Layanan (`pages/layanan/`)
 
-- [ ] Buat `pages/layanan/index.vue` — daftar semua layanan
+- [x] Buat `pages/layanan/index.vue` — daftar semua layanan
   - Fetch: semua services yang `isActive: true`
   - Grid card layanan, setiap card link ke `/layanan/:slug`
   - `useHead()` dengan meta SEO
-- [ ] Buat `pages/layanan/[slug].vue` — detail layanan
+- [x] Buat `pages/layanan/[slug].vue` — detail layanan
   - Fetch: satu service berdasarkan `slug`
   - Render `content` (rich text/HTML) dengan sanitasi
   - Handle 404 jika slug tidak ditemukan
@@ -554,11 +542,11 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
 
 ### 3.8 — Halaman Blog (`pages/blog/`)
 
-- [ ] Buat `pages/blog/index.vue` — daftar artikel
+- [x] Buat `pages/blog/index.vue` — daftar artikel
   - Fetch: blog posts (`isPublished: true`), dengan pagination
   - Card artikel: cover image (thumbnail), judul, excerpt, tanggal publish, tags
   - `useHead()` dengan meta SEO
-- [ ] Buat `pages/blog/[slug].vue` — detail artikel
+- [x] Buat `pages/blog/[slug].vue` — detail artikel
   - Fetch: satu artikel berdasarkan `slug`
   - Render `content` HTML
   - Tampilkan: cover image, judul, tanggal, tags, konten
@@ -567,11 +555,11 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
 
 ### 3.9 — Halaman Karir (`pages/karir/index.vue`)
 
-- [ ] Fetch: semua careers yang `isActive: true` dan `closingDate` belum lewat
-- [ ] List lowongan: judul, lokasi, tipe, deskripsi singkat, tanggal tutup
-- [ ] Setiap lowongan ada tombol "Lamar Sekarang" → arahkan ke email kantor atau WhatsApp
+- [x] Fetch: semua careers yang `isActive: true` dan `closingDate` belum lewat
+- [x] List lowongan: judul, lokasi, tipe, deskripsi singkat, tanggal tutup
+- [x] Setiap lowongan ada tombol "Lamar Sekarang" → arahkan ke email kantor atau WhatsApp
   - Format: `mailto:email@kjpphjar.com?subject=Lamaran%20[Judul%20Lowongan]`
-- [ ] `useHead()` dengan meta SEO
+- [x] `useHead()` dengan meta SEO
 
 ---
 
@@ -579,7 +567,7 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
 
 ### 4.1 — Meta Tags & SEO
 
-- [ ] Pastikan setiap halaman punya `useHead()` dengan:
+- [x] Pastikan setiap halaman punya `useHead()` dengan:
   - `title` — format: `[Nama Halaman] | KJPP HJA'R`
   - `meta description` — deskripsi unik per halaman, max 160 karakter
   - `og:title`, `og:description`, `og:image`, `og:url` — untuk sharing sosmed
@@ -587,19 +575,19 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
 
 ### 4.2 — Sitemap
 
-- [ ] Konfigurasi `@nuxtjs/sitemap` di `nuxt.config.ts`
-- [ ] Tambahkan route statis: `/`, `/about-us`, `/gallery`, `/rekan-klien`, `/contact-us`, `/blog`, `/karir`, `/layanan`
-- [ ] Tambahkan route dinamis: `/layanan/:slug`, `/blog/:slug` — fetch dari API
-- [ ] Verifikasi `sitemap.xml` terbentuk dengan benar di `/sitemap.xml`
+- [x] Konfigurasi `@nuxtjs/sitemap` di `nuxt.config.ts`
+- [x] Tambahkan route statis: `/`, `/about-us`, `/gallery`, `/rekan-klien`, `/contact-us`, `/blog`, `/karir`, `/layanan`
+- [x] Tambahkan route dinamis: `/layanan/:slug`, `/blog/:slug` — fetch dari API
+- [x] Verifikasi `sitemap.xml` terbentuk dengan benar di `/sitemap.xml`
 
 ### 4.3 — Structured Data (JSON-LD)
 
-- [ ] Tambahkan schema `LocalBusiness` di halaman beranda:
+- [x] Tambahkan schema `LocalBusiness` di halaman beranda:
   - Nama perusahaan, deskripsi, alamat kantor pusat, telepon, email, URL website
 
 ### 4.4 — `robots.txt`
 
-- [ ] Update `public/robots.txt`:
+- [x] Update `public/robots.txt`:
   ```
   User-agent: *
   Allow: /
@@ -609,14 +597,14 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
 
 ### 4.5 — Halaman Error
 
-- [ ] Update `error.vue` — tampilkan pesan 404 yang informatif
-- [ ] Tambahkan link kembali ke beranda
+- [x] Update `error.vue` — tampilkan pesan 404 yang informatif
+- [x] Tambahkan link kembali ke beranda
 
 ### 4.6 — Performance
 
-- [ ] Pastikan semua `<img>` di halaman publik pakai `loading="lazy"` dan `width`/`height` attribute
-- [ ] Gunakan thumbnail (bukan original) di semua tampilan grid/list
-- [ ] Verifikasi tidak ada blocking resource di head HTML
+- [x] Pastikan semua `<img>` di halaman publik pakai `loading="lazy"` dan `width`/`height` attribute
+- [x] Gunakan thumbnail (bukan original) di semua tampilan grid/list
+- [x] Verifikasi tidak ada blocking resource di head HTML
 
 ### 4.7 — WhatsApp CTA
 
@@ -650,11 +638,13 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
 ### 5.3 — Setup Hostinger
 
 - [ ] Masuk ke hPanel Hostinger
-- [ ] Setup Node.js application
-- [ ] Set entrypoint: `.output/server/index.mjs`
+- [ ] Setup Node.js Web App dengan Node.js 22 atau 24
+- [ ] Set build command: `npm run build`
+- [ ] Set start command: `npm run start` dan port `3000`
 - [ ] Set semua environment variables di panel Hostinger (lihat daftar di `project-plan.md`)
-- [ ] Upload file project (tanpa `node_modules` dan `public/uploads/`)
-- [ ] Jalankan `npm install` di server Hostinger (jika diperlukan)
+- [ ] Buat direktori upload persisten di luar folder build `nodejs`, lalu set `UPLOADS_DIR` absolut
+- [ ] Aktifkan `TRUST_PROXY=true`
+- [ ] Hubungkan repository GitHub atau upload ZIP tanpa `node_modules`
 
 ### 5.4 — Testing Production
 
@@ -679,7 +669,7 @@ Buat setiap model mengikuti schema di `project-plan.md`. Setiap model harus:
 
 > **Setiap endpoint API yang bersifat write (POST/PUT/PATCH/DELETE) harus dilindungi auth middleware**, kecuali `POST /api/contacts/submit` yang memang endpoint publik.
 
-> **Jangan simpan file upload di dalam folder `src/` atau di-bundle oleh Nuxt.** Selalu ke `public/uploads/` agar bisa diakses langsung sebagai static file.
+> **Jangan simpan file upload di dalam source atau bundle Nuxt.** Simpan ke `UPLOADS_DIR`; aplikasi menyajikannya melalui URL `/uploads/*`.
 
 > **Mongoose strict mode harus ON** (default). Jangan pernah set `strict: false` — ini yang menjaga kontrak data tetap konsisten.
 
