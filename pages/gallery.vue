@@ -32,7 +32,7 @@ const filteredPhotos = computed(() => {
       <div class="container">
         <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
           <div class="heading mb-0 text-center md:text-left">
-            <h4 class="!text-white">Galeri</h4>
+            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Galeri</h1>
           </div>
         </div>
       </div>
@@ -41,8 +41,8 @@ const filteredPhotos = computed(() => {
     <section class="py-14 lg:py-[100px]">
       <div class="container">
         <div class="heading text-center">
-          <h6>Momen & Kegiatan</h6>
-          <h4>Valuing What Matters</h4>
+          <p class="subtitle">Momen & Kegiatan</p>
+          <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Valuing What Matters</h2>
         </div>
 
         <!-- Category filter -->

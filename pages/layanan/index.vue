@@ -16,20 +16,20 @@ const { data: services, pending } = await useFetch('/api/services')
       <div class="container">
         <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
           <div class="heading mb-0 text-center md:text-left">
-            <h4 class="!text-white">Layanan Kami</h4>
+            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Layanan Kami</h1>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Content Section -->
-    <div class="py-16 sm:py-24 bg-white">
+    <div class="py-16 sm:py-24 bg-white dark:bg-black">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-12">
-           <h2 class="text-2xl sm:text-3xl font-extrabold text-black font-mulish">
+           <p class="text-xl sm:text-2xl font-extrabold text-black dark:text-white font-mulish max-w-3xl mx-auto">
              Berbagai solusi penilaian dan konsultasi properti terbaik yang disesuaikan dengan kebutuhan Anda.
-           </h2>
+           </p>
         </div>
 
         <div v-if="pending" class="text-center text-gray py-12">
@@ -45,7 +45,7 @@ const { data: services, pending } = await useFetch('/api/services')
             v-for="service in services"
             :key="service._id"
             :to="`/layanan/${service.slug}`"
-            class="group bg-white border border-gray-200 rounded-xl p-8 hover:shadow-xl hover:border-primary transition-all duration-300"
+            class="group bg-white dark:bg-gray-dark border border-gray-200 dark:border-gray-800 rounded-xl p-8 hover:shadow-xl hover:border-primary transition-all duration-300"
           >
             <div class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-6 group-hover:bg-primary transition-colors duration-300">
               <ClientOnly v-if="service.icon">
@@ -57,10 +57,10 @@ const { data: services, pending } = await useFetch('/api/services')
               </svg>
             </div>
 
-            <h3 class="text-xl font-bold text-black mb-3">{{ service.title }}</h3>
-            <p class="text-gray mb-6 line-clamp-3">{{ service.description }}</p>
+            <h2 class="text-xl font-bold text-black dark:text-white mb-3">{{ service.title }}</h2>
+            <p class="text-gray-700 dark:text-gray-300 mb-6 line-clamp-3">{{ service.description }}</p>
 
-            <div class="text-primary font-semibold text-sm flex items-center group-hover:text-blue-600">
+            <div class="text-sky-600 dark:text-primary font-bold text-sm flex items-center group-hover:text-primary">
               Pelajari Lebih Lanjut
               <span class="ml-2 transform group-hover:translate-x-1 transition-transform duration-300">&rarr;</span>
             </div>

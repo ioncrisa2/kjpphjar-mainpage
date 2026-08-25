@@ -57,7 +57,7 @@ const chooseUs = [
       <div class="container">
         <div class="flex flex-col gap-7 pt-6 md:flex-row md:gap-0">
           <div class="space-y-5 pt-24 pb-10 text-center md:text-left">
-            <h5 class="text-xl font-bold">Selamat Datang</h5>
+            <p class="text-xl font-bold text-primary">Selamat Datang</p>
             <h1 class="text-3xl font-black uppercase sm:leading-tight lg:text-4xl">
               KJPP Henricus Judi Adrianto dan Rekan
             </h1>
@@ -66,7 +66,7 @@ const chooseUs = [
               menawarkan berbagai layanan profesional.
             </p>
             <NuxtLink to="/layanan" class="btn rounded-md bg-white !text-black inline-flex items-center gap-2">
-              <svg width="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M20.3873 7.1575L11.9999 12L3.60913 7.14978" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 <path d="M12 12V21" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 <path d="M11 2.577C11.6188 2.22 12.3812 2.22 13 2.577L19.66 6.423C20.279 6.78 20.66 7.44 20.66 8.155V15.845C20.66 16.56 20.279 17.22 19.66 17.577L13 21.423C12.3812 21.78 11.6188 21.78 11 21.423L4.34 17.577C3.721 17.22 3.34 16.56 3.34 15.845V8.155C3.34 7.44 3.721 6.78 4.34 6.423L11 2.577Z" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -85,7 +85,7 @@ const chooseUs = [
     <section class="bg-gradient-to-b from-white/[55%] to-transparent py-14 dark:bg-none lg:py-20" id="service">
       <div class="container">
         <div class="heading mb-5 text-center">
-          <h4>Layanan Kami</h4>
+          <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Layanan Kami</h2>
         </div>
 
         <!-- Loading state -->
@@ -113,7 +113,7 @@ const chooseUs = [
               <p v-if="service.titleEn" class="mt-2 text-base md:text-lg font-bold text-black/80 dark:text-white/80">
                 ({{ service.titleEn }})
               </p>
-              <p class="mt-3 text-base md:text-lg text-gray leading-relaxed">
+              <p class="mt-3 text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
                 {{ service.description }}
               </p>
             </div>
@@ -136,9 +136,9 @@ const chooseUs = [
       </div>
       <div class="container relative z-[1]">
         <div class="heading text-center text-white">
-          <h4 class="mb-2 !font-black uppercase !text-white">
+          <h2 class="mb-2 !font-black uppercase !text-white text-2xl sm:text-3xl lg:text-[40px] lg:!leading-[50px]">
             Kenapa <span class="text-primary">Memilih kami</span>?
-          </h4>
+          </h2>
         </div>
         <div class="mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 lg:grid-cols-2">
           <div v-for="(item, index) in chooseUs" :key="index" class="group">
@@ -146,7 +146,7 @@ const chooseUs = [
               <img :src="item.image" class="w-full duration-200 group-hover:rotate-2 group-hover:scale-110" :alt="item.title" />
             </div>
             <div class="relative mx-4 -mt-10 space-y-2.5 bg-gray-dark px-4 pt-[22px] text-center dark:bg-black md:px-[26px]">
-              <h5 class="text-2xl font-bold text-primary group-hover:text-secondary">{{ item.title }}</h5>
+              <h3 class="text-2xl font-bold text-primary group-hover:text-secondary">{{ item.title }}</h3>
               <div class="mx-auto h-1 w-[50px] bg-secondary duration-200 group-hover:bg-primary" />
               <p class="pb-[60px] text-lg font-semibold text-white">{{ item.desc }}</p>
             </div>
@@ -160,15 +160,15 @@ const chooseUs = [
       <div class="container">
         <div class="grid grid-cols-1 gap-12 text-center lg:grid-cols-2 lg:gap-20 lg:text-left">
           <div>
-            <h3 class="text-3xl font-black uppercase text-white sm:text-[40px] sm:leading-[50px]">
+            <h2 class="text-3xl font-black uppercase text-white sm:text-[40px] sm:leading-[50px]">
               Pengalaman <span class="text-primary">Kami</span>
-            </h3>
-            <p class="mt-[18px] text-lg text-gray">
+            </h2>
+            <p class="mt-[18px] text-lg text-gray-300">
               Dengan pengalaman lebih dari 10 tahun dan ribuan pelanggan puas, kami menjadi mitra
               terpercaya dalam memenuhi kebutuhan Anda.
             </p>
             <div class="mt-[18px] flex justify-center gap-6 lg:justify-start">
-              <NuxtLink to="/contact-us" class="btn rounded-md bg-secondary text-white shadow-[10px_15px_30px_rgba(180,118,229,0.3)] hover:bg-primary">
+              <NuxtLink to="/contact-us" class="btn rounded-md !bg-primary !text-black font-extrabold shadow-[0_10px_25px_rgba(71,189,255,0.35)] hover:!bg-white hover:!text-black">
                 Contact Us
               </NuxtLink>
             </div>
@@ -176,11 +176,11 @@ const chooseUs = [
           <div class="grid grid-cols-2 items-center gap-3 sm:gap-7">
             <div class="border border-transparent bg-gray/20 py-10 px-5 text-center duration-200 hover:border-secondary sm:py-[52px]">
               <span class="text-[34px] font-black text-white">5000+</span>
-              <p class="mt-2.5 font-bold text-gray">Pelanggan Puas</p>
+              <p class="mt-2.5 font-bold text-gray-300">Pelanggan Puas</p>
             </div>
             <div class="border border-transparent bg-gray/20 py-10 px-5 text-center duration-200 hover:border-secondary sm:py-[52px]">
               <span class="text-[34px] font-black text-white">10+</span>
-              <p class="mt-2.5 font-bold text-gray">Tahun Pengalaman</p>
+              <p class="mt-2.5 font-bold text-gray-300">Tahun Pengalaman</p>
             </div>
           </div>
         </div>
@@ -191,8 +191,8 @@ const chooseUs = [
     <section v-if="featuredPhotos.length > 0" class="py-14 lg:py-20">
       <div class="container">
         <div class="heading text-center">
-          <h6>Galeri Kami</h6>
-          <h4>Momen & Kegiatan</h4>
+          <p class="subtitle">Galeri Kami</p>
+          <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Momen & Kegiatan</h2>
         </div>
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6">
           <div

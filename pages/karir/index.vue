@@ -23,7 +23,7 @@ function getMailtoLink(title: string) {
       <div class="container">
         <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
           <div class="heading mb-0 text-center md:text-left">
-            <h4 class="!text-white">Peluang Karir</h4>
+            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Peluang Karir</h1>
           </div>
         </div>
       </div>
@@ -34,9 +34,9 @@ function getMailtoLink(title: string) {
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-12">
-           <h2 class="text-2xl sm:text-3xl font-extrabold text-black font-mulish">
+           <p class="text-xl sm:text-2xl font-extrabold text-black font-mulish max-w-2xl mx-auto">
              Tingkatkan potensi dan kembangkan karir Anda bersama tim ahli penilai dan konsultan KJPP HJA'R.
-           </h2>
+           </p>
         </div>
 
         <div v-if="pending" class="text-center text-gray py-12">

@@ -40,14 +40,14 @@ function telephoneHref(phone: string) {
             </span>
           </div>
           <div v-if="socialLinks.length" class="mt-8">
-            <p class="mb-3 text-sm text-gray">Ikuti kami di media sosial:</p>
+            <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">Ikuti kami di media sosial:</p>
             <ul class="flex flex-wrap items-center gap-2">
               <li v-for="social in socialLinks" :key="social.network">
                 <a
                   :href="social.href"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-gray/15 px-2 text-xs font-extrabold text-gray transition hover:border-secondary hover:text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/40"
+                  class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-gray/25 px-2 text-xs font-extrabold text-gray-700 transition hover:border-secondary hover:text-secondary dark:text-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/40"
                   :aria-label="social.label"
                 >
                   <Icon :name="social.icon" class="h-5 w-5" aria-hidden="true" />
@@ -61,7 +61,7 @@ function telephoneHref(phone: string) {
         <div>
           <ul class="flex flex-col gap-3 font-bold">
             <li class="mb-3 text-lg font-extrabold text-black dark:text-white">Alamat</li>
-            <li v-if="settings.footerAddress.headOffice" class="whitespace-pre-line text-sm leading-relaxed text-gray">
+            <li v-if="settings.footerAddress.headOffice" class="whitespace-pre-line text-sm leading-relaxed text-gray-700 dark:text-gray-300">
               <strong class="text-black dark:text-white">Kantor Pusat:</strong><br />
               {{ settings.footerAddress.headOffice }}
             </li>
@@ -70,7 +70,7 @@ function telephoneHref(phone: string) {
                 :href="settings.footerAddress.googleMapsUrl"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-primary transition hover:text-secondary"
+                class="text-sm font-bold text-sky-600 transition hover:text-secondary dark:text-primary"
               >
                 Buka di Google Maps →
               </a>
@@ -92,17 +92,17 @@ function telephoneHref(phone: string) {
           <ul class="flex flex-col gap-2 font-bold">
             <li class="mb-3 text-lg font-extrabold text-black dark:text-white">Kontak</li>
             <li v-if="settings.generalContacts.email">
-              <a :href="`mailto:${settings.generalContacts.email}`" class="inline-block text-sm text-gray transition hover:text-secondary">
+              <a :href="`mailto:${settings.generalContacts.email}`" class="inline-block text-sm font-medium text-gray-700 transition hover:text-secondary dark:text-gray-300">
                 {{ settings.generalContacts.email }}
               </a>
             </li>
             <li v-if="settings.generalContacts.phone">
-              <a :href="telephoneHref(settings.generalContacts.phone)" class="inline-block text-sm text-gray transition hover:text-secondary">
+              <a :href="telephoneHref(settings.generalContacts.phone)" class="inline-block text-sm font-medium text-gray-700 transition hover:text-secondary dark:text-gray-300">
                 {{ settings.generalContacts.phone }}
               </a>
             </li>
             <li v-for="contact in contacts" :key="contact._id">
-              <a :href="telephoneHref(contact.phone)" class="inline-block text-sm text-gray transition hover:text-secondary">
+              <a :href="telephoneHref(contact.phone)" class="inline-block text-sm font-medium text-gray-700 transition hover:text-secondary dark:text-gray-300">
                 {{ contact.phone }} ({{ contact.name }})
               </a>
             </li>
@@ -114,14 +114,14 @@ function telephoneHref(phone: string) {
     <!-- Bottom bar -->
     <div class="bg-gradient-to-r from-[#FCF1F4] to-[#EDFBF9] py-5 dark:border-t-2 dark:border-white/5 dark:bg-none">
       <div class="container">
-        <div class="flex flex-col items-center justify-between gap-2 text-center font-bold dark:text-white md:flex-row">
+        <div class="flex flex-col items-center justify-between gap-2 text-center font-bold text-gray-800 dark:text-white md:flex-row">
           <div class="text-sm">
             Copyright &copy; {{ new Date().getFullYear() }}
-            <NuxtLink to="/" class="text-primary transition hover:text-secondary">{{ settings.copyrightText || settings.siteName }}</NuxtLink>
+            <NuxtLink to="/" class="text-sky-700 transition hover:text-secondary dark:text-primary">{{ settings.copyrightText || settings.siteName }}</NuxtLink>
           </div>
           <div class="text-sm">
             Need help?
-            <NuxtLink to="/contact-us" class="text-secondary transition hover:text-primary">Contact Us</NuxtLink>
+            <NuxtLink to="/contact-us" class="text-purple-700 font-bold transition hover:text-primary dark:text-primary">Contact Us</NuxtLink>
           </div>
         </div>
       </div>

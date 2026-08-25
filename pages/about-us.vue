@@ -24,8 +24,8 @@ const missions = [
       <div class="container">
         <div class="items-center justify-between py-10 md:flex md:h-[400px] md:py-0">
           <div class="heading relative mb-0 text-center md:text-left">
-            <h6 class="!text-white">About Us</h6>
-            <h4 class="!text-white">KJPP Henricus Judi Adrianto dan Rekan</h4>
+            <span class="subtitle !text-white">About Us</span>
+            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">KJPP Henricus Judi Adrianto dan Rekan</h1>
           </div>
         </div>
       </div>
@@ -39,11 +39,11 @@ const missions = [
             <h2 class="mt-2 mb-4 text-2xl font-bold text-black dark:text-white">
               Siapa <span class="text-primary">kami?</span>
             </h2>
-            <h3 class="mb-6 text-xl font-bold text-black dark:text-white">
+            <p class="mb-6 text-xl font-bold text-black dark:text-white">
               Kami merupakan perusahaan Jasa Penilai Publik yang berdiri dengan tujuan untuk memberikan
               jasa layanan konsultasi penilaian publik.
-            </h3>
-            <p class="text-gray leading-relaxed">
+            </p>
+            <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
               KJPP Henricus Judi Adrianto dan Rekan berdiri pada 28 November 2013. Perusahaan kami
               berdiri berdasarkan Akta Notaris (Terdahulu) Linda Aprianti No. 114 Tanggal 31 Oktober
               2013 dan Akta Notaris (Perubahan Terbaru) Linta Aprianti No.01 Tanggal 3 Agustus 2019.
@@ -60,10 +60,10 @@ const missions = [
     <section class="py-14 lg:py-[100px]">
       <div class="container">
         <div class="heading text-center lg:text-left">
-          <h6 class="!text-black !text-lg font-bold dark:!text-primary">Visi Kami</h6>
-          <h4>Menjadi Perusahaan Penilai yang terpercaya dan lebih baik di Indonesia.</h4>
+          <span class="subtitle !text-black dark:!text-primary">Visi Kami</span>
+          <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Menjadi Perusahaan Penilai yang terpercaya dan lebih baik di Indonesia.</h2>
         </div>
-        <p class="mb-6 text-lg font-semibold text-gray">Misi kami sebagai Perusahaan Penilai:</p>
+        <p class="mb-6 text-lg font-semibold text-gray-700 dark:text-gray-300">Misi kami sebagai Perusahaan Penilai:</p>
         <div class="grid gap-[30px] sm:grid-cols-2 lg:grid-cols-2">
           <div
             v-for="mission in missions"
@@ -81,8 +81,8 @@ const missions = [
     <section class="bg-black py-14 lg:py-20">
       <div class="container">
         <div class="heading text-center">
-          <h6>Tim Kami</h6>
-          <h4 class="!text-white">Tim <span class="text-primary">Pimpinan</span></h4>
+          <span class="subtitle">Tim Kami</span>
+          <h2 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Tim <span class="text-primary">Pimpinan</span></h2>
         </div>
 
         <div v-if="leaders.length === 0" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -106,7 +106,7 @@ const missions = [
             <div class="mt-4">
               <h3 class="font-extrabold text-white text-lg leading-snug">{{ leader.name }}</h3>
               <p class="text-primary font-semibold mt-1">{{ leader.position }}</p>
-              <p v-if="leader.bio" class="text-gray text-sm mt-2">{{ leader.bio }}</p>
+              <p v-if="leader.bio" class="text-gray-300 text-sm mt-2">{{ leader.bio }}</p>
             </div>
           </div>
         </div>

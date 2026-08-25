@@ -42,7 +42,7 @@ async function submitForm() {
       <div class="container">
         <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
           <div class="heading mb-0 text-center md:text-left">
-            <h4 class="!text-white">Contact Us</h4>
+            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Contact Us</h1>
           </div>
         </div>
       </div>
@@ -53,7 +53,7 @@ async function submitForm() {
       <div class="container">
         <div class="relative z-10 lg:flex lg:gap-16">
           <div class="heading text-center lg:text-left">
-            <h4>Get in touch with us</h4>
+            <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Get in touch with us</h2>
           </div>
         </div>
 
@@ -94,8 +94,8 @@ async function submitForm() {
     <section class="py-14 lg:py-[50px]">
       <div class="container">
         <div class="heading text-center">
-          <h6>Lokasi Kami</h6>
-          <h4>Kantor & Cabang</h4>
+          <p class="subtitle">Lokasi Kami</p>
+          <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Kantor & Cabang</h2>
         </div>
 
         <div v-if="branches.length === 0" class="text-center text-gray py-10">Memuat data lokasi...</div>

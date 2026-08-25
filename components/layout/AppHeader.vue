@@ -56,8 +56,8 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
             <!-- Header menu on mobile (Logo & Close) -->
             <div class="flex items-center justify-between p-5 lg:hidden border-b border-gray-800">
               <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" class="h-8" />
-              <button type="button" class="p-2" @click="closeMenu">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-8 w-8 text-white hover:text-primary transition-colors">
+              <button type="button" class="p-2" @click="closeMenu" aria-label="Tutup Menu Navigasi">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-8 w-8 text-white hover:text-primary transition-colors" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -82,12 +82,13 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
             <button
               type="button"
               class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-800 text-white hover:text-primary transition-colors"
+              aria-label="Ganti Tema Warna (Terang / Gelap)"
               @click="store.toggleTheme(store.theme === 'light' ? 'dark' : 'light')"
             >
-              <svg v-if="store.theme === 'light'" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg v-if="store.theme === 'light'" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M8 4C8 8.4 11.6 12 16 12C17.4 12 18.8 11.6 20 11C19.5 16.1 15.2 20 10 20C4.5 20 0 15.5 0 10C0 4.8 4 0.5 9 0C8.4 1.2 8 2.6 8 4ZM2 10C2 14.4 5.6 18 10 18C12.9 18 15.5 16.5 17 14C16.7 14 16.4 14 16 14C10.5 14 6 9.5 6 4C6 3.7 6 3.4 6 3C3.6 4.4 2 7.1 2 10Z" fill="currentColor" />
               </svg>
-              <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg v-else width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M10 15C8.67392 15 7.40215 14.4732 6.46447 13.5355C5.52678 12.5979 5 11.3261 5 10C5 8.67392 5.52678 7.40215 6.46447 6.46447C7.40215 5.52678 8.67392 5 10 5C11.3261 5 12.5979 5.52678 13.5355 6.46447C14.4732 7.40215 15 8.67392 15 10C15 11.3261 14.4732 12.5979 13.5355 13.5355C12.5979 14.4732 11.3261 15 10 15Z" fill="currentColor" />
                 <path d="M9.09091 0.909092C9.09091 0.407014 9.49792 0 10 0C10.5021 0 10.9091 0.407014 10.9091 0.909092V1.81818C10.9091 2.32026 10.5021 2.72727 10 2.72727C9.49792 2.72727 9.09091 2.32026 9.09091 1.81818V0.909092Z" fill="currentColor" />
               </svg>
@@ -97,9 +98,10 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
             <button
               type="button"
               class="flex h-10 w-10 items-center justify-center rounded-md bg-primary lg:hidden text-white"
+              aria-label="Buka Menu Navigasi"
               @click="toggleMenu"
             >
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>

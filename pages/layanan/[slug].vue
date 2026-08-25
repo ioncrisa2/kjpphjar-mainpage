@@ -57,7 +57,7 @@ useHead({
       <div class="container">
         <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
           <div class="heading mb-0 text-center md:text-left">
-            <h4 class="!text-white">{{ service.title }}</h4>
+            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">{{ service.title }}</h1>
           </div>
         </div>
       </div>
