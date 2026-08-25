@@ -4,11 +4,15 @@ useHead({
   meta: [{ name: 'description', content: 'Galeri foto kegiatan dan momen KJPP Henricus Judi Adrianto dan Rekan.' }],
 })
 
-const activeCategory = ref('all')
-const visible = ref(false)
-const currentIndex = ref(0)
+import Lightgallery from 'lightgallery/vue'
+import lgZoom from 'lightgallery/plugins/zoom'
+import lgThumbnail from 'lightgallery/plugins/thumbnail'
 
-const { data, refresh } = await useFetch('/api/gallery')
+const plugins = [lgZoom, lgThumbnail]
+
+const activeCategory = ref('all')
+
+const { data } = await useFetch('/api/gallery')
 
 const categories = computed(() => ['all', ...(data.value?.categories || [])])
 
@@ -18,14 +22,7 @@ const filteredPhotos = computed(() => {
   return all.filter((p: Record<string, string>) => p.category === activeCategory.value)
 })
 
-const lightboxImages = computed(() =>
-  filteredPhotos.value.map((p: Record<string, string>) => ({ src: p.imageUrl, alt: p.title || "Galeri KJPP HJA'R" }))
-)
 
-function openLightbox(index: number) {
-  currentIndex.value = index
-  visible.value = true
-}
 </script>
 
 <template>
@@ -34,7 +31,7 @@ function openLightbox(index: number) {
     <div class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
       <div class="container">
         <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
-          <div class="heading mb-0 text-center ltr:md:text-left">
+          <div class="heading mb-0 text-center md:text-left">
             <h4 class="!text-white">Galeri</h4>
           </div>
         </div>
@@ -68,35 +65,30 @@ function openLightbox(index: number) {
           Belum ada foto di galeri.
         </div>
 
-        <div v-else class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6">
-          <div
-            v-for="(photo, index) in filteredPhotos"
-            :key="photo._id"
-            class="cursor-pointer overflow-hidden rounded-[24px]"
-            data-aos="fade-up"
-            data-aos-duration="800"
-            @click="openLightbox(index)"
-          >
-            <img
-              :src="photo.thumbnailUrl"
-              :alt="photo.title || 'Galeri'"
-              class="h-56 w-full object-cover transition duration-500 hover:scale-110"
-              loading="lazy"
-            />
-          </div>
+        <div v-else :key="activeCategory">
+          <ClientOnly>
+            <lightgallery
+              :settings="{ speed: 500, plugins: plugins, download: false }"
+              class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6"
+            >
+              <a
+                v-for="photo in filteredPhotos"
+                :key="photo._id"
+                :href="photo.imageUrl"
+                :data-src="photo.imageUrl"
+                :data-sub-html="photo.title"
+                class="cursor-pointer overflow-hidden rounded-[24px] block"
+              >
+                <img
+                  :src="photo.thumbnailUrl"
+                  :alt="photo.title || 'Galeri'"
+                  class="h-56 w-full object-cover transition duration-500 hover:scale-110"
+                  loading="lazy"
+                />
+              </a>
+            </lightgallery>
+          </ClientOnly>
         </div>
-
-        <!-- Lightbox -->
-        <ClientOnly>
-          <VueEasyLightbox
-            :visible="visible"
-            :imgs="lightboxImages"
-            :index="currentIndex"
-            move-disabled
-            loop
-            @hide="visible = false"
-          />
-        </ClientOnly>
       </div>
     </section>
   </div>
