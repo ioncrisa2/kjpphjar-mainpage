@@ -78,8 +78,8 @@ async function submitForm() {
             <input v-model="form.slug" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm" required>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700">Icon (Nama atau Class)</label>
-            <input v-model="form.icon" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Icon Layanan</label>
+            <AdminIconPicker v-model="form.icon" />
           </div>
           <div class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700">Deskripsi Singkat (Tampil di card beranda)</label>
@@ -88,10 +88,6 @@ async function submitForm() {
           <div class="md:col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-2">Konten Lengkap</label>
             <UiWysiwygEditor v-model="form.content" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Urutan (Order)</label>
-            <input v-model="form.order" type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
           </div>
           <div class="flex items-center pt-6">
             <input v-model="form.isActive" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
