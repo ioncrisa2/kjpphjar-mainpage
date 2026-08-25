@@ -23,6 +23,13 @@ const breadcrumbLabel = computed(() => {
   return segments.map((s) => map[s] || s).join(' / ')
 })
 
+const { unreadCount, fetchUnreadCount } = useUnreadContacts()
+const { data: adminInfo } = useFetch<{ authenticated: boolean; username?: string; name?: string }>('/api/auth/me')
+
+onMounted(() => {
+  fetchUnreadCount()
+})
+
 async function logout() {
   await $fetch('/api/auth/logout', { method: 'POST' })
   await navigateTo('/admin/login')
@@ -36,13 +43,33 @@ async function logout() {
     </div>
 
     <div class="flex items-center gap-3">
-      <!-- Inbox Link -->
+      <!-- Admin Profile Quick Link -->
+      <NuxtLink
+        to="/admin/settings"
+        class="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-bold text-black hover:bg-stone-100 dark:text-white dark:hover:bg-gray-800 transition"
+        title="Buka Profil & Pengaturan Admin"
+      >
+        <div class="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">
+          <Icon name="ph:user-bold" class="h-3.5 w-3.5" />
+        </div>
+        <span class="hidden md:inline">{{ adminInfo?.name || 'Administrator' }}</span>
+      </NuxtLink>
+
+      <div class="h-4 w-px bg-gray/20"></div>
+
+      <!-- Inbox Link with Badge -->
       <NuxtLink
         to="/admin/contacts"
         class="relative inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-stone-100 hover:text-primary dark:text-gray-300 dark:hover:bg-gray-800"
       >
         <Icon name="ph:envelope-simple-bold" class="h-4 w-4" aria-hidden="true" />
         <span>Inbox</span>
+        <span
+          v-if="unreadCount > 0"
+          class="inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white shadow-xs animate-pulse"
+        >
+          {{ unreadCount > 99 ? '99+' : unreadCount }}
+        </span>
       </NuxtLink>
 
       <div class="h-4 w-px bg-gray/20"></div>

@@ -13,6 +13,18 @@ const query = computed(() => {
 
 const { data, refresh, pending } = await useFetch('/api/contacts', { query })
 
+const { unreadCount, setUnreadCount, decrementUnread } = useUnreadContacts()
+
+watch(
+  data,
+  (val) => {
+    if (val?.unread !== undefined) {
+      setUnreadCount(val.unread)
+    }
+  },
+  { immediate: true }
+)
+
 const contacts = computed(() => data.value?.items || [])
 
 const selectedContact = ref<any>(null)
@@ -29,7 +41,7 @@ async function openDetail(contact: any) {
         body: { isRead: true }
       })
       contact.isRead = true
-      refresh() // update badge count in layout eventually
+      decrementUnread()
     } catch (err) {
       console.error('Failed to mark as read', err)
     }
@@ -44,23 +56,36 @@ watch(showUnreadOnly, () => {
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Inbox Pesan</h1>
         <p class="mt-1 text-sm text-gray">Pesan dari pengunjung website via form Contact Us.</p>
       </div>
+
+      <!-- Export to Excel Button -->
+      <div>
+        <a
+          href="/api/contacts/export"
+          download
+          class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700"
+          title="Download semua data pesan kontak ke file Excel (.csv)"
+        >
+          <Icon name="ph:microsoft-excel-logo-bold" class="h-4 w-4" aria-hidden="true" />
+          <span>Export ke Excel</span>
+        </a>
+      </div>
     </div>
 
     <!-- Filters -->
-    <div class="bg-white p-4 rounded-lg shadow border border-gray-200 flex justify-between items-center">
+    <div class="bg-white p-4 rounded-xl shadow-xs border border-gray/10 flex justify-between items-center dark:bg-gray-dark">
       <div class="flex items-center space-x-2">
-        <label class="text-sm font-medium text-gray-700">Filter:</label>
-        <select v-model="showUnreadOnly" class="border border-gray-300 rounded-md text-sm py-1 px-2">
+        <label class="text-xs font-bold text-gray uppercase tracking-wider">Filter:</label>
+        <select v-model="showUnreadOnly" class="border border-gray/20 rounded-lg text-xs py-1.5 px-3 bg-stone-50 dark:bg-gray-800 dark:text-white outline-none">
           <option :value="false">Semua Pesan</option>
           <option :value="true">Belum Dibaca</option>
         </select>
       </div>
-      <div class="text-sm text-gray-500">
+      <div class="text-xs font-semibold text-gray">
         Total: {{ data?.total || 0 }} pesan
       </div>
     </div>

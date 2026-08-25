@@ -73,6 +73,12 @@ const openCategories = ref<Record<string, boolean>>({
   settings: true,
 })
 
+const { unreadCount, fetchUnreadCount } = useUnreadContacts()
+
+onMounted(() => {
+  fetchUnreadCount()
+})
+
 function isItemActive(itemTo: string): boolean {
   if (itemTo === '/admin') {
     return route.path === '/admin'
@@ -159,7 +165,13 @@ function toggleCategory(key: string) {
               ></span>
 
               <Icon :name="item.icon" class="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span>{{ item.label }}</span>
+              <span class="flex-1">{{ item.label }}</span>
+              <span
+                v-if="item.to === '/admin/contacts' && unreadCount > 0"
+                class="inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white shadow-xs"
+              >
+                {{ unreadCount > 99 ? '99+' : unreadCount }}
+              </span>
             </NuxtLink>
           </div>
         </Transition>
