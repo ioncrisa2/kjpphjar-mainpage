@@ -41,7 +41,7 @@ async function submitForm() {
     <div class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
       <div class="container">
         <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
-          <div class="heading mb-0 text-center ltr:md:text-left">
+          <div class="heading mb-0 text-center md:text-left">
             <h4 class="!text-white">Contact Us</h4>
           </div>
         </div>
@@ -52,7 +52,7 @@ async function submitForm() {
     <section class="bg-gradient-to-t from-white/[55%] to-transparent py-14 dark:bg-none lg:py-[50px]">
       <div class="container">
         <div class="relative z-10 lg:flex lg:gap-16">
-          <div class="heading text-center ltr:lg:text-left">
+          <div class="heading text-center lg:text-left">
             <h4>Get in touch with us</h4>
           </div>
         </div>
@@ -105,12 +105,19 @@ async function submitForm() {
             v-for="branch in branches"
             :key="branch._id"
             class="flex flex-col gap-6 rounded-[32px] border border-gray/10 overflow-hidden sm:flex-row"
-            data-aos="fade-up"
-            data-aos-duration="800"
           >
             <!-- Map -->
             <ClientOnly>
-              <div :id="`map-branch-${branch._id}`" class="sm:w-1/2 h-64 sm:h-auto min-h-[250px]" />
+              <BranchMap
+                v-if="branch.latitude && branch.longitude"
+                :lat="branch.latitude"
+                :lng="branch.longitude"
+                :title="branch.name"
+                class="sm:w-1/2 h-64 sm:h-auto min-h-[250px]"
+              />
+              <div v-else class="sm:w-1/2 h-64 sm:h-auto min-h-[250px] bg-gray-100 flex items-center justify-center text-gray-500">
+                Peta tidak tersedia
+              </div>
               <template #fallback>
                 <div class="sm:w-1/2 h-64 bg-gray/10 animate-pulse" />
               </template>
