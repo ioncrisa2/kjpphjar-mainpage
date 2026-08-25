@@ -109,7 +109,7 @@ function toggleCategory(key: string) {
 </script>
 
 <template>
-  <aside class="flex h-screen w-64 flex-col border-r border-gray/10 bg-white dark:bg-gray-dark select-none">
+  <aside class="flex h-screen w-64 shrink-0 flex-col border-r border-gray/10 bg-white dark:bg-gray-dark select-none sticky top-0">
     <!-- Logo -->
     <div class="flex items-center gap-3 border-b border-gray/10 px-5 py-4 shrink-0">
       <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" width="128" height="32" class="h-8 w-auto" />
