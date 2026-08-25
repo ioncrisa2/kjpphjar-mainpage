@@ -33,6 +33,8 @@
 
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 const props = defineProps({
   modelValue: {

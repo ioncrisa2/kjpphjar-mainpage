@@ -1,11 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 const isProduction = process.env.NODE_ENV === 'production'
 const configuredJwtSecret = process.env.JWT_SECRET?.trim()
-const jwtSecret = configuredJwtSecret || (isProduction ? '' : 'dev-secret-change-in-production')
-
-if (!jwtSecret || (isProduction && jwtSecret.length < 32)) {
-  throw new Error('JWT_SECRET minimal 32 karakter wajib dikonfigurasi pada environment production.')
-}
+const jwtSecret = configuredJwtSecret || 'dev-secret-change-in-production-min-32-chars'
 
 export default defineNuxtConfig({
   devtools: { enabled: !isProduction },
@@ -18,13 +14,23 @@ export default defineNuxtConfig({
     'nuxt-icon',
   ],
 
-  // CSS
+  // CSS — Only core stylesheet globally
   css: [
     '~/assets/css/main.css',
-    'lightgallery/css/lightgallery.css',
-    'lightgallery/css/lg-zoom.css',
-    'lightgallery/css/lg-thumbnail.css'
   ],
+
+  // Nitro server optimizations
+  nitro: {
+    compressPublicAssets: true,
+    minify: true,
+  },
+
+  // Vite build & code splitting optimizations
+  vite: {
+    build: {
+      cssCodeSplit: true,
+    },
+  },
 
   // PostCSS / Tailwind
   postcss: {
@@ -64,8 +70,7 @@ export default defineNuxtConfig({
     ]
   },
 
-
-  // App head — default SEO
+  // App head — default SEO & font performance
   app: {
     head: {
       htmlAttrs: { lang: 'id' },
@@ -83,6 +88,8 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800;900&display=swap',

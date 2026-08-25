@@ -223,6 +223,9 @@ function formatDate(value: string) {
 </template>
 
 <style>
+@import 'lightgallery/css/lightgallery.css';
+@import 'lightgallery/css/lg-zoom.css';
+
 .blog-article li[data-list='bullet'] {
   list-style-type: disc;
 }
