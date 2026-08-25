@@ -1,24 +1,41 @@
+const fa5ToFa6Map: Record<string, string> = {
+  'project-diagram': 'diagram-project',
+  'hard-hat': 'helmet-safety',
+  'search-dollar': 'magnifying-glass-dollar',
+  'home': 'house',
+  'money-bill-wave': 'money-bill-1-wave',
+  'hand-holding-usd': 'hand-holding-dollar',
+  'university': 'landmark',
+}
+
 export const getNuxtIconName = (iconClass: string | undefined): string => {
   if (!iconClass) return 'fa6-solid:circle-question'
 
-  // If it's already in the Iconify format (contains a colon), return as is
-  if (iconClass.includes(':')) return iconClass
+  let iconName = iconClass.trim()
 
-  // Convert font-awesome solid classes
-  if (iconClass.includes('fas fa-')) {
-    return 'fa6-solid:' + iconClass.replace('fas fa-', '').trim()
+  // Handle prefix with colon e.g. "fa6-solid:hard-hat"
+  if (iconName.includes(':')) {
+    const parts = iconName.split(':')
+    const prefix = parts[0]
+    const name = parts.slice(1).join(':')
+    const mapped = fa5ToFa6Map[name] || name
+    return `${prefix}:${mapped}`
   }
 
-  // Convert font-awesome regular classes
-  if (iconClass.includes('far fa-')) {
-    return 'fa6-regular:' + iconClass.replace('far fa-', '').trim()
+  // Handle legacy Font Awesome class names (fas fa-..., far fa-..., fab fa-...)
+  if (iconName.startsWith('fas fa-')) {
+    iconName = iconName.replace('fas fa-', '')
+  } else if (iconName.startsWith('far fa-')) {
+    const name = iconName.replace('far fa-', '')
+    return `fa6-regular:${fa5ToFa6Map[name] || name}`
+  } else if (iconName.startsWith('fab fa-')) {
+    const name = iconName.replace('fab fa-', '')
+    return `fa6-brands:${fa5ToFa6Map[name] || name}`
+  } else if (iconName.startsWith('fa-')) {
+    iconName = iconName.replace('fa-', '')
   }
 
-  // Convert font-awesome brands
-  if (iconClass.includes('fab fa-')) {
-    return 'fa6-brands:' + iconClass.replace('fab fa-', '').trim()
-  }
-
-  // Fallback: assume it's fa6-solid if just a simple string
-  return 'fa6-solid:' + iconClass.replace('fa-', '').trim()
+  const mappedName = fa5ToFa6Map[iconName] || iconName
+  return `fa6-solid:${mappedName}`
 }
+

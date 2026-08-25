@@ -49,19 +49,20 @@ onUnmounted(() => {
 
 // A curated list of popular icons for services
 const popularIcons = [
-  'fa6-solid:building', 'fa6-solid:chart-line', 'fa6-solid:project-diagram',
-  'fa6-solid:hard-hat', 'fa6-solid:file-contract', 'fa6-solid:search-dollar',
-  'fa6-solid:handshake', 'fa6-solid:users', 'fa6-solid:home',
+  'fa6-solid:building', 'fa6-solid:chart-line', 'fa6-solid:diagram-project',
+  'fa6-solid:helmet-safety', 'fa6-solid:file-contract', 'fa6-solid:magnifying-glass-dollar',
+  'fa6-solid:handshake', 'fa6-solid:users', 'fa6-solid:house',
   'fa6-solid:city', 'fa6-solid:map-location-dot', 'fa6-solid:scale-balanced',
   'fa6-solid:briefcase', 'fa6-solid:calculator', 'fa6-solid:magnifying-glass-chart',
   'fa6-solid:building-user', 'fa6-solid:industry', 'fa6-solid:shop',
   'fa6-solid:gavel', 'fa6-solid:coins', 'fa6-solid:money-bill-trend-up',
   'fa6-solid:chart-pie', 'fa6-solid:pen-ruler', 'fa6-solid:house-laptop',
 
-  // Alternative generic icons
+  // Alternative generic icons (Phosphor icons)
   'ph:buildings-bold', 'ph:chart-line-up-bold', 'ph:presentation-chart-bold',
-  'ph:handshake-bold', 'ph:users-three-bold', 'ph:calculator-bold',
-  'ph:money-bold', 'ph:file-text-bold', 'ph:gavel-bold', 'ph:scales-bold'
+  'ph:hard-hat-bold', 'ph:handshake-bold', 'ph:users-three-bold',
+  'ph:calculator-bold', 'ph:money-bold', 'ph:file-text-bold',
+  'ph:gavel-bold', 'ph:scales-bold'
 ]
 
 const filteredIcons = computed(() => {
