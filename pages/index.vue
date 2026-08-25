@@ -10,16 +10,36 @@ useHead({
     { property: 'og:title', content: "KJPP HJA'R | Penilai Publik & Konsultan Independen" },
     { property: 'og:description', content: 'Jasa penilai publik dan konsultan independen terpercaya.' },
   ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "KJPP Henricus Judi Adrianto dan Rekan",
+        "image": "https://kjpphjar.com/assets/images/h-logo.png",
+        "@id": "https://kjpphjar.com",
+        "url": "https://kjpphjar.com",
+        "telephone": "+628117101066",
+        "description": "Perusahaan jasa penilai publik dan konsultan independen berpengalaman.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Gedung Kantor Pusat",
+          "addressLocality": "Jakarta",
+          "addressRegion": "DKI Jakarta",
+          "addressCountry": "ID"
+        }
+      })
+    }
+  ]
 })
 
 // Fetch services and featured gallery
 const { data: servicesData } = await useFetch('/api/services')
 const { data: galleryData } = await useFetch('/api/gallery', { query: { featured: 'true', limit: 6 } })
-const { data: leadersData } = await useFetch('/api/leaders')
 
 const services = computed(() => servicesData.value || [])
 const featuredPhotos = computed(() => galleryData.value?.items || [])
-const leaders = computed(() => leadersData.value || [])
 
 const chooseUs = [
   { title: 'Tim Solid', desc: 'Didukung tim manajemen yang solid dan berkualitas tinggi', image: '/assets/images/team.jpg' },
@@ -28,15 +48,6 @@ const chooseUs = [
   { title: 'Kerahasiaan', desc: 'Kami menjamin kerahasiaan data Anda sesuai dengan pakta integritas.', image: '/assets/images/rahasia.jpg' },
 ]
 
-// Service icon map (static SVG components by slug)
-const serviceIcons: Record<string, string> = {
-  consulting: 'consulting',
-  'feasibility-study': 'feasibility',
-  'project-supervision': 'supervision',
-  'asset-valuation': 'asset',
-  'project-valuation': 'valuation',
-  monitoring: 'monitoring',
-}
 </script>
 
 <template>
@@ -45,7 +56,7 @@ const serviceIcons: Record<string, string> = {
     <section class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-center bg-no-repeat pt-[82px] text-white lg:pt-[106px]">
       <div class="container">
         <div class="flex flex-col gap-7 pt-6 md:flex-row md:gap-0">
-          <div class="space-y-5 pt-24 pb-10 text-center ltr:md:text-left">
+          <div class="space-y-5 pt-24 pb-10 text-center md:text-left">
             <h5 class="text-xl font-bold">Selamat Datang</h5>
             <h1 class="text-3xl font-black uppercase sm:leading-tight lg:text-4xl">
               KJPP Henricus Judi Adrianto dan Rekan
@@ -88,19 +99,24 @@ const serviceIcons: Record<string, string> = {
             v-for="service in services"
             :key="service._id"
             :to="`/layanan/${service.slug}`"
-            class="group text-center"
+            class="group flex gap-5 md:gap-6 text-left"
           >
-            <div class="mb-6 flex justify-center">
-              <div
-                class="flex h-[100px] w-[100px] items-center justify-center rounded-full bg-primary/10 transition duration-300 group-hover:bg-primary/20"
-                v-html="service.icon"
-              />
+            <div class="shrink-0 text-5xl text-primary">
+              <ClientOnly>
+                <Icon :name="getNuxtIconName(service.icon)" />
+              </ClientOnly>
             </div>
-            <h3 class="text-black dark:text-white text-xl font-extrabold transition group-hover:text-primary">
-              {{ service.title }}
-            </h3>
-            <p class="mt-3 text-sm font-medium text-gray">{{ service.titleEn }}</p>
-            <p class="mt-4 text-base text-gray leading-relaxed">{{ service.description }}</p>
+            <div>
+              <h3 class="text-black dark:text-white text-xl md:text-2xl font-extrabold transition group-hover:text-primary">
+                {{ service.title }}
+              </h3>
+              <p v-if="service.titleEn" class="mt-2 text-base md:text-lg font-bold text-black/80 dark:text-white/80">
+                ({{ service.titleEn }})
+              </p>
+              <p class="mt-3 text-base md:text-lg text-gray leading-relaxed">
+                {{ service.description }}
+              </p>
+            </div>
           </NuxtLink>
         </div>
 
@@ -124,7 +140,7 @@ const serviceIcons: Record<string, string> = {
             Kenapa <span class="text-primary">Memilih kami</span>?
           </h4>
         </div>
-        <div class="mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 lg:grid-cols-2" data-aos="zoom-in" data-aos-duration="1000">
+        <div class="mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 lg:grid-cols-2">
           <div v-for="(item, index) in chooseUs" :key="index" class="group">
             <div class="overflow-hidden">
               <img :src="item.image" class="w-full duration-200 group-hover:rotate-2 group-hover:scale-110" :alt="item.title" />
@@ -157,7 +173,7 @@ const serviceIcons: Record<string, string> = {
               </NuxtLink>
             </div>
           </div>
-          <div class="grid grid-cols-2 items-center gap-3 sm:gap-7" data-aos="zoom-in" data-aos-duration="1000">
+          <div class="grid grid-cols-2 items-center gap-3 sm:gap-7">
             <div class="border border-transparent bg-gray/20 py-10 px-5 text-center duration-200 hover:border-secondary sm:py-[52px]">
               <span class="text-[34px] font-black text-white">5000+</span>
               <p class="mt-2.5 font-bold text-gray">Pelanggan Puas</p>
@@ -183,8 +199,6 @@ const serviceIcons: Record<string, string> = {
             v-for="photo in featuredPhotos"
             :key="photo._id"
             class="overflow-hidden rounded-2xl"
-            data-aos="fade-up"
-            data-aos-duration="800"
           >
             <img
               :src="photo.thumbnailUrl"
