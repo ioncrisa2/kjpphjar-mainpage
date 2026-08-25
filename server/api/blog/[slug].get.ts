@@ -1,20 +1,21 @@
 import { BlogPost } from '~/server/models/BlogPost'
 import { connectDB } from '~/server/utils/db'
+import { getPublicBlogFilter, sanitizePlainText, toBlogPostDto } from '~/server/utils/blog'
 
 export default defineEventHandler(async (event) => {
   await connectDB()
-  const slug = getRouterParam(event, 'slug')
+  const slug = sanitizePlainText(getRouterParam(event, 'slug'), 180)
 
-  const post = await BlogPost.findOne({ slug })
+  const post = await BlogPost.findOne({ $and: [{ slug }, getPublicBlogFilter()] })
+    .populate({
+      path: 'categoryId',
+      select: 'name slug description isActive createdAt updatedAt',
+      match: { isActive: true },
+    })
+    .lean()
   if (!post) {
     throw createError({ statusCode: 404, statusMessage: 'Artikel tidak ditemukan' })
   }
 
-  // Only admins can view drafts
-  const isAdmin = event.context.path?.startsWith('/api/admin') || getQuery(event).admin === 'true'
-  if (!post.isPublished && !isAdmin) {
-     throw createError({ statusCode: 404, statusMessage: 'Artikel tidak ditemukan' })
-  }
-
-  return post
+  return toBlogPostDto(post as any)
 })

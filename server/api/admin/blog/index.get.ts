@@ -1,10 +1,10 @@
+import mongoose from 'mongoose'
 import { BlogPost } from '~/server/models/BlogPost'
-import { Category } from '~/server/models/Category'
 import { connectDB } from '~/server/utils/db'
 import {
   clampPagination,
   escapeRegex,
-  getPublicBlogFilter,
+  normalizeStatus,
   sanitizePlainText,
   toBlogPostDto,
 } from '~/server/utils/blog'
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   await connectDB()
   const query = getQuery(event)
   const { page, limit, skip } = clampPagination(query.page, query.limit)
-  const filters: Record<string, any>[] = [getPublicBlogFilter() as any]
+  const filters: Record<string, any>[] = []
 
   const search = sanitizePlainText(query.q || query.search, 80)
   if (search) {
@@ -21,31 +21,28 @@ export default defineEventHandler(async (event) => {
     filters.push({ $or: [{ title: regex }, { excerpt: regex }, { tags: regex }] })
   }
 
-  const categorySlug = sanitizePlainText(query.category, 100)
-  if (categorySlug) {
-    const category = await Category.findOne({ slug: categorySlug, isActive: true }).select('_id').lean()
-    if (!category) return { items: [], total: 0, page, totalPages: 0 }
-    filters.push({ categoryId: category._id })
+  const requestedStatus = sanitizePlainText(query.status, 20)
+  if (requestedStatus) {
+    const status = normalizeStatus(requestedStatus)
+    if (status === 'published') {
+      filters.push({ $or: [{ status: 'published' }, { status: { $exists: false }, isPublished: true }] })
+    } else if (status === 'draft') {
+      filters.push({ $or: [{ status: 'draft' }, { status: { $exists: false }, isPublished: { $ne: true } }] })
+    } else {
+      filters.push({ status: 'scheduled' })
+    }
   }
 
-  const tag = sanitizePlainText(query.tag, 40)
-  if (tag) filters.push({ tags: new RegExp(`^${escapeRegex(tag)}$`, 'i') })
+  const categoryId = sanitizePlainText(query.categoryId, 30)
+  if (categoryId && mongoose.isValidObjectId(categoryId)) filters.push({ categoryId })
   if (String(query.featured) === 'true') filters.push({ isFeatured: true })
 
-  const excludeId = sanitizePlainText(query.exclude, 30)
-  if (excludeId && /^[a-f\d]{24}$/i.test(excludeId)) filters.push({ _id: { $ne: excludeId } })
-
-  const filter = { $and: filters }
-
+  const filter = filters.length ? { $and: filters } : {}
   const [items, total] = await Promise.all([
     BlogPost.find(filter)
       .select('-content')
-      .populate({
-        path: 'categoryId',
-        select: 'name slug description isActive createdAt updatedAt',
-        match: { isActive: true },
-      })
-      .sort({ publishedAt: -1, createdAt: -1 })
+      .populate('categoryId', 'name slug description isActive createdAt updatedAt')
+      .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean(),
