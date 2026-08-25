@@ -39,12 +39,18 @@ export async function processUploadedImage(
     return await image
       .rotate()
       .resize({
-        width: options.maxWidth || 1800,
-        height: options.maxHeight || 1800,
+        width: options.maxWidth || 1920,
+        height: options.maxHeight || 1920,
         fit: 'inside',
         withoutEnlargement: true,
+        kernel: sharp.kernel.lanczos3,
       })
-      .webp({ quality: options.quality || 84, effort: 4 })
+      .webp({
+        quality: options.quality || 85,
+        effort: 6,
+        smartSubsample: true,
+        alphaQuality: 95,
+      })
       .toBuffer()
   } catch (error: any) {
     if (error?.statusCode) throw error
@@ -62,7 +68,7 @@ export async function generateThumbnail(
   return processUploadedImage(input, {
     maxWidth: options.width || 600,
     maxHeight: options.height || 600,
-    quality: options.quality || 80,
+    quality: options.quality || 82,
   })
 }
 
@@ -70,5 +76,9 @@ export async function processUploadedBlogImage(
   input: string | Buffer,
   options: ProcessImageOptions = {},
 ) {
-  return processUploadedImage(input, options)
+  return processUploadedImage(input, {
+    maxWidth: options.maxWidth || 1920,
+    maxHeight: options.maxHeight || 1920,
+    quality: options.quality || 85,
+  })
 }
