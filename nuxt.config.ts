@@ -1,4 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+const isProduction = process.env.NODE_ENV === 'production'
+const configuredJwtSecret = process.env.JWT_SECRET?.trim()
+const jwtSecret = configuredJwtSecret || (isProduction ? '' : 'dev-secret-change-in-production')
+
+if (!jwtSecret || (isProduction && jwtSecret.length < 32)) {
+  throw new Error('JWT_SECRET minimal 32 karakter wajib dikonfigurasi pada environment production.')
+}
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
@@ -7,10 +15,16 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@vueuse/nuxt',
     '@nuxtjs/sitemap',
+    'nuxt-icon',
   ],
 
   // CSS
-  css: ['~/assets/css/main.css'],
+  css: [
+    '~/assets/css/main.css',
+    'lightgallery/css/lightgallery.css',
+    'lightgallery/css/lg-zoom.css',
+    'lightgallery/css/lg-thumbnail.css'
+  ],
 
   // PostCSS / Tailwind
   postcss: {
@@ -24,8 +38,11 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Private — only available server-side
     mongodbUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/kjpphjar_dev',
-    jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',
+    jwtSecret,
     jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    analyticsHashSecret:
+      process.env.ANALYTICS_HASH_SECRET ||
+      jwtSecret,
     smtpHost: process.env.SMTP_HOST || '',
     smtpPort: process.env.SMTP_PORT || '465',
     smtpSecure: process.env.SMTP_SECURE || 'true',
@@ -42,18 +59,11 @@ export default defineNuxtConfig({
   // Sitemap config
   sitemap: {
     strictNuxtContentPaths: false,
+    sources: [
+      '/api/_sitemap-urls'
+    ]
   },
 
-  // Nitro config — for serving /public/uploads as static files
-  nitro: {
-    publicAssets: [
-      {
-        dir: 'public/uploads',
-        baseURL: '/uploads',
-        maxAge: 60 * 60 * 24 * 30, // 30 days cache
-      },
-    ],
-  },
 
   // App head — default SEO
   app: {

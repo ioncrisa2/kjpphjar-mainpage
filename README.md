@@ -48,14 +48,12 @@ npm run dev
 Website publik dapat diakses di: `http://localhost:3000`
 Admin Panel dapat diakses di: `http://localhost:3000/admin/login`
 
-> **Info Login Default Admin:**
-> - Username: `admin`
-> - Password: `admin123`
-> *(Sistem otomatis membuat admin ini saat pertama kali server menyala jika tabel User masih kosong).*
+> **Info bootstrap admin:** akun pertama hanya dibuat pada database kosong bila
+> `ADMIN_USERNAME` dan `ADMIN_PASSWORD` (minimal 12 karakter) tersedia di environment.
 
 ## 📦 Build untuk Production (Hostinger)
 
-Untuk menjalankan di production (misalnya Hostinger Node.js environment):
+Untuk menjalankan di Hostinger Node.js Web App:
 
 1. **Build Project**
    ```sh
@@ -64,10 +62,11 @@ Untuk menjalankan di production (misalnya Hostinger Node.js environment):
 2. **Jalankan Aplikasi**
    Nuxt 3 akan menghasilkan file `.mjs` server di dalam direktori `.output`. Gunakan command berikut untuk menjalankan aplikasi:
    ```sh
-   node .output/server/index.mjs
+   npm run start
    ```
 
-*Pastikan semua Environment Variables disetel (setup) pada menu konfigurasi di Panel Hosting Anda.*
+Gunakan Node.js 22 atau 24, port `3000`, dan set semua environment variables di hPanel.
+Panduan lengkap tersedia di [`docs/deployment-hostinger.md`](docs/deployment-hostinger.md).
 
 ---
 *Dikembangkan dengan ❤️ untuk kelancaran operasional dan pembaruan informasi KJPP HJA'R.*
