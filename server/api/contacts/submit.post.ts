@@ -1,6 +1,7 @@
 import { ContactSubmission } from '~/server/models/ContactSubmission'
 import { connectDB } from '~/server/utils/db'
 import { sendContactNotification } from '~/server/utils/mailer'
+import xss from 'xss'
 
 export default defineEventHandler(async (event) => {
   await connectDB()
@@ -8,29 +9,44 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { fullname, email, message, phone, city, branch } = body
 
+  // Type casting to prevent NoSQL Injection and XSS sanitization
+  const safeFullname = xss(String(fullname || '')).trim()
+  const safeEmail = xss(String(email || '')).trim().toLowerCase()
+  const safeMessage = xss(String(message || '')).trim()
+  const safePhone = phone ? xss(String(phone)).trim() : undefined
+  const safeCity = city ? xss(String(city)).trim() : undefined
+  const safeBranch = branch ? xss(String(branch)).trim() : undefined
+
   // Validation
-  if (!fullname?.trim()) throw createError({ statusCode: 400, statusMessage: 'Nama lengkap wajib diisi' })
-  if (!email?.trim()) throw createError({ statusCode: 400, statusMessage: 'Email wajib diisi' })
-  if (!message?.trim()) throw createError({ statusCode: 400, statusMessage: 'Pesan wajib diisi' })
+  if (!safeFullname) throw createError({ statusCode: 400, statusMessage: 'Nama lengkap wajib diisi' })
+  if (!safeEmail) throw createError({ statusCode: 400, statusMessage: 'Email wajib diisi' })
+  if (!safeMessage) throw createError({ statusCode: 400, statusMessage: 'Pesan wajib diisi' })
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email)) throw createError({ statusCode: 400, statusMessage: 'Format email tidak valid' })
+  if (!emailRegex.test(safeEmail)) throw createError({ statusCode: 400, statusMessage: 'Format email tidak valid' })
 
   const submittedAt = new Date()
 
   const submission = await ContactSubmission.create({
-    fullname: fullname.trim(),
-    email: email.trim().toLowerCase(),
-    message: message.trim(),
-    phone: phone?.trim() || undefined,
-    city: city?.trim() || undefined,
-    branch: branch?.trim() || undefined,
+    fullname: safeFullname,
+    email: safeEmail,
+    message: safeMessage,
+    phone: safePhone,
+    city: safeCity,
+    branch: safeBranch,
     submittedAt,
     isRead: false,
   })
 
   // Send email notification (non-blocking — don't fail the request if email fails)
-  sendContactNotification({ fullname, email, phone, city, message, submittedAt }).catch((err) => {
+  sendContactNotification({
+    fullname: safeFullname,
+    email: safeEmail,
+    phone: safePhone,
+    city: safeCity,
+    message: safeMessage,
+    submittedAt
+  }).catch((err) => {
     console.error('[Contacts] Failed to send email notification:', err)
   })
 

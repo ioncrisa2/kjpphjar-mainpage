@@ -1,13 +1,13 @@
-import { verifyToken } from '~/server/utils/auth'
+import { requireAdmin } from '~/server/utils/require-admin'
 
-export default defineEventHandler((event) => {
-  const token = getCookie(event, 'admin_token')
-  if (!token) return { authenticated: false }
-
+export default defineEventHandler(async (event) => {
   try {
-    const payload = verifyToken(token)
-    return { authenticated: true, username: payload.username }
-  } catch {
-    return { authenticated: false }
+    const admin = await requireAdmin(event)
+    return { authenticated: true, username: admin.username, role: admin.role }
+  } catch (error: any) {
+    if (error?.statusCode === 401 || error?.statusCode === 403) {
+      return { authenticated: false }
+    }
+    throw error
   }
 })
