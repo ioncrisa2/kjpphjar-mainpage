@@ -2,7 +2,8 @@
 definePageMeta({ layout: 'admin', middleware: 'auth' })
 useHead({ title: "Admin Klien | KJPP HJA'R" })
 
-const { data: clients, refresh, pending } = await useFetch('/api/clients')
+const { data: clientsResponse, refresh, pending } = await useFetch('/api/clients?all=true')
+const clients = computed(() => clientsResponse.value?.items || [])
 
 const modalOpen = ref(false)
 const saving = ref(false)
@@ -10,10 +11,12 @@ const isEditing = ref(false)
 const editId = ref('')
 const fileInput = ref<HTMLInputElement | null>(null)
 
+const draggedIndex = ref<number | null>(null)
+const dragOverIndex = ref<number | null>(null)
+
 const form = reactive({
   name: '',
   category: '',
-  order: 0,
   isActive: true
 })
 
@@ -22,7 +25,6 @@ function resetForm() {
   editId.value = ''
   form.name = ''
   form.category = ''
-  form.order = 0
   form.isActive = true
   if (fileInput.value) fileInput.value.value = ''
 }
@@ -37,7 +39,6 @@ function openEdit(item: any) {
   editId.value = item._id
   form.name = item.name
   form.category = item.category || ''
-  form.order = item.order || 0
   form.isActive = item.isActive !== false
   if (fileInput.value) fileInput.value.value = ''
   modalOpen.value = true
@@ -56,7 +57,6 @@ async function submitForm() {
     if (file) formData.append('image', file)
     formData.append('name', form.name)
     formData.append('category', form.category)
-    formData.append('order', String(form.order))
     formData.append('isActive', String(form.isActive))
 
     const url = isEditing.value ? `/api/clients/${editId.value}` : '/api/clients'
@@ -85,6 +85,62 @@ async function deleteItem(id: string) {
     alert('Gagal menghapus data')
   }
 }
+
+function onDragStart(index: number, event: DragEvent) {
+  draggedIndex.value = index
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/plain', index.toString())
+  }
+}
+
+function onDragOver(index: number, event: DragEvent) {
+  event.preventDefault()
+  if (draggedIndex.value === null) return
+  dragOverIndex.value = index
+}
+
+function onDragLeave(index: number, event: DragEvent) {
+  if (dragOverIndex.value === index) {
+    dragOverIndex.value = null
+  }
+}
+
+async function onDrop(index: number, event: DragEvent) {
+  event.preventDefault()
+  dragOverIndex.value = null
+  if (draggedIndex.value === null) return
+  if (draggedIndex.value === index) return
+
+  const items = clientsResponse.value?.items
+  if (!items) return
+
+  // Reorder visually
+  const draggedItem = items[draggedIndex.value]
+  items.splice(draggedIndex.value, 1)
+  items.splice(index, 0, draggedItem)
+
+  draggedIndex.value = null
+
+  // Save to API
+  await saveOrder()
+}
+
+async function saveOrder() {
+  saving.value = true
+  try {
+    const clientIds = clientsResponse.value!.items.map((c: any) => c._id)
+    await $fetch('/api/clients/reorder', {
+      method: 'PUT',
+      body: { clientIds }
+    })
+  } catch (err) {
+    alert('Gagal menyimpan urutan baru')
+    refresh()
+  } finally {
+    saving.value = false
+  }
+}
 </script>
 
 <template>
@@ -92,7 +148,7 @@ async function deleteItem(id: string) {
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Rekan & Klien</h1>
-        <p class="mt-1 text-sm text-gray">Kelola logo klien yang tampil di website.</p>
+        <p class="mt-1 text-sm text-gray">Kelola logo klien yang tampil di website. Anda bisa drag & drop (geser) kartu klien di bawah untuk mengatur urutannya.</p>
       </div>
       <button @click="openAdd" class="admin-btn-primary">
         + Tambah Klien
@@ -102,11 +158,24 @@ async function deleteItem(id: string) {
     <!-- Grid -->
     <div class="admin-card">
       <div v-if="pending" class="p-6 text-center text-gray-500">Memuat data...</div>
-      <div v-else-if="!clients?.length" class="p-6 text-center text-gray-500">
+      <div v-else-if="!clients.length" class="p-6 text-center text-gray-500">
         Belum ada data klien.
       </div>
       <div v-else class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 p-4">
-        <div v-for="client in clients" :key="client._id" class="border rounded-lg p-4 flex flex-col items-center relative group bg-white">
+        <div
+          v-for="(client, index) in clients"
+          :key="client._id"
+          draggable="true"
+          @dragstart="onDragStart(index, $event)"
+          @dragover="onDragOver(index, $event)"
+          @dragleave="onDragLeave(index, $event)"
+          @drop="onDrop(index, $event)"
+          :class="[
+            'border rounded-lg p-4 flex flex-col items-center relative group bg-white cursor-move transition-all duration-200',
+            draggedIndex === index ? 'opacity-50 ring-2 ring-blue-500 ring-offset-2' : '',
+            dragOverIndex === index && draggedIndex !== index ? 'ring-2 ring-blue-300 ring-offset-2 bg-blue-50 transform scale-[1.02]' : ''
+          ]"
+        >
           <div class="h-24 w-full flex items-center justify-center mb-4">
             <img :src="client.logoUrl" :alt="client.name" class="max-h-full max-w-full object-contain">
           </div>
@@ -143,10 +212,6 @@ async function deleteItem(id: string) {
         <div>
           <label class="block text-sm font-medium text-gray-700">Kategori (Opsional)</label>
           <input v-model="form.category" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm" placeholder="Contoh: BUMN, Swasta, Perbankan">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Urutan Tampil (Order)</label>
-          <input v-model="form.order" type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
         </div>
         <div class="flex items-center mt-6">
           <input v-model="form.isActive" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">

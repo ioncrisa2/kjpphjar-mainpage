@@ -4,7 +4,12 @@ import { connectDB } from '~/server/utils/db'
 export default defineEventHandler(async (event) => {
   await connectDB()
   const query = getQuery(event)
-  const filter: Record<string, unknown> = { isActive: true }
+  const filter: Record<string, unknown> = {}
+
+  if (query.all !== 'true') {
+    filter.isActive = true
+  }
+
   if (query.category) filter.category = query.category
 
   const clients = await Client.find(filter).sort({ category: 1, order: 1 }).lean()
