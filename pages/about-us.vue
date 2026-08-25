@@ -23,7 +23,7 @@ const missions = [
     <div class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
       <div class="container">
         <div class="items-center justify-between py-10 md:flex md:h-[400px] md:py-0">
-          <div class="heading relative mb-0 text-center ltr:md:text-left">
+          <div class="heading relative mb-0 text-center md:text-left">
             <h6 class="!text-white">About Us</h6>
             <h4 class="!text-white">KJPP Henricus Judi Adrianto dan Rekan</h4>
           </div>
@@ -69,8 +69,6 @@ const missions = [
             v-for="mission in missions"
             :key="mission.id"
             class="flex gap-6 rounded-2xl border border-primary/20 p-6 transition hover:border-primary/50"
-            data-aos="fade-up"
-            data-aos-duration="600"
           >
             <span class="text-4xl font-black text-primary/30">{{ mission.id }}</span>
             <p class="text-base font-semibold leading-relaxed text-black dark:text-white">{{ mission.text }}</p>
@@ -96,8 +94,6 @@ const missions = [
             v-for="leader in leaders"
             :key="leader._id"
             class="group text-center"
-            data-aos="fade-up"
-            data-aos-duration="800"
           >
             <div class="overflow-hidden rounded-2xl">
               <img
