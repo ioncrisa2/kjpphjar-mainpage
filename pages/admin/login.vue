@@ -35,7 +35,7 @@ async function handleLogin() {
     <div class="w-full max-w-md px-6">
       <!-- Logo -->
       <div class="mb-8 text-center">
-        <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" class="mx-auto h-14 mb-4" />
+        <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" width="224" height="56" class="mx-auto h-14 w-auto mb-4" />
         <h1 class="text-xl font-bold text-white">Admin Panel</h1>
         <p class="text-sm text-gray mt-1">KJPP Henricus Judi Adrianto dan Rekan</p>
       </div>

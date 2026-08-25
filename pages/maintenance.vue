@@ -44,7 +44,7 @@ if (import.meta.server) {
   <main class="flex min-h-[100dvh] items-center bg-[#08111F] px-5 py-12 font-mulish text-white sm:px-8">
     <div class="mx-auto w-full max-w-3xl">
       <div class="mb-10 flex items-center gap-3">
-        <img src="/assets/images/h-logo.png" :alt="settings.siteName" class="h-11 w-auto" />
+        <img src="/assets/images/h-logo.png" :alt="settings.siteName" width="176" height="44" class="h-11 w-auto" />
         <p class="max-w-xs text-sm font-bold leading-5 text-white/85">{{ settings.siteName }}</p>
       </div>
 

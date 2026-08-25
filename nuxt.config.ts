@@ -70,7 +70,14 @@ export default defineNuxtConfig({
     ]
   },
 
-  // App head — default SEO & font performance
+  // Caching & static headers
+  routeRules: {
+    '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+    '/assets/**': { headers: { 'cache-control': 'public, max-age=2592000, stale-while-revalidate=86400' } },
+    '/favicon.png': { headers: { 'cache-control': 'public, max-age=2592000' } },
+  },
+
+  // App head — default SEO & non-render-blocking font performance
   app: {
     head: {
       htmlAttrs: { lang: 'id' },
@@ -91,8 +98,15 @@ export default defineNuxtConfig({
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
+          rel: 'preload',
+          as: 'style',
+          href: 'https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800;900&display=swap',
+        },
+        {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800;900&display=swap',
+          media: 'print',
+          onload: "this.media='all'",
         },
       ],
     },

@@ -89,7 +89,10 @@ const filteredClients = computed(() => {
                 class="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
                 :src="client.logoUrl"
                 :alt="client.name"
+                width="160"
+                height="96"
                 loading="lazy"
+                decoding="async"
               >
             </div>
             <h3 class="mt-4 text-sm font-medium text-black text-center line-clamp-2" :title="client.name">

@@ -10,6 +10,14 @@ useHead({
     { property: 'og:title', content: "KJPP HJA'R | Penilai Publik & Konsultan Independen" },
     { property: 'og:description', content: 'Jasa penilai publik dan konsultan independen terpercaya.' },
   ],
+  link: [
+    {
+      rel: 'preload',
+      as: 'image',
+      href: '/assets/images/consulting/banner-bg.jpg',
+      fetchpriority: 'high',
+    },
+  ],
   script: [
     {
       type: 'application/ld+json',
@@ -75,7 +83,15 @@ const chooseUs = [
             </NuxtLink>
           </div>
           <div class="mx-auto w-full max-w-[386px] hidden lg:block">
-            <img src="/assets/images/pak-henricus.png" alt="Pimpinan KJPP HJA'R" />
+            <img
+              src="/assets/images/pak-henricus.png"
+              alt="Pimpinan KJPP HJA'R"
+              width="386"
+              height="450"
+              fetchpriority="high"
+              decoding="async"
+              class="w-full h-auto"
+            />
           </div>
         </div>
       </div>
@@ -132,7 +148,7 @@ const chooseUs = [
     <!-- Why Choose Us -->
     <section class="relative bg-black py-12 dark:bg-white/5 lg:py-24">
       <div class="absolute bottom-0 right-0">
-        <img src="/assets/images/consulting/bg-icon.svg" alt="" />
+        <img src="/assets/images/consulting/bg-icon.svg" alt="" width="200" height="200" loading="lazy" decoding="async" />
       </div>
       <div class="container relative z-[1]">
         <div class="heading text-center text-white">
@@ -142,8 +158,16 @@ const chooseUs = [
         </div>
         <div class="mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 lg:grid-cols-2">
           <div v-for="(item, index) in chooseUs" :key="index" class="group">
-            <div class="overflow-hidden">
-              <img :src="item.image" class="w-full duration-200 group-hover:rotate-2 group-hover:scale-110" :alt="item.title" />
+            <div class="overflow-hidden rounded-xl">
+              <img
+                :src="item.image"
+                class="w-full h-auto duration-200 group-hover:rotate-2 group-hover:scale-110"
+                :alt="item.title"
+                width="600"
+                height="400"
+                loading="lazy"
+                decoding="async"
+              />
             </div>
             <div class="relative mx-4 -mt-10 space-y-2.5 bg-gray-dark px-4 pt-[22px] text-center dark:bg-black md:px-[26px]">
               <h3 class="text-2xl font-bold text-primary group-hover:text-secondary">{{ item.title }}</h3>
@@ -203,8 +227,11 @@ const chooseUs = [
             <img
               :src="photo.thumbnailUrl"
               :alt="photo.title || 'Galeri KJPP HJA\'R'"
+              width="400"
+              height="250"
               class="h-48 w-full object-cover transition duration-500 hover:scale-110"
               loading="lazy"
+              decoding="async"
             />
           </div>
         </div>

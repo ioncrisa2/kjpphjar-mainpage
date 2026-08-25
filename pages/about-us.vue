@@ -50,7 +50,15 @@ const missions = [
             </p>
           </div>
           <div class="w-full px-4 lg:w-1/2">
-            <img src="/assets/images/aboutbg.png" alt="Tentang KJPP HJA'R" class="w-full rounded-xl object-cover" />
+            <img
+              src="/assets/images/aboutbg.png"
+              alt="Tentang KJPP HJA'R"
+              width="600"
+              height="400"
+              loading="lazy"
+              decoding="async"
+              class="w-full h-auto rounded-xl object-cover"
+            />
           </div>
         </div>
       </div>
@@ -99,8 +107,11 @@ const missions = [
               <img
                 :src="leader.photoUrl"
                 :alt="leader.name"
+                width="400"
+                height="400"
                 class="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
                 loading="lazy"
+                decoding="async"
               />
             </div>
             <div class="mt-4">

@@ -34,7 +34,7 @@ function telephoneHref(phone: string) {
         <!-- Brand -->
         <div class="relative">
           <div class="flex flex-row gap-2 items-center">
-            <img src="/assets/images/h-logo.png" :alt="settings.siteName" width="60" />
+            <img src="/assets/images/h-logo.png" :alt="settings.siteName" width="60" height="60" class="h-[60px] w-auto" />
             <span class="max-w-[220px] text-base font-semibold leading-tight text-black dark:text-white">
               {{ settings.siteName }}
             </span>

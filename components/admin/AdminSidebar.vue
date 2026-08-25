@@ -112,7 +112,7 @@ function toggleCategory(key: string) {
   <aside class="flex h-screen w-64 flex-col border-r border-gray/10 bg-white dark:bg-gray-dark select-none">
     <!-- Logo -->
     <div class="flex items-center gap-3 border-b border-gray/10 px-5 py-4 shrink-0">
-      <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" class="h-8 w-auto" />
+      <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" width="128" height="32" class="h-8 w-auto" />
       <div class="leading-tight">
         <p class="text-xs font-extrabold text-black dark:text-white tracking-wide">KJPP HJA'R</p>
         <p class="text-[10px] font-semibold text-gray">Admin Panel</p>

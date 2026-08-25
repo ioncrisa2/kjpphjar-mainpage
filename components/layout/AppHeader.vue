@@ -35,7 +35,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
       <div class="flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" @click="closeMenu">
-          <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" class="h-10" />
+          <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" width="160" height="40" class="h-10 w-auto" />
         </NuxtLink>
 
         <!-- Nav -->
@@ -55,7 +55,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
           >
             <!-- Header menu on mobile (Logo & Close) -->
             <div class="flex items-center justify-between p-5 lg:hidden border-b border-gray-800">
-              <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" class="h-8" />
+              <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" width="128" height="32" class="h-8 w-auto" />
               <button type="button" class="p-2" @click="closeMenu" aria-label="Tutup Menu Navigasi">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-8 w-8 text-white hover:text-primary transition-colors" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
