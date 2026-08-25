@@ -1,7 +1,6 @@
 import { Gallery } from '~/server/models/Gallery'
 import { connectDB } from '~/server/utils/db'
-import { deleteFile } from '~/server/utils/image'
-import path from 'path'
+import { deleteAsset } from '~/server/utils/media-storage'
 
 export default defineEventHandler(async (event) => {
   await connectDB()
@@ -12,15 +11,17 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Foto tidak ditemukan' })
   }
 
-  // Hapus dari database
   await Gallery.findByIdAndDelete(id)
 
-  // Hapus file fisik
-  const originalPath = path.join(process.cwd(), 'public', photo.imageUrl)
-  const thumbnailPath = path.join(process.cwd(), 'public', photo.thumbnailUrl)
-  
-  deleteFile(originalPath)
-  deleteFile(thumbnailPath)
+  const deletionResults = await Promise.allSettled([
+    deleteAsset(photo.imageUrl),
+    deleteAsset(photo.thumbnailUrl),
+  ])
+  for (const result of deletionResults) {
+    if (result.status === 'rejected') {
+      console.error('Gagal membersihkan aset galeri yang dihapus:', result.reason)
+    }
+  }
 
   return { success: true, message: 'Foto berhasil dihapus' }
 })

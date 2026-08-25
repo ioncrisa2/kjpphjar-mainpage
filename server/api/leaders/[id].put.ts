@@ -1,56 +1,67 @@
+import path from 'node:path'
 import { Leader } from '~/server/models/Leader'
 import { connectDB } from '~/server/utils/db'
-import { upload, ensureUploadsFolder } from '~/server/utils/upload'
-import { deleteFile } from '~/server/utils/image'
-import path from 'path'
-import fs from 'fs'
+import { processUploadedImage } from '~/server/utils/image'
+import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
+import { receiveSingleImage, removeFileIfExists } from '~/server/utils/upload'
 
 export default defineEventHandler(async (event) => {
   await connectDB()
   const id = getRouterParam(event, 'id')
-  
-  const req = event.node.req as any
-  const res = event.node.res as any
-  
-  const uploadFolder = ensureUploadsFolder('leaders')
-  
-  await new Promise((resolve, reject) => {
-    upload.single('image')(req, res, (err: any) => {
-      if (err) reject(err)
-      else resolve(true)
-    })
-  })
+  const { body, file } = await receiveSingleImage(event)
+  let newPhotoUrl = ''
+  let didPersistUpdate = false
 
-  const body = req.body
-  const updates: Record<string, any> = {
-    name: body.name,
-    position: body.position,
-    bio: body.bio,
-    order: body.order,
-  }
-  
-  if (body.isActive !== undefined) {
-    updates.isActive = body.isActive === 'true'
-  }
-
-  const file = req.file
-  if (file) {
-    // There is a new photo
-    const newPath = path.join(uploadFolder, file.filename)
-    fs.renameSync(file.path, newPath)
-    updates.photoUrl = `/uploads/leaders/${file.filename}`
-    
-    // Find old and delete
-    const oldLeader = await Leader.findById(id)
-    if (oldLeader && oldLeader.photoUrl) {
-      deleteFile(path.join(process.cwd(), 'public', oldLeader.photoUrl))
+  try {
+    const existing = await Leader.findById(id)
+    if (!existing) {
+      throw createError({ statusCode: 404, statusMessage: 'Pimpinan tidak ditemukan' })
     }
-  }
 
-  const updated = await Leader.findByIdAndUpdate(id, updates, { new: true })
-  if (!updated) {
-    throw createError({ statusCode: 404, statusMessage: 'Pimpinan tidak ditemukan' })
-  }
+    const updates: Record<string, any> = {
+      name: body.name,
+      position: body.position,
+      bio: body.bio,
+      order: body.order,
+    }
+    if (body.isActive !== undefined) updates.isActive = body.isActive === 'true'
 
-  return updated
+    if (file) {
+      const filename = `${path.parse(file.filename).name}.webp`
+      const buffer = await processUploadedImage(file.path, {
+        maxWidth: 1600,
+        maxHeight: 2000,
+        quality: 88,
+      })
+      const stored = await storeAsset({
+        pathname: `leaders/${filename}`,
+        contentType: 'image/webp',
+        source: { buffer },
+      })
+      newPhotoUrl = stored.url
+      updates.photoUrl = stored.url
+    }
+
+    const updated = await Leader.findByIdAndUpdate(id, updates, { new: true, runValidators: true })
+    if (!updated) {
+      throw createError({ statusCode: 404, statusMessage: 'Pimpinan tidak ditemukan' })
+    }
+    didPersistUpdate = true
+
+    if (newPhotoUrl && existing.photoUrl) {
+      await deleteAsset(existing.photoUrl).catch((cleanupError) => {
+        console.error('Gagal membersihkan foto pimpinan lama:', cleanupError)
+      })
+    }
+    return updated
+  } catch (error) {
+    if (newPhotoUrl && !didPersistUpdate) {
+      await deleteAsset(newPhotoUrl).catch((rollbackError) => {
+        console.error('Gagal membatalkan upload foto pimpinan:', rollbackError)
+      })
+    }
+    throw error
+  } finally {
+    await removeFileIfExists(file?.path)
+  }
 })

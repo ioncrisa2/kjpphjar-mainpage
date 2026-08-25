@@ -1,53 +1,66 @@
+import path from 'node:path'
 import { Client } from '~/server/models/Client'
 import { connectDB } from '~/server/utils/db'
-import { upload, ensureUploadsFolder } from '~/server/utils/upload'
-import { deleteFile } from '~/server/utils/image'
-import path from 'path'
-import fs from 'fs'
+import { processUploadedImage } from '~/server/utils/image'
+import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
+import { receiveSingleImage, removeFileIfExists } from '~/server/utils/upload'
 
 export default defineEventHandler(async (event) => {
   await connectDB()
   const id = getRouterParam(event, 'id')
-  
-  const req = event.node.req as any
-  const res = event.node.res as any
-  
-  const uploadFolder = ensureUploadsFolder('clients')
-  
-  await new Promise((resolve, reject) => {
-    upload.single('image')(req, res, (err: any) => {
-      if (err) reject(err)
-      else resolve(true)
-    })
-  })
+  const { body, file } = await receiveSingleImage(event)
+  let newLogoUrl = ''
+  let didPersistUpdate = false
 
-  const body = req.body
-  const updates: Record<string, any> = {
-    name: body.name,
-    category: body.category,
-    order: body.order,
-  }
-  
-  if (body.isActive !== undefined) {
-    updates.isActive = body.isActive === 'true'
-  }
-
-  const file = req.file
-  if (file) {
-    const newPath = path.join(uploadFolder, file.filename)
-    fs.renameSync(file.path, newPath)
-    updates.logoUrl = `/uploads/clients/${file.filename}`
-    
-    const oldClient = await Client.findById(id)
-    if (oldClient && oldClient.logoUrl) {
-      deleteFile(path.join(process.cwd(), 'public', oldClient.logoUrl))
+  try {
+    const existing = await Client.findById(id)
+    if (!existing) {
+      throw createError({ statusCode: 404, statusMessage: 'Klien tidak ditemukan' })
     }
-  }
 
-  const updated = await Client.findByIdAndUpdate(id, updates, { new: true })
-  if (!updated) {
-    throw createError({ statusCode: 404, statusMessage: 'Klien tidak ditemukan' })
-  }
+    const updates: Record<string, any> = {
+      name: body.name,
+      category: body.category,
+      order: body.order,
+    }
+    if (body.isActive !== undefined) updates.isActive = body.isActive === 'true'
 
-  return updated
+    if (file) {
+      const filename = `${path.parse(file.filename).name}.webp`
+      const buffer = await processUploadedImage(file.path, {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        quality: 88,
+      })
+      const stored = await storeAsset({
+        pathname: `clients/${filename}`,
+        contentType: 'image/webp',
+        source: { buffer },
+      })
+      newLogoUrl = stored.url
+      updates.logoUrl = stored.url
+    }
+
+    const updated = await Client.findByIdAndUpdate(id, updates, { new: true, runValidators: true })
+    if (!updated) {
+      throw createError({ statusCode: 404, statusMessage: 'Klien tidak ditemukan' })
+    }
+    didPersistUpdate = true
+
+    if (newLogoUrl && existing.logoUrl) {
+      await deleteAsset(existing.logoUrl).catch((cleanupError) => {
+        console.error('Gagal membersihkan logo klien lama:', cleanupError)
+      })
+    }
+    return updated
+  } catch (error) {
+    if (newLogoUrl && !didPersistUpdate) {
+      await deleteAsset(newLogoUrl).catch((rollbackError) => {
+        console.error('Gagal membatalkan upload logo klien:', rollbackError)
+      })
+    }
+    throw error
+  } finally {
+    await removeFileIfExists(file?.path)
+  }
 })

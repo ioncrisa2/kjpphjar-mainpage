@@ -1,7 +1,6 @@
 import { Leader } from '~/server/models/Leader'
 import { connectDB } from '~/server/utils/db'
-import { deleteFile } from '~/server/utils/image'
-import path from 'path'
+import { deleteAsset } from '~/server/utils/media-storage'
 
 export default defineEventHandler(async (event) => {
   await connectDB()
@@ -13,7 +12,9 @@ export default defineEventHandler(async (event) => {
   }
 
   if (leader.photoUrl) {
-    deleteFile(path.join(process.cwd(), 'public', leader.photoUrl))
+    await deleteAsset(leader.photoUrl).catch((cleanupError) => {
+      console.error('Gagal membersihkan foto pimpinan yang dihapus:', cleanupError)
+    })
   }
 
   return { success: true, message: 'Pimpinan berhasil dihapus' }

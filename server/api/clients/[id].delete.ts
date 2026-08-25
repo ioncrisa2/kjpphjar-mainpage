@@ -1,7 +1,6 @@
 import { Client } from '~/server/models/Client'
 import { connectDB } from '~/server/utils/db'
-import { deleteFile } from '~/server/utils/image'
-import path from 'path'
+import { deleteAsset } from '~/server/utils/media-storage'
 
 export default defineEventHandler(async (event) => {
   await connectDB()
@@ -13,7 +12,9 @@ export default defineEventHandler(async (event) => {
   }
 
   if (client.logoUrl) {
-    deleteFile(path.join(process.cwd(), 'public', client.logoUrl))
+    await deleteAsset(client.logoUrl).catch((cleanupError) => {
+      console.error('Gagal membersihkan logo klien yang dihapus:', cleanupError)
+    })
   }
 
   return { success: true, message: 'Klien berhasil dihapus' }

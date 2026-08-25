@@ -1,41 +1,52 @@
+import path from 'node:path'
 import { Leader } from '~/server/models/Leader'
 import { connectDB } from '~/server/utils/db'
-import { upload, ensureUploadsFolder } from '~/server/utils/upload'
-import path from 'path'
-import fs from 'fs'
+import { processUploadedImage } from '~/server/utils/image'
+import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
+import { receiveSingleImage, removeFileIfExists } from '~/server/utils/upload'
 
 export default defineEventHandler(async (event) => {
   await connectDB()
-  const req = event.node.req as any
-  const res = event.node.res as any
-  
-  const uploadFolder = ensureUploadsFolder('leaders')
-  
-  await new Promise((resolve, reject) => {
-    upload.single('image')(req, res, (err: any) => {
-      if (err) reject(err)
-      else resolve(true)
+  const { body, file } = await receiveSingleImage(event)
+  let storedPhotoUrl = ''
+  let didPersist = false
+
+  try {
+    if (!file) {
+      throw createError({ statusCode: 400, statusMessage: 'Foto pimpinan wajib diunggah.' })
+    }
+
+    const filename = `${path.parse(file.filename).name}.webp`
+    const buffer = await processUploadedImage(file.path, {
+      maxWidth: 1600,
+      maxHeight: 2000,
+      quality: 88,
     })
-  })
+    const stored = await storeAsset({
+      pathname: `leaders/${filename}`,
+      contentType: 'image/webp',
+      source: { buffer },
+    })
+    storedPhotoUrl = stored.url
 
-  const file = req.file
-  if (!file) {
-    throw createError({ statusCode: 400, statusMessage: 'Foto pimpinan wajib diunggah.' })
+    const leader = await Leader.create({
+      name: body.name,
+      position: body.position,
+      bio: body.bio,
+      order: body.order || 0,
+      isActive: body.isActive === 'true',
+      photoUrl: stored.url,
+    })
+    didPersist = true
+    return leader
+  } catch (error) {
+    if (storedPhotoUrl && !didPersist) {
+      await deleteAsset(storedPhotoUrl).catch((rollbackError) => {
+        console.error('Gagal membatalkan upload foto pimpinan:', rollbackError)
+      })
+    }
+    throw error
+  } finally {
+    await removeFileIfExists(file?.path)
   }
-
-  const newPath = path.join(uploadFolder, file.filename)
-  fs.renameSync(file.path, newPath)
-  
-  const body = req.body
-  const leader = new Leader({
-    name: body.name,
-    position: body.position,
-    bio: body.bio,
-    order: body.order || 0,
-    isActive: body.isActive === 'true',
-    photoUrl: `/uploads/leaders/${file.filename}`
-  })
-
-  await leader.save()
-  return leader
 })

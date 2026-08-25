@@ -21,10 +21,7 @@ npm-debug.log*
 Thumbs.db
 
 # Uploads (foto disimpan di server, tidak di-commit)
-public/uploads/
-
-# Vite (sisa dari project lama)
-src/
+/uploads/
 
 # Editor
 .vscode/settings.json
