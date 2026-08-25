@@ -8,7 +8,7 @@ if (!jwtSecret || (isProduction && jwtSecret.length < 32)) {
 }
 
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: !isProduction },
 
   // Modules
   modules: [
