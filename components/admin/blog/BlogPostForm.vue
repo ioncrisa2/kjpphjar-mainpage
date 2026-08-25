@@ -13,12 +13,16 @@ const emit = defineEmits<{ submit: [payload: FormData] }>()
 const { data: categoryData } = await useFetch('/api/admin/categories')
 const categories = computed(() => categoryData.value?.items || [])
 
+const { data: leadersData } = await useFetch('/api/leaders')
+const leaders = computed(() => leadersData.value || [])
+
 const form = reactive({
   title: '',
   slug: '',
   excerpt: '',
   content: '',
   categoryId: '',
+  leaderId: '',
   tags: [] as string[],
   metaTitle: '',
   metaDescription: '',
@@ -43,6 +47,15 @@ function toLocalDateTime(value: unknown) {
   return local.toISOString().slice(0, 16)
 }
 
+function onLeaderChange() {
+  if (form.leaderId) {
+    const selected = leaders.value.find((l: any) => l._id === form.leaderId)
+    if (selected) {
+      form.author = selected.name
+    }
+  }
+}
+
 watch(() => props.initialValue, (article) => {
   if (!article) return
   const key = `${article._id || 'new'}-${article.updatedAt || ''}`
@@ -53,6 +66,7 @@ watch(() => props.initialValue, (article) => {
   form.excerpt = article.excerpt || ''
   form.content = article.content || ''
   form.categoryId = article.categoryId || ''
+  form.leaderId = article.leaderId || article.leader?._id || ''
   form.tags = Array.isArray(article.tags) ? [...article.tags] : []
   form.metaTitle = article.metaTitle || ''
   form.metaDescription = article.metaDescription || ''
@@ -111,6 +125,7 @@ function submitForm() {
   payload.append('excerpt', form.excerpt)
   payload.append('content', contentEditor.value?.getSemanticHtml() || form.content)
   payload.append('categoryId', form.categoryId)
+  payload.append('leaderId', form.leaderId)
   payload.append('tags', JSON.stringify(form.tags))
   payload.append('metaTitle', form.metaTitle)
   payload.append('metaDescription', form.metaDescription)
@@ -239,8 +254,17 @@ function submitForm() {
           <AdminBlogTagInput v-model="form.tags" />
         </div>
         <div>
-          <label for="blog-author" class="admin-label">Penulis</label>
-          <input id="blog-author" v-model="form.author" type="text" maxlength="100" class="admin-input">
+          <label for="blog-leader" class="admin-label">Penulis (Pimpinan Rekan)</label>
+          <select id="blog-leader" v-model="form.leaderId" class="admin-input" @change="onLeaderChange">
+            <option value="">Nama Manual / Tim Redaksi</option>
+            <option v-for="leader in leaders" :key="leader._id" :value="leader._id">
+              {{ leader.name }} — {{ leader.position }}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label for="blog-author" class="admin-label">Nama Tampilan Penulis</label>
+          <input id="blog-author" v-model="form.author" type="text" maxlength="100" class="admin-input" placeholder="Contoh: Admin / Tim Redaksi / Nama Penulis">
         </div>
       </section>
 

@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
 
   const post = await BlogPost.findById(id)
     .populate('categoryId', 'name slug description isActive createdAt updatedAt')
+    .populate('leaderId', 'name position photoUrl bio')
     .lean()
   if (!post) throw createError({ statusCode: 404, statusMessage: 'Artikel tidak ditemukan.' })
   return toBlogPostDto(post as any)

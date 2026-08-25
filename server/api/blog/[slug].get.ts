@@ -12,6 +12,10 @@ export default defineEventHandler(async (event) => {
       select: 'name slug description isActive createdAt updatedAt',
       match: { isActive: true },
     })
+    .populate({
+      path: 'leaderId',
+      select: 'name position photoUrl bio isActive',
+    })
     .lean()
   if (!post) {
     throw createError({ statusCode: 404, statusMessage: 'Artikel tidak ditemukan' })

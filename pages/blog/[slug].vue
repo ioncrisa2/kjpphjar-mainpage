@@ -52,6 +52,30 @@ useHead({
       type: 'application/ld+json',
       children: computed(() => {
         if (!article.value) return ''
+        const leader = article.value.leader
+        const authorObj = leader
+          ? {
+              '@type': 'Person',
+              name: leader.name,
+              jobTitle: leader.position || 'Penilai Publik',
+              description: leader.bio || undefined,
+              image: leader.photoUrl ? (leader.photoUrl.startsWith('http') ? leader.photoUrl : `${baseUrl}${leader.photoUrl}`) : undefined,
+              worksFor: {
+                '@type': 'Organization',
+                name: 'KJPP Henricus Judi Adrianto dan Rekan',
+                url: baseUrl,
+              },
+            }
+          : {
+              '@type': 'Person',
+              name: article.value.author || 'Admin',
+              worksFor: {
+                '@type': 'Organization',
+                name: 'KJPP Henricus Judi Adrianto dan Rekan',
+                url: baseUrl,
+              },
+            }
+
         return JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'BlogPosting',
@@ -59,7 +83,7 @@ useHead({
           image: absoluteCover.value ? [absoluteCover.value] : [],
           datePublished: article.value.publishedAt || article.value.createdAt,
           dateModified: article.value.updatedAt || article.value.createdAt,
-          author: [{ '@type': 'Person', name: article.value.author || 'Admin' }],
+          author: [authorObj],
           publisher: {
             '@type': 'Organization',
             name: 'KJPP Henricus Judi Adrianto dan Rekan',
@@ -192,6 +216,53 @@ function formatDate(value: string) {
             <a v-for="item in shareLinks" :key="item.label" :href="item.href" target="_blank" rel="noopener noreferrer" class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-600 transition dark:bg-white/5 dark:text-slate-300" :class="item.class" :aria-label="`Bagikan ke ${item.label}`">
               <Icon :name="item.icon" />
             </a>
+          </div>
+        </section>
+
+        <!-- Author Bio Card (Pimpinan Rekan Penulis / Google E-E-A-T) -->
+        <section
+          v-if="article.leader"
+          class="mt-12 overflow-hidden rounded-2xl border border-primary/20 bg-slate-50 p-6 dark:border-white/10 dark:bg-slate-900/60 sm:p-8"
+          aria-labelledby="author-heading"
+        >
+          <div class="flex flex-col gap-6 sm:flex-row sm:items-center">
+            <div class="shrink-0">
+              <img
+                v-if="article.leader.photoUrl"
+                :src="article.leader.photoUrl"
+                :alt="article.leader.name"
+                width="96"
+                height="96"
+                class="h-24 w-24 rounded-full border-2 border-primary object-cover shadow-md"
+                loading="lazy"
+                decoding="async"
+              />
+              <div v-else class="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-3xl font-extrabold text-primary">
+                {{ article.leader.name.charAt(0) }}
+              </div>
+            </div>
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-xs font-extrabold uppercase tracking-wider text-primary">Penulis Artikel</p>
+                  <h3 id="author-heading" class="mt-0.5 text-xl font-extrabold text-black dark:text-white sm:text-2xl">
+                    {{ article.leader.name }}
+                  </h3>
+                  <p class="text-sm font-semibold text-gray-700 dark:text-slate-300">
+                    {{ article.leader.position }} · KJPP HJA'R
+                  </p>
+                </div>
+                <NuxtLink
+                  :to="{ path: '/blog', query: { author: article.leader._id } }"
+                  class="inline-flex items-center gap-1.5 rounded-xl border border-primary/30 bg-white px-4 py-2 text-xs font-bold text-primary transition hover:bg-primary hover:text-black dark:bg-slate-800"
+                >
+                  Artikel lain dari penulis <Icon name="ph:arrow-right-bold" />
+                </NuxtLink>
+              </div>
+              <p v-if="article.leader.bio" class="mt-3 text-sm leading-6 text-gray-600 dark:text-slate-300">
+                {{ article.leader.bio }}
+              </p>
+            </div>
           </div>
         </section>
       </div>

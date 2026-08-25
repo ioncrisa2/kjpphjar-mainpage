@@ -19,6 +19,7 @@ export interface IBlogPost extends Document {
   status: BlogPostStatus
   /** Legacy compatibility flag. Use status for all new behavior. */
   isPublished: boolean
+  leaderId?: Types.ObjectId | null
   author?: string
   createdAt: Date
   updatedAt: Date
@@ -34,6 +35,7 @@ const BlogPostSchema = new Schema<IBlogPost>(
     coverImageUrl: { type: String, maxlength: 500 },
     tags: { type: [String], default: [] },
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category', default: null, index: true },
+    leaderId: { type: Schema.Types.ObjectId, ref: 'Leader', default: null, index: true },
     isFeatured: { type: Boolean, default: false, index: true },
     views: { type: Number, default: 0, min: 0 },
     readingTime: { type: Number, default: 1, min: 1 },
@@ -53,6 +55,7 @@ const BlogPostSchema = new Schema<IBlogPost>(
 
 BlogPostSchema.index({ status: 1, publishedAt: -1 })
 BlogPostSchema.index({ categoryId: 1, status: 1, publishedAt: -1 })
+BlogPostSchema.index({ leaderId: 1, status: 1, publishedAt: -1 })
 BlogPostSchema.index({ isFeatured: 1, status: 1, publishedAt: -1 })
 BlogPostSchema.index({ tags: 1, publishedAt: -1 })
 

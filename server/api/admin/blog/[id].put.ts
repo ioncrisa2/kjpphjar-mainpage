@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import path from 'path'
 import { BlogPost } from '~/server/models/BlogPost'
 import { Category } from '~/server/models/Category'
+import { Leader } from '~/server/models/Leader'
 import { connectDB } from '~/server/utils/db'
 import {
   calculateReadingTime,
@@ -48,6 +49,18 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    const leaderId = sanitizePlainText(body.leaderId, 30) || null
+    let authorName = sanitizePlainText(body.author, 100) || 'Admin'
+    if (leaderId) {
+      if (!mongoose.isValidObjectId(leaderId)) {
+        throw createError({ statusCode: 400, statusMessage: 'Pimpinan penulis tidak valid.' })
+      }
+      const leaderDoc = await Leader.findById(leaderId).select('name').lean()
+      if (leaderDoc) {
+        authorName = leaderDoc.name
+      }
+    }
+
     const publication = parsePublicationInput(
       body.status || getLegacyCompatibleStatus(existing.toObject()),
       body.publishedAt,
@@ -73,11 +86,12 @@ export default defineEventHandler(async (event) => {
       excerpt: sanitizePlainText(body.excerpt, 400) || createExcerpt(content),
       tags: normalizeTags(body.tags),
       categoryId,
+      leaderId,
       isFeatured: parseBoolean(body.isFeatured),
       readingTime: calculateReadingTime(content),
       metaTitle: sanitizePlainText(body.metaTitle, 70),
       metaDescription: sanitizePlainText(body.metaDescription, 180),
-      author: sanitizePlainText(body.author, 100) || 'Admin',
+      author: authorName,
       ...publication,
     }
 
@@ -87,7 +101,10 @@ export default defineEventHandler(async (event) => {
     const updated = await BlogPost.findByIdAndUpdate(id, updates, { new: true, runValidators: true })
     if (!updated) throw createError({ statusCode: 404, statusMessage: 'Artikel tidak ditemukan.' })
     didPersistUpdate = true
-    await updated.populate('categoryId', 'name slug description isActive createdAt updatedAt')
+    await updated.populate([
+      { path: 'categoryId', select: 'name slug description isActive createdAt updatedAt' },
+      { path: 'leaderId', select: 'name position photoUrl bio' },
+    ])
 
     if ((newCoverImageUrl || removeCover) && existing.coverImageUrl) {
       await deleteAsset(existing.coverImageUrl).catch((cleanupError) => {

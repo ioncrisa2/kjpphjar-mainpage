@@ -42,6 +42,7 @@ export default defineEventHandler(async (event) => {
     BlogPost.find(filter)
       .select('-content')
       .populate('categoryId', 'name slug description isActive createdAt updatedAt')
+      .populate('leaderId', 'name position photoUrl bio')
       .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(limit)

@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import path from 'path'
 import { BlogPost } from '~/server/models/BlogPost'
 import { Category } from '~/server/models/Category'
+import { Leader } from '~/server/models/Leader'
 import { connectDB } from '~/server/utils/db'
 import {
   calculateReadingTime,
@@ -40,6 +41,18 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    const leaderId = sanitizePlainText(body.leaderId, 30) || null
+    let authorName = sanitizePlainText(body.author, 100) || 'Admin'
+    if (leaderId) {
+      if (!mongoose.isValidObjectId(leaderId)) {
+        throw createError({ statusCode: 400, statusMessage: 'Pimpinan penulis tidak valid.' })
+      }
+      const leaderDoc = await Leader.findById(leaderId).select('name').lean()
+      if (leaderDoc) {
+        authorName = leaderDoc.name
+      }
+    }
+
     const publication = parsePublicationInput(body.status, body.publishedAt)
     let coverImageUrl = ''
     if (file) {
@@ -63,17 +76,21 @@ export default defineEventHandler(async (event) => {
       coverImageUrl,
       tags: normalizeTags(body.tags),
       categoryId,
+      leaderId,
       isFeatured: parseBoolean(body.isFeatured),
       views: 0,
       readingTime: calculateReadingTime(content),
       metaTitle: sanitizePlainText(body.metaTitle, 70),
       metaDescription: sanitizePlainText(body.metaDescription, 180),
-      author: sanitizePlainText(body.author, 100) || 'Admin',
+      author: authorName,
       ...publication,
     })
     didPersist = true
 
-    await post.populate('categoryId', 'name slug description isActive createdAt updatedAt')
+    await post.populate([
+      { path: 'categoryId', select: 'name slug description isActive createdAt updatedAt' },
+      { path: 'leaderId', select: 'name position photoUrl bio' },
+    ])
     setResponseStatus(event, 201)
     return toBlogPostDto(post.toObject())
   } catch (error: any) {

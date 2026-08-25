@@ -255,6 +255,16 @@ export function toCategoryDto(category: Record<string, any>) {
   }
 }
 
+export function toLeaderDto(leader: Record<string, any>) {
+  return {
+    _id: String(leader._id),
+    name: leader.name,
+    position: leader.position,
+    photoUrl: leader.photoUrl || '',
+    bio: leader.bio || '',
+  }
+}
+
 export function toBlogPostDto(post: Record<string, any>, includeContent = true) {
   const populatedCategory = post.categoryId && typeof post.categoryId === 'object' && post.categoryId.name
     ? toCategoryDto(post.categoryId)
@@ -262,6 +272,13 @@ export function toBlogPostDto(post: Record<string, any>, includeContent = true) 
 
   const categoryId = populatedCategory?._id
     || (post.categoryId ? String(post.categoryId) : null)
+
+  const populatedLeader = post.leaderId && typeof post.leaderId === 'object' && post.leaderId.name
+    ? toLeaderDto(post.leaderId)
+    : null
+
+  const leaderId = populatedLeader?._id
+    || (post.leaderId ? String(post.leaderId) : null)
 
   const dto: Record<string, any> = {
     _id: String(post._id),
@@ -272,6 +289,8 @@ export function toBlogPostDto(post: Record<string, any>, includeContent = true) 
     tags: Array.isArray(post.tags) ? post.tags : [],
     categoryId,
     category: populatedCategory,
+    leaderId,
+    leader: populatedLeader,
     isFeatured: Boolean(post.isFeatured),
     views: Number(post.views) || 0,
     readingTime: Number(post.readingTime) || calculateReadingTime(post.content || ''),
@@ -280,7 +299,7 @@ export function toBlogPostDto(post: Record<string, any>, includeContent = true) 
     status: getLegacyCompatibleStatus(post),
     isPublished: Boolean(post.isPublished),
     publishedAt: post.publishedAt || null,
-    author: post.author || 'Admin',
+    author: populatedLeader?.name || post.author || 'Admin',
     createdAt: post.createdAt,
     updatedAt: post.updatedAt,
   }

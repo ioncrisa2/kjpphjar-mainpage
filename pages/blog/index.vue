@@ -14,6 +14,7 @@ const searchInput = ref(String(route.query.q || ''))
 const search = refDebounced(searchInput, 350)
 const activeCategory = ref(String(route.query.category || ''))
 const activeTag = ref(String(route.query.tag || ''))
+const activeAuthor = ref(String(route.query.author || ''))
 
 const { data: categoryData } = await useFetch('/api/categories')
 const categories = computed(() => categoryData.value?.items || [])
@@ -21,7 +22,7 @@ const { data: featuredData } = await useFetch('/api/blog', {
   query: { featured: 'true', page: 1, limit: 1 },
 })
 const featured = computed(() => featuredData.value?.items?.[0] || null)
-const hasFilters = computed(() => Boolean(search.value || activeCategory.value || activeTag.value))
+const hasFilters = computed(() => Boolean(search.value || activeCategory.value || activeTag.value || activeAuthor.value))
 const showFeatured = computed(() => Boolean(featured.value && page.value === 1 && !hasFilters.value))
 const excludeFeatured = computed(() => Boolean(featured.value && !hasFilters.value))
 
@@ -32,13 +33,14 @@ const { data, pending, error: listError, refresh } = await useFetch('/api/blog',
     q: search.value || undefined,
     category: activeCategory.value || undefined,
     tag: activeTag.value || undefined,
+    author: activeAuthor.value || undefined,
     exclude: excludeFeatured.value ? featured.value?._id : undefined,
   })),
 })
 const articles = computed(() => data.value?.items || [])
 
-watch([search, activeCategory, activeTag], () => { page.value = 1 })
-watch([page, search, activeCategory, activeTag], () => {
+watch([search, activeCategory, activeTag, activeAuthor], () => { page.value = 1 })
+watch([page, search, activeCategory, activeTag, activeAuthor], () => {
   if (!import.meta.client) return
   router.replace({
     query: {
@@ -46,6 +48,7 @@ watch([page, search, activeCategory, activeTag], () => {
       q: search.value || undefined,
       category: activeCategory.value || undefined,
       tag: activeTag.value || undefined,
+      author: activeAuthor.value || undefined,
     },
   })
 })
@@ -57,6 +60,7 @@ function resetFilters() {
   searchInput.value = ''
   activeCategory.value = ''
   activeTag.value = ''
+  activeAuthor.value = ''
 }
 
 function selectTag(tag: string) {
@@ -129,9 +133,10 @@ function formatDate(value: string) {
             </label>
           </div>
 
-          <div v-if="activeTag" class="mt-4 flex items-center gap-2 text-sm">
-            <span class="text-gray dark:text-slate-300">Tag aktif:</span>
-            <button type="button" class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 font-semibold text-blue-800 dark:bg-blue-400/15 dark:text-blue-200" @click="activeTag = ''">#{{ activeTag }} <Icon name="ph:x-bold" /></button>
+          <div v-if="activeTag || activeAuthor" class="mt-4 flex flex-wrap items-center gap-2 text-sm">
+            <span class="text-gray dark:text-slate-300">Filter aktif:</span>
+            <button v-if="activeTag" type="button" class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 font-semibold text-blue-800 dark:bg-blue-400/15 dark:text-blue-200" @click="activeTag = ''">#{{ activeTag }} <Icon name="ph:x-bold" /></button>
+            <button v-if="activeAuthor" type="button" class="inline-flex items-center gap-1 rounded-full bg-purple-50 px-3 py-1.5 font-semibold text-purple-800 dark:bg-purple-400/15 dark:text-purple-200" @click="activeAuthor = ''">Penulis aktif <Icon name="ph:x-bold" /></button>
           </div>
         </section>
 
@@ -174,9 +179,30 @@ function formatDate(value: string) {
               <div v-if="article.tags.length" class="mt-4 flex flex-wrap gap-1.5">
                 <button v-for="tag in article.tags.slice(0, 3)" :key="tag" type="button" class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-800 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-blue-400/15 dark:hover:text-blue-200" @click="selectTag(tag)">#{{ tag }}</button>
               </div>
-              <div class="mt-auto flex items-center justify-between border-t border-gray/10 pt-5 text-xs text-gray dark:border-white/10 dark:text-slate-300" :class="article.tags.length ? 'mt-5' : 'mt-6'">
-                <span>{{ formatDate(article.publishedAt || article.createdAt) }}</span>
-                <span class="inline-flex items-center gap-1"><Icon name="ph:eye-bold" /> {{ article.views.toLocaleString('id-ID') }}</span>
+              <div class="mt-auto flex items-center justify-between border-t border-gray/10 pt-4 text-xs text-gray dark:border-white/10 dark:text-slate-300" :class="article.tags.length ? 'mt-5' : 'mt-6'">
+                <div class="flex items-center gap-2 min-w-0 pr-2">
+                  <img
+                    v-if="article.leader?.photoUrl"
+                    :src="article.leader.photoUrl"
+                    :alt="article.author"
+                    width="24"
+                    height="24"
+                    class="h-6 w-6 rounded-full object-cover shrink-0 border border-primary/40"
+                    loading="lazy"
+                  />
+                  <Icon v-else name="ph:user-circle-bold" class="text-base shrink-0 text-primary" />
+                  <button
+                    type="button"
+                    class="truncate font-semibold text-black dark:text-white hover:text-primary transition text-left"
+                    :title="`Lihat artikel oleh ${article.author}`"
+                    @click="activeAuthor = article.leader?._id || article.author"
+                  >
+                    {{ article.author }}
+                  </button>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span>{{ formatDate(article.publishedAt || article.createdAt) }}</span>
+                </div>
               </div>
             </div>
           </article>

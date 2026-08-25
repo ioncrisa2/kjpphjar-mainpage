@@ -32,6 +32,16 @@ export default defineEventHandler(async (event) => {
   if (tag) filters.push({ tags: new RegExp(`^${escapeRegex(tag)}$`, 'i') })
   if (String(query.featured) === 'true') filters.push({ isFeatured: true })
 
+  const authorFilter = sanitizePlainText(query.author, 80)
+  if (authorFilter) {
+    if (/^[a-f\d]{24}$/i.test(authorFilter)) {
+      filters.push({ leaderId: authorFilter })
+    } else {
+      const authorRegex = new RegExp(escapeRegex(authorFilter), 'i')
+      filters.push({ author: authorRegex })
+    }
+  }
+
   const excludeId = sanitizePlainText(query.exclude, 30)
   if (excludeId && /^[a-f\d]{24}$/i.test(excludeId)) filters.push({ _id: { $ne: excludeId } })
 
@@ -44,6 +54,10 @@ export default defineEventHandler(async (event) => {
         path: 'categoryId',
         select: 'name slug description isActive createdAt updatedAt',
         match: { isActive: true },
+      })
+      .populate({
+        path: 'leaderId',
+        select: 'name position photoUrl bio',
       })
       .sort({ publishedAt: -1, createdAt: -1 })
       .skip(skip)
