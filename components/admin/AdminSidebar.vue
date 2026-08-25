@@ -2,15 +2,18 @@
 const route = useRoute()
 
 const navItems = [
-  { label: 'Dashboard', icon: '📊', to: '/admin' },
-  { label: 'Galeri', icon: '🖼️', to: '/admin/gallery' },
-  { label: 'Cabang', icon: '📍', to: '/admin/branches' },
-  { label: 'Pimpinan', icon: '👤', to: '/admin/leaders' },
-  { label: 'Klien & Rekanan', icon: '🤝', to: '/admin/clients' },
-  { label: 'Layanan', icon: '⚙️', to: '/admin/services' },
-  { label: 'Blog', icon: '📝', to: '/admin/blog' },
-  { label: 'Karir', icon: '💼', to: '/admin/careers' },
-  { label: 'Inbox Kontak', icon: '✉️', to: '/admin/contacts' },
+  { label: 'Dashboard', icon: 'ph:squares-four-bold', to: '/admin' },
+  { label: 'Galeri', icon: 'ph:images-bold', to: '/admin/gallery' },
+  { label: 'Cabang', icon: 'ph:map-pin-bold', to: '/admin/branches' },
+  { label: 'Pimpinan', icon: 'ph:user-circle-bold', to: '/admin/leaders' },
+  { label: 'Klien & Rekanan', icon: 'ph:handshake-bold', to: '/admin/clients' },
+  { label: 'Layanan', icon: 'ph:briefcase-bold', to: '/admin/services' },
+  { label: 'Blog', icon: 'ph:article-bold', to: '/admin/blog' },
+  { label: 'Karir', icon: 'ph:identification-card-bold', to: '/admin/careers' },
+  { label: 'Analitik', icon: 'ph:chart-line-up-bold', to: '/admin/analytics' },
+  { label: 'Pengaturan', icon: 'ph:gear-six-bold', to: '/admin/settings' },
+  { label: 'Inbox Kontak', icon: 'ph:envelope-simple-bold', to: '/admin/contacts' },
+  { label: 'Kontak Footer', icon: 'ph:phone-bold', to: '/admin/contact-persons' },
 ]
 
 async function logout() {
@@ -39,7 +42,7 @@ async function logout() {
         class="admin-sidebar-link"
         :class="{ active: route.path === item.to || (item.to !== '/admin' && route.path.startsWith(item.to)) }"
       >
-        <span class="text-base">{{ item.icon }}</span>
+        <Icon :name="item.icon" class="h-5 w-5 shrink-0" aria-hidden="true" />
         <span>{{ item.label }}</span>
       </NuxtLink>
     </nav>
@@ -50,7 +53,7 @@ async function logout() {
         class="admin-sidebar-link w-full text-red-500 hover:bg-red-500/10 hover:text-red-500"
         @click="logout"
       >
-        <span>🚪</span>
+        <Icon name="ph:sign-out-bold" class="h-5 w-5" aria-hidden="true" />
         <span>Logout</span>
       </button>
       <div class="mt-2 px-4">
@@ -59,7 +62,8 @@ async function logout() {
           target="_blank"
           class="text-xs text-gray hover:text-primary flex items-center gap-1"
         >
-          <span>↗</span> Lihat Website
+          <Icon name="ph:arrow-square-out-bold" class="h-4 w-4" aria-hidden="true" />
+          Lihat Website
         </NuxtLink>
       </div>
     </div>
