@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
+const { isCollapsed, toggleSidebar } = useAdminSidebar()
 
 const breadcrumbLabel = computed(() => {
   const path = route.path.replace('/admin', '').replace('/', '') || 'dashboard'
@@ -37,9 +38,25 @@ async function logout() {
 </script>
 
 <template>
-  <header class="flex h-14 items-center justify-between border-b border-gray/10 bg-white px-6 dark:bg-gray-dark">
-    <div class="text-sm font-semibold text-black dark:text-white capitalize">
-      Admin / {{ breadcrumbLabel || 'Dashboard' }}
+  <header class="flex h-14 items-center justify-between border-b border-gray/10 bg-white px-4 md:px-6 dark:bg-gray-dark shrink-0">
+    <div class="flex items-center gap-2.5">
+      <!-- Sidebar Quick Toggle Button -->
+      <button
+        type="button"
+        @click="toggleSidebar"
+        class="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:text-black hover:bg-stone-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800 transition"
+        :title="isCollapsed ? 'Perluas Menu Sidebar' : 'Ciutkan Menu Sidebar'"
+        aria-label="Toggle Sidebar Menu"
+      >
+        <Icon
+          name="ph:list-bold"
+          class="h-5 w-5 transition-transform duration-200"
+        />
+      </button>
+
+      <div class="text-sm font-semibold text-black dark:text-white capitalize">
+        Admin / {{ breadcrumbLabel || 'Dashboard' }}
+      </div>
     </div>
 
     <div class="flex items-center gap-3">
