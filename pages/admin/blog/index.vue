@@ -47,8 +47,16 @@ function statusPresentation(article: Record<string, any>) {
   return { label: 'Draft', class: 'bg-amber-100 text-amber-800' }
 }
 
+const { ask } = useConfirm()
+
 async function deleteItem(article: Record<string, any>) {
-  if (!confirm(`Hapus artikel “${article.title}”? Tindakan ini tidak dapat dibatalkan.`)) return
+  const confirmed = await ask({
+    title: 'Hapus Artikel',
+    message: 'Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.',
+    itemName: article.title || undefined,
+    confirmText: 'Ya, Hapus',
+  })
+  if (!confirmed) return
   try {
     await $fetch(`/api/admin/blog/${article._id}`, { method: 'DELETE' })
     if (articles.value.length === 1 && page.value > 1) page.value--

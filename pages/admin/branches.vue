@@ -78,10 +78,18 @@ async function submitForm() {
   }
 }
 
-async function deleteItem(id: string) {
-  if (!confirm('Yakin ingin menghapus cabang ini?')) return
+const { ask } = useConfirm()
+
+async function deleteItem(branch: any) {
+  const confirmed = await ask({
+    title: 'Hapus Cabang',
+    message: 'Apakah Anda yakin ingin menghapus data cabang ini?',
+    itemName: branch.name ? `${branch.name} (${branch.city})` : undefined,
+    confirmText: 'Ya, Hapus',
+  })
+  if (!confirmed) return
   try {
-    await $fetch(`/api/branches/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/branches/${branch._id}`, { method: 'DELETE' })
     refresh()
   } catch (err) {
     alert('Gagal menghapus cabang')
@@ -133,7 +141,7 @@ async function deleteItem(id: string) {
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium">
                 <button @click="openEdit(branch)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
-                <button @click="deleteItem(branch._id)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <button @click="deleteItem(branch)" class="text-red-600 hover:text-red-900">Hapus</button>
               </td>
             </tr>
           </tbody>

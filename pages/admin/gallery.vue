@@ -87,10 +87,18 @@ async function submitEdit() {
   }
 }
 
-async function deletePhoto(id: string) {
-  if (!confirm('Hapus foto ini dari galeri?')) return
+const { ask } = useConfirm()
+
+async function deletePhoto(photo: any) {
+  const confirmed = await ask({
+    title: 'Hapus Foto Galeri',
+    message: 'Apakah Anda yakin ingin menghapus foto ini dari galeri?',
+    itemName: photo.title ? photo.title : (photo.category ? `Foto Kategori ${photo.category}` : undefined),
+    confirmText: 'Ya, Hapus',
+  })
+  if (!confirmed) return
   try {
-    await $fetch(`/api/gallery/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/gallery/${photo._id}`, { method: 'DELETE' })
     refresh()
   } catch (error) {
     alert('Gagal menghapus foto.')
@@ -134,7 +142,7 @@ async function deletePhoto(id: string) {
         </div>
         <div class="mt-3 flex items-center justify-between border-t border-gray/10 pt-3">
           <button class="text-xs font-bold text-primary hover:underline" @click="openEdit(photo)">Edit</button>
-          <button class="text-xs font-bold text-red-500 hover:underline" @click="deletePhoto(photo._id)">Hapus</button>
+          <button class="text-xs font-bold text-red-500 hover:underline" @click="deletePhoto(photo)">Hapus</button>
         </div>
       </div>
     </div>

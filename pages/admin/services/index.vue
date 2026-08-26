@@ -9,10 +9,18 @@ const saving = ref(false)
 const draggedIndex = ref<number | null>(null)
 const dragOverIndex = ref<number | null>(null)
 
-async function deleteItem(id: string) {
-  if (!confirm('Yakin ingin menghapus layanan ini?')) return
+const { ask } = useConfirm()
+
+async function deleteItem(service: any) {
+  const confirmed = await ask({
+    title: 'Hapus Layanan',
+    message: 'Apakah Anda yakin ingin menghapus data layanan ini?',
+    itemName: service.title || undefined,
+    confirmText: 'Ya, Hapus',
+  })
+  if (!confirmed) return
   try {
-    await $fetch(`/api/services/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/services/${service._id}`, { method: 'DELETE' })
     refresh()
   } catch (err) {
     alert('Gagal menghapus layanan')
@@ -138,7 +146,7 @@ async function saveOrder(items: any[]) {
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium">
                 <NuxtLink :to="`/admin/services/${service._id}`" class="text-primary hover:text-blue-900 mr-4">Edit</NuxtLink>
-                <button @click="deleteItem(service._id)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <button @click="deleteItem(service)" class="text-red-600 hover:text-red-900">Hapus</button>
               </td>
             </tr>
           </tbody>

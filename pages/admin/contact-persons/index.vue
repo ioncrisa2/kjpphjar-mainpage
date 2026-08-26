@@ -49,10 +49,18 @@ const submitForm = async () => {
   }
 }
 
-const deleteContact = async (id: string) => {
-  if (!confirm('Apakah Anda yakin ingin menghapus kontak ini?')) return
+const { ask } = useConfirm()
+
+const deleteContact = async (item: any) => {
+  const confirmed = await ask({
+    title: 'Hapus Kontak Footer',
+    message: 'Apakah Anda yakin ingin menghapus contact person ini dari footer website?',
+    itemName: item.name ? `${item.name} (${item.phone})` : undefined,
+    confirmText: 'Ya, Hapus',
+  })
+  if (!confirmed) return
   try {
-    await $fetch(`/api/contact-persons/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/contact-persons/${item._id}`, { method: 'DELETE' })
     refresh()
   } catch (err: any) {
     alert(err.data?.message || 'Terjadi kesalahan')
@@ -161,7 +169,7 @@ const onDrop = async (dropIndex: number) => {
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <button @click="openEditModal(item)" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-              <button @click="deleteContact(item._id)" class="text-red-600 hover:text-red-900">Hapus</button>
+              <button @click="deleteContact(item)" class="text-red-600 hover:text-red-900">Hapus</button>
             </td>
           </tr>
         </tbody>

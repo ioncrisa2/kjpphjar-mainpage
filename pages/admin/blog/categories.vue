@@ -41,8 +41,16 @@ async function saveCategory() {
   }
 }
 
+const { ask } = useConfirm()
+
 async function deleteCategory(category: Record<string, any>) {
-  if (!confirm(`Hapus kategori “${category.name}”?`)) return
+  const confirmed = await ask({
+    title: 'Hapus Kategori Artikel',
+    message: 'Apakah Anda yakin ingin menghapus kategori ini?',
+    itemName: category.name || undefined,
+    confirmText: 'Ya, Hapus',
+  })
+  if (!confirmed) return
   try {
     await $fetch(`/api/admin/categories/${category._id}`, { method: 'DELETE' })
     if (editingId.value === category._id) resetForm()

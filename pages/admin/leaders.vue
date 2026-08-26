@@ -80,10 +80,18 @@ async function submitForm() {
   }
 }
 
-async function deleteItem(id: string) {
-  if (!confirm('Yakin ingin menghapus data ini?')) return
+const { ask } = useConfirm()
+
+async function deleteItem(leader: any) {
+  const confirmed = await ask({
+    title: 'Hapus Pimpinan',
+    message: 'Apakah Anda yakin ingin menghapus data profil pimpinan ini?',
+    itemName: leader.name ? `${leader.name} — ${leader.position}` : undefined,
+    confirmText: 'Ya, Hapus',
+  })
+  if (!confirmed) return
   try {
-    await $fetch(`/api/leaders/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/leaders/${leader._id}`, { method: 'DELETE' })
     refresh()
   } catch (err) {
     alert('Gagal menghapus data')
@@ -144,7 +152,7 @@ async function deleteItem(id: string) {
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button @click="openEdit(leader)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
-                <button @click="deleteItem(leader._id)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <button @click="deleteItem(leader)" class="text-red-600 hover:text-red-900">Hapus</button>
               </td>
             </tr>
           </tbody>

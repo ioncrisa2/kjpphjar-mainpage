@@ -168,18 +168,19 @@ const errorMessage = computed(() => {
   return currentError?.statusMessage || currentError?.message || 'Data analitik gagal dimuat.'
 })
 
+const { ask } = useConfirm()
 const purging = ref(false)
 const purgeNotice = ref('')
 const purgeError = ref('')
 
 async function purgeExpiredLogs() {
-  if (
-    !window.confirm(
-      'Bersihkan log analitik yang berusia lebih dari 90 hari? Data lama yang terhapus tidak dapat dipulihkan.'
-    )
-  ) {
-    return
-  }
+  const confirmed = await ask({
+    title: 'Bersihkan Log Analitik',
+    message: 'Bersihkan log analitik yang berusia lebih dari 90 hari? Data lama yang terhapus tidak dapat dipulihkan.',
+    confirmText: 'Ya, Bersihkan Log',
+    variant: 'warning',
+  })
+  if (!confirmed) return
 
   purging.value = true
   purgeNotice.value = ''

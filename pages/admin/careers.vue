@@ -71,10 +71,18 @@ async function submitForm() {
   }
 }
 
-async function deleteItem(id: string) {
-  if (!confirm('Yakin ingin menghapus lowongan ini?')) return
+const { ask } = useConfirm()
+
+async function deleteItem(career: any) {
+  const confirmed = await ask({
+    title: 'Hapus Lowongan Karir',
+    message: 'Apakah Anda yakin ingin menghapus lowongan pekerjaan ini?',
+    itemName: career.title ? `${career.title} (${career.type} - ${career.location})` : undefined,
+    confirmText: 'Ya, Hapus',
+  })
+  if (!confirmed) return
   try {
-    await $fetch(`/api/careers/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/careers/${career._id}`, { method: 'DELETE' })
     refresh()
   } catch (err) {
     alert('Gagal menghapus lowongan')
@@ -130,7 +138,7 @@ async function deleteItem(id: string) {
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium">
                 <button @click="openEdit(career)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
-                <button @click="deleteItem(career._id)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <button @click="deleteItem(career)" class="text-red-600 hover:text-red-900">Hapus</button>
               </td>
             </tr>
           </tbody>

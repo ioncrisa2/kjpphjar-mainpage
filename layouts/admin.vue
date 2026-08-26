@@ -35,5 +35,9 @@ const store = useAppStore()
         </footer>
       </main>
     </div>
+
+    <!-- Global Confirmation Modal for Admin Actions -->
+    <UiConfirmModal />
   </div>
 </template>
+
