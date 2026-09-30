@@ -1,15 +1,14 @@
 services:
   app:
+    image: ghcr.io/ioncrisa2/kjpphjar-mainpage:latest
     build:
-      context: ./kjpphjar-mainpage
+      context: .
       dockerfile: Dockerfile
     container_name: kjpphjar-app
     restart: unless-stopped
     ports:
       - "3000:3000"
     env_file:
-      - path: ./kjpphjar-mainpage/.env
-        required: false
       - path: .env
         required: false
     environment:
@@ -17,6 +16,12 @@ services:
       - HOST=0.0.0.0
       - PORT=3000
       - UPLOADS_DIR=/app/uploads
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongodb:27017/kjpphjar?replicaSet=rs0}
+      - NUXT_MONGODB_URI=${MONGODB_URI:-mongodb://mongodb:27017/kjpphjar?replicaSet=rs0}
+      - NUXT_JWT_SECRET=${JWT_SECRET}
+      - NUXT_JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
+      - NUXT_ANALYTICS_HASH_SECRET=${ANALYTICS_HASH_SECRET}
+      - NUXT_PUBLIC_BASE_URL=${NUXT_PUBLIC_BASE_URL:-http://localhost:3000}
     volumes:
       - uploads_data:/app/uploads
     depends_on:

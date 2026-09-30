@@ -8,7 +8,7 @@ export async function connectDB() {
   if (connectionPromise) return connectionPromise
 
   const config = useRuntimeConfig()
-  const uri = config.mongodbUri
+  const uri = process.env.MONGODB_URI || config.mongodbUri
 
   if (!listenersAttached) {
     listenersAttached = true

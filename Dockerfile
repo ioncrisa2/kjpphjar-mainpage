@@ -50,7 +50,7 @@ EXPOSE 3000
 
 # Health check to ensure the server responds
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD curl -f http://localhost:3000/api/settings/session || exit 1
+  CMD curl -f http://localhost:3000/ || exit 1
 
 # Start the Nitro production server
 CMD ["node", ".output/server/index.mjs"]
