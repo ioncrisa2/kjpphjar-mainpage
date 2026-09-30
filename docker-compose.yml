@@ -1,0 +1,59 @@
+services:
+  app:
+    build:
+      context: ./kjpphjar-mainpage
+      dockerfile: Dockerfile
+    container_name: kjpphjar-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: ./kjpphjar-mainpage/.env
+        required: false
+      - path: .env
+        required: false
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=3000
+      - UPLOADS_DIR=/app/uploads
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - kjpphjar-net
+
+  mongodb:
+    image: mongo:7.0
+    container_name: kjpphjar-mongodb
+    restart: unless-stopped
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    # Uncomment baris di bawah jika ingin mengakses MongoDB dari luar server (misal: MongoDB Compass)
+    # ports:
+    #   - "127.0.0.1:27017:27017"
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --port 27017 --eval \"try { rs.status().ok } catch(e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongodb:27017'}]}).ok }\" --quiet || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - kjpphjar-net
+
+volumes:
+  mongodb_data:
+    name: kjpphjar_mongodb_data
+  mongodb_config:
+    name: kjpphjar_mongodb_config
+  uploads_data:
+    name: kjpphjar_uploads_data
+
+networks:
+  kjpphjar-net:
+    name: kjpphjar_network
+    driver: bridge
