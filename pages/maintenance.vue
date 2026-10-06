@@ -41,40 +41,53 @@ if (import.meta.server) {
 </script>
 
 <template>
-  <main class="flex min-h-[100dvh] items-center bg-[#08111F] px-5 py-12 font-mulish text-white sm:px-8">
-    <div class="mx-auto w-full max-w-3xl">
-      <div class="mb-10 flex items-center gap-3">
-        <img src="/assets/images/h-logo.png" :alt="settings.siteName" width="176" height="44" class="h-11 w-auto" />
-        <p class="max-w-xs text-sm font-bold leading-5 text-white/85">{{ settings.siteName }}</p>
-      </div>
-
-      <div class="max-w-2xl">
-        <div class="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85">
-          <span class="h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
-          Pemeliharaan terjadwal
-        </div>
-        <h1 class="max-w-xl text-4xl font-black leading-tight tracking-[-0.03em] text-wrap-balance sm:text-5xl">
-          Kami sedang merawat website ini.
-        </h1>
-        <p class="mt-6 max-w-2xl text-base leading-8 text-white/75 sm:text-lg">
-          {{ settings.maintenanceMode.message }}
-        </p>
-
-        <div v-if="expectedEnd" class="mt-8 border-t border-white/15 pt-6">
-          <p class="text-xs font-bold text-white/55">Estimasi layanan kembali</p>
-          <p class="mt-1 text-base font-bold text-white">{{ expectedEnd }} WIB</p>
+  <main class="min-h-screen font-mulish bg-white dark:bg-gray-dark flex flex-col relative z-0">
+    <div class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat flex-1 flex flex-col justify-center relative">
+      <div class="absolute inset-0 bg-black/30"></div>
+      
+      <div class="container relative z-10 px-4 sm:px-6 lg:px-8 mx-auto py-20 flex flex-col items-center text-center">
+        
+        <div class="mb-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl inline-block transform hover:scale-105 transition-transform duration-300">
+          <img src="/assets/images/h-logo.png" :alt="settings.siteName" width="220" height="55" class="h-14 w-auto mx-auto drop-shadow-md" />
         </div>
 
-        <p class="mt-10 max-w-xl text-sm leading-6 text-white/55">
-          Terima kasih atas kesabaran Anda. Silakan muat ulang halaman ini setelah waktu pemeliharaan berakhir.
-        </p>
-      </div>
+        <div class="max-w-2xl bg-black/50 backdrop-blur-md p-8 sm:p-12 rounded-[2rem] border border-white/10 shadow-2xl relative overflow-hidden">
+          <!-- Glassmorphism glare effect -->
+          <div class="absolute -top-24 -left-24 w-48 h-48 bg-primary/30 rounded-full blur-3xl opacity-50"></div>
+          
+          <div class="relative z-10">
+            <div class="mb-6 inline-flex items-center justify-center gap-2 rounded-full bg-primary/20 px-4 py-2 text-sm font-bold text-white border border-primary/30">
+              <span class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+              </span>
+              Mode Pemeliharaan
+            </div>
+            
+            <h1 class="max-w-xl text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-[40px] mx-auto mb-6 drop-shadow-md">
+              Situs ini sedang dalam pemeliharaan.
+            </h1>
+            
+            <p class="max-w-xl mx-auto text-base leading-relaxed text-white/80 sm:text-lg">
+              {{ settings.maintenanceMode.message || 'Kami sedang melakukan pemeliharaan sistem rutin untuk meningkatkan kualitas layanan kami. Silakan kembali dalam beberapa saat lagi.' }}
+            </p>
 
-      <div class="mt-14 flex items-center justify-between border-t border-white/10 pt-5 text-xs text-white/45">
-        <span>HTTP 503 / Layanan sementara tidak tersedia</span>
-        <NuxtLink to="/admin/login" class="font-semibold transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-          Akses admin
-        </NuxtLink>
+            <div v-if="expectedEnd" class="mt-8 mx-auto inline-block border border-white/15 bg-white/10 rounded-xl px-6 py-4 backdrop-blur-sm">
+              <p class="text-xs font-bold text-white/70 uppercase tracking-wider mb-1">Estimasi Layanan Kembali</p>
+              <p class="text-xl font-extrabold text-primary drop-shadow-sm">{{ expectedEnd }} WIB</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="bg-[#0b131e] py-5 border-t border-white/5 relative z-10">
+      <div class="container mx-auto px-4 text-center">
+        <p class="text-sm font-semibold text-white/50">
+          &copy; {{ new Date().getFullYear() }} {{ settings.siteName }}. HTTP 503 Service Unavailable.
+        </p>
       </div>
     </div>
   </main>
