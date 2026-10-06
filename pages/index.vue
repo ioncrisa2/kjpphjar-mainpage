@@ -1,14 +1,14 @@
 <script setup lang="ts">
 useHead({
-  title: "KJPP HJA'R | Penilai Publik & Konsultan Independen",
+  title: "KJPP HJA'R | Jasa Penilaian Publik & Layanan Konsultan Independen",
   meta: [
     {
       name: 'description',
       content:
-        'KJPP Henricus Judi Adrianto dan Rekan — perusahaan jasa penilai publik dan konsultan independen terpercaya dengan pengalaman lebih dari 10 tahun.',
+        'KJPP Henricus Judi Adrianto dan Rekan menyediakan layanan konsultan dan penilaian publik independen. Terpercaya menangani berbagai proyek dengan ribuan pelanggan puas selama lebih dari 10 tahun.',
     },
-    { property: 'og:title', content: "KJPP HJA'R | Penilai Publik & Konsultan Independen" },
-    { property: 'og:description', content: 'Jasa penilai publik dan konsultan independen terpercaya.' },
+    { property: 'og:title', content: "KJPP HJA'R | Jasa Penilaian Publik & Layanan Konsultan Independen" },
+    { property: 'og:description', content: 'KJPP Henricus Judi Adrianto dan Rekan menyediakan layanan konsultan dan penilaian publik independen terpercaya.' },
   ],
   link: [
     {

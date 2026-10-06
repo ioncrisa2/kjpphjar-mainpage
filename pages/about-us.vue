@@ -34,6 +34,7 @@ const missions = [
     <!-- About section -->
     <section class="flex items-center bg-stone-100 py-16 dark:bg-gray-dark/30 lg:py-24">
       <div class="container">
+        <UiBreadcrumbs :items="[{ label: 'Tentang Kami' }]" class="mb-6" />
         <div class="flex flex-wrap gap-8 lg:gap-0">
           <div class="w-full px-4 lg:w-1/2">
             <h2 class="mt-2 mb-4 text-2xl font-bold text-black dark:text-white">

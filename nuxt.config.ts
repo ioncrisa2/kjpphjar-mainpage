@@ -83,12 +83,12 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'id' },
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
-      title: "KJPP HJA'R | Penilai Publik & Konsultan Independen",
+      title: "KJPP HJA'R | Jasa Penilaian Publik & Layanan Konsultan Independen",
       meta: [
         {
           name: 'description',
           content:
-            'KJPP Henricus Judi Adrianto dan Rekan — perusahaan jasa penilai publik dan konsultan independen dengan pengalaman lebih dari 10 tahun.',
+            'KJPP Henricus Judi Adrianto dan Rekan menyediakan layanan konsultan dan penilaian publik independen. Terpercaya menangani berbagai proyek dengan ribuan pelanggan puas selama lebih dari 10 tahun.',
         },
         { property: 'og:type', content: 'website' },
         { property: 'og:site_name', content: "KJPP HJA'R" },

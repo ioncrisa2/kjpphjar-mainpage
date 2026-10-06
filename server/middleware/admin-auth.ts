@@ -30,6 +30,7 @@ export default defineEventHandler(async (event) => {
     (path.startsWith('/api/leaders') && isMutation) ||
     (path.startsWith('/api/clients') && (isMutation || query.all === 'true')) ||
     (path.startsWith('/api/services') && isMutation) ||
+    (path.startsWith('/api/faq') && (isMutation || query.admin === 'true')) ||
     (path.startsWith('/api/blog') &&
       ((isMutation && !isPublicBlogView) || query.admin === 'true')) ||
     (path.startsWith('/api/careers') &&

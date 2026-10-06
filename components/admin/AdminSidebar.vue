@@ -31,6 +31,7 @@ const categories: NavCategory[] = [
     icon: 'ph:folder-bold',
     items: [
       { label: 'Layanan', icon: 'ph:briefcase-bold', to: '/admin/services' },
+      { label: 'FAQ', icon: 'ph:question-bold', to: '/admin/faq' },
       { label: 'Blog', icon: 'ph:article-bold', to: '/admin/blog' },
       { label: 'Karir', icon: 'ph:identification-card-bold', to: '/admin/careers' },
       { label: 'Galeri', icon: 'ph:images-bold', to: '/admin/gallery' },

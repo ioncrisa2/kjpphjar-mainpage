@@ -32,6 +32,7 @@ function getMailtoLink(title: string) {
     <!-- Content Section -->
     <div class="py-16 sm:py-24 bg-white">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <UiBreadcrumbs :items="[{ label: 'Karir' }]" class="mb-6" />
 
         <div class="text-center mb-12">
            <p class="text-xl sm:text-2xl font-extrabold text-black font-mulish max-w-2xl mx-auto">

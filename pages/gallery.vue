@@ -40,6 +40,7 @@ const filteredPhotos = computed(() => {
 
     <section class="py-14 lg:py-[100px]">
       <div class="container">
+        <UiBreadcrumbs :items="[{ label: 'Galeri' }]" class="mb-6" />
         <div class="heading text-center">
           <p class="subtitle">Momen & Kegiatan</p>
           <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Valuing What Matters</h2>

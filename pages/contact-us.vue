@@ -112,6 +112,7 @@ function resetFormToNewMessage() {
     <!-- Form & Socials -->
     <section class="bg-gradient-to-t from-white/[55%] to-transparent py-14 dark:bg-none lg:py-[50px]">
       <div class="container">
+        <UiBreadcrumbs :items="[{ label: 'Contact Us' }]" class="mb-6" />
         <div class="relative z-10 lg:flex lg:gap-16">
           <div class="heading text-center lg:text-left">
             <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Get in touch with us</h2>

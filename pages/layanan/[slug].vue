@@ -43,6 +43,21 @@ useHead({
     { name: 'description', content: computed(() => service.value?.description || '') },
     { property: 'og:title', content: computed(() => service.value?.title || '') },
     { property: 'og:description', content: computed(() => service.value?.description || '') }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: computed(() => service.value ? JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": service.value.title,
+        "description": service.value.description,
+        "provider": {
+          "@type": "LocalBusiness",
+          "name": "KJPP Henricus Judi Adrianto dan Rekan"
+        }
+      }) : '')
+    }
   ]
 })
 </script>
@@ -65,6 +80,13 @@ useHead({
     <!-- Main Content (Rich Text) -->
     <div class="py-16 sm:py-24 bg-white">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <UiBreadcrumbs 
+          :items="[
+            { label: 'Layanan', to: '/layanan' },
+            { label: service.title }
+          ]" 
+          class="mb-6"
+        />
         <div class="text-center mb-12">
           <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
             <ClientOnly v-if="service.icon">

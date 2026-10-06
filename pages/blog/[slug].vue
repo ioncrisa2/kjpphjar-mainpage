@@ -196,9 +196,12 @@ function formatDate(value: string) {
 
     <main class="py-14 sm:py-20">
       <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <NuxtLink to="/blog" class="inline-flex items-center gap-2 text-sm font-bold text-primary transition hover:text-blue-700">
-          <Icon name="ph:arrow-left-bold" /> Kembali ke semua artikel
-        </NuxtLink>
+        <UiBreadcrumbs 
+          :items="[
+            { label: 'Blog', to: '/blog' },
+            { label: article.title }
+          ]" 
+        />
 
         <article ref="articleRef" class="blog-article prose prose-lg prose-blue mx-auto mt-10 max-w-none text-gray-900 prose-headings:font-extrabold prose-headings:text-black prose-a:text-primary prose-img:rounded-xl dark:prose-invert dark:text-slate-200 dark:prose-headings:text-white" v-html="article.content"></article>
 

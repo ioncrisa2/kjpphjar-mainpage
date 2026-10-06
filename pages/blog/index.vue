@@ -85,6 +85,8 @@ function formatDate(value: string) {
 
     <main class="py-14 sm:py-20">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <UiBreadcrumbs :items="[{ label: 'Blog & Publikasi' }]" class="mb-8" />
+        
         <NuxtLink
           v-if="showFeatured"
           :to="`/blog/${featured.slug}`"

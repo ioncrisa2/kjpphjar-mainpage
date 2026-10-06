@@ -43,6 +43,7 @@ const filteredClients = computed(() => {
     <!-- Content Section -->
     <div class="py-16 sm:py-24 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <UiBreadcrumbs :items="[{ label: 'Rekan dan Klien' }]" class="mb-6" />
 
         <div class="text-center mb-12">
            <h2 class="text-2xl sm:text-3xl font-extrabold text-black font-mulish">
