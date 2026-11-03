@@ -64,7 +64,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
             </div>
 
             <!-- Navigation Links -->
-            <ul class="flex flex-col items-center justify-center flex-1 gap-8 text-xl font-bold lg:flex-row lg:gap-8 lg:text-base lg:p-0">
+            <ul class="flex flex-col items-center justify-center flex-1 gap-8 text-xl font-bold lg:flex-row lg:gap-6 xl:gap-8 lg:text-base lg:p-0">
               <li><NuxtLink to="/" @click="closeMenu" class="hover:text-primary transition-colors">Home</NuxtLink></li>
               <li><NuxtLink to="/about-us" @click="closeMenu" class="hover:text-primary transition-colors">Tentang Kami</NuxtLink></li>
               <li><NuxtLink to="/layanan" @click="closeMenu" class="hover:text-primary transition-colors">Layanan</NuxtLink></li>
@@ -72,6 +72,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
               <li><NuxtLink to="/gallery" @click="closeMenu" class="hover:text-primary transition-colors">Galeri</NuxtLink></li>
               <li><NuxtLink to="/blog" @click="closeMenu" class="hover:text-primary transition-colors">Blog</NuxtLink></li>
               <li><NuxtLink to="/karir" @click="closeMenu" class="hover:text-primary transition-colors">Karir</NuxtLink></li>
+              <li><NuxtLink to="/faq" @click="closeMenu" class="hover:text-primary transition-colors">FAQ</NuxtLink></li>
               <li><NuxtLink to="/contact-us" @click="closeMenu" class="hover:text-primary transition-colors">Contact Us</NuxtLink></li>
             </ul>
           </div>

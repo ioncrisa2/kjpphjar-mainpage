@@ -121,6 +121,8 @@ function telephoneHref(phone: string) {
           </div>
           <div class="text-sm">
             Need help?
+            <NuxtLink to="/faq" class="text-purple-700 font-bold transition hover:text-primary dark:text-primary">FAQ</NuxtLink>
+            <span class="mx-1 text-gray-400" aria-hidden="true">·</span>
             <NuxtLink to="/contact-us" class="text-purple-700 font-bold transition hover:text-primary dark:text-primary">Contact Us</NuxtLink>
           </div>
         </div>
