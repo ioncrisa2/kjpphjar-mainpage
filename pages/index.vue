@@ -45,7 +45,6 @@ useHead({
   ]
 })
 
-// Fetch services and featured gallery
 const { data: servicesData } = await useFetch('/api/services')
 const { data: galleryData } = await useFetch('/api/gallery', { query: { featured: 'true', limit: 6 } })
 
@@ -213,6 +212,15 @@ const chooseUs = [
         </div>
       </div>
     </section>
+
+    <!-- Recent Articles (only if at least 3 articles are published) -->
+    <BlogRecentArticles
+      class="py-14 lg:py-20"
+      eyebrow="Wawasan & Artikel"
+      description="Panduan dan wawasan seputar penilaian aset, bisnis, dan proyek dari tim penilai kami."
+      :min-items="3"
+      centered
+    />
 
     <!-- Featured Gallery Preview (only if there are featured photos) -->
     <section v-if="featuredPhotos.length > 0" class="py-14 lg:py-20">

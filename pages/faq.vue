@@ -97,5 +97,11 @@ function isOpen(index: number) {
         </div>
       </div>
     </section>
+
+    <BlogRecentArticles
+      class="border-t border-gray-100 py-14 dark:border-gray-800 lg:py-20"
+      title="Ingin Tahu Lebih Dalam?"
+      description="Baca panduan dan artikel dari tim penilai kami."
+    />
   </div>
 </template>

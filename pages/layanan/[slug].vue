@@ -123,5 +123,13 @@ useHead({
         </div>
       </div>
     </div>
+
+    <!-- Artikel sekategori dengan layanan (slug kategori = slug layanan), fallback ke artikel terbaru -->
+    <BlogRecentArticles
+      class="border-t border-gray-100 bg-gray-50 py-16 dark:border-white/10 dark:bg-white/5 sm:py-20"
+      :category="service.slug"
+      :category-title="`Artikel seputar ${service.title}`"
+      description="Bacaan lanjutan untuk membantu Anda memahami layanan ini lebih dalam."
+    />
   </div>
 </template>

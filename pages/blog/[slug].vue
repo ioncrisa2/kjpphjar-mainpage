@@ -279,17 +279,7 @@ function formatDate(value: string) {
           <NuxtLink to="/blog" class="hidden text-sm font-bold text-primary hover:underline sm:inline">Lihat semua</NuxtLink>
         </div>
         <div class="mt-8 grid gap-7 md:grid-cols-3">
-          <NuxtLink v-for="related in relatedArticles" :key="related._id" :to="`/blog/${related.slug}`" class="group overflow-hidden rounded-xl border border-gray/15 transition hover:border-primary/60 dark:border-white/10 dark:bg-slate-900">
-            <div class="h-44 overflow-hidden bg-slate-100 dark:bg-white/5">
-              <img v-if="related.coverImageUrl" :src="related.coverImageUrl" :alt="related.title" loading="lazy" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]">
-              <div v-else class="flex h-full items-center justify-center text-slate-300"><Icon name="ph:image-bold" class="text-4xl" /></div>
-            </div>
-            <div class="p-5">
-              <p class="text-xs font-semibold text-primary">{{ related.category?.name || 'Artikel' }} · {{ related.readingTime }} menit</p>
-              <h3 class="mt-2 line-clamp-2 text-lg font-extrabold leading-snug text-black transition group-hover:text-primary dark:text-white">{{ related.title }}</h3>
-              <p class="mt-3 line-clamp-2 text-sm leading-6 text-gray dark:text-slate-300">{{ related.excerpt }}</p>
-            </div>
-          </NuxtLink>
+          <BlogArticleCard v-for="related in relatedArticles" :key="related._id" :article="related" />
         </div>
       </section>
     </main>
