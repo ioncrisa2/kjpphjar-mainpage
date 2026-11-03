@@ -9,10 +9,19 @@ useHead({
 const { data: careers, pending } = await useFetch('/api/careers')
 
 const runtimeConfig = useRuntimeConfig()
-const emailTarget = runtimeConfig.public.contactEmail || 'hrd@kjpphjar.com'
+const { data: settings } = await useAppSettings()
+const emailTarget = computed(() => settings.value.generalContacts.email.trim())
+const waNumber = computed(() => {
+  const configured = settings.value.generalContacts.whatsapp.replace(/\D/g, '')
+  return configured || String(runtimeConfig.public.whatsappNumber || '').replace(/\D/g, '')
+})
 
-function getMailtoLink(title: string) {
-  return `mailto:${emailTarget}?subject=Lamaran%20Posisi:%20${encodeURIComponent(title)}`
+// Email lamaran diatur di Admin > Pengaturan; jika kosong, arahkan ke WhatsApp
+function getApplyLink(title: string) {
+  if (emailTarget.value) {
+    return `mailto:${emailTarget.value}?subject=Lamaran%20Posisi:%20${encodeURIComponent(title)}`
+  }
+  return `https://wa.me/${waNumber.value}?text=${encodeURIComponent(`Halo, saya ingin melamar posisi ${title} di KJPP HJA'R.`)}`
 }
 </script>
 
@@ -104,7 +113,9 @@ function getMailtoLink(title: string) {
 
             <div class="pt-4 border-t border-gray-100 flex justify-end">
               <a
-                :href="getMailtoLink(career.title)"
+                :href="getApplyLink(career.title)"
+                :target="emailTarget ? undefined : '_blank'"
+                :rel="emailTarget ? undefined : 'noopener noreferrer'"
                 class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
               >
                 <i class="far fa-paper-plane mr-2"></i> Lamar Posisi Ini

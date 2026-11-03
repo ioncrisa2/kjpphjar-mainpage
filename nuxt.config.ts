@@ -57,7 +57,7 @@ export default defineNuxtConfig({
     mailTo: process.env.MAIL_TO || '',
     // Public — exposed to client
     public: {
-      baseUrl: process.env.NUXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+      baseUrl: process.env.NUXT_PUBLIC_BASE_URL || (isProduction ? 'https://kjpp-hjar.co.id' : 'http://localhost:3000'),
       whatsappNumber: process.env.WHATSAPP_NUMBER || '628117101066',
     },
   },
@@ -65,6 +65,7 @@ export default defineNuxtConfig({
   // Sitemap config
   sitemap: {
     strictNuxtContentPaths: false,
+    exclude: ['/admin/**', '/maintenance'],
     sources: [
       '/api/_sitemap-urls'
     ]

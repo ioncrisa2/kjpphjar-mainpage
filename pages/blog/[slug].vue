@@ -13,7 +13,7 @@ if (error.value) {
 const { data: relatedData } = await useFetch(`/api/blog/${slug}/related`)
 const relatedArticles = computed(() => relatedData.value?.items || [])
 const config = useRuntimeConfig()
-const baseUrl = String(config.public.baseUrl || 'https://kjpphjar.com').replace(/\/$/, '')
+const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace(/\/$/, '')
 const canonicalUrl = computed(() => `${baseUrl}/blog/${article.value?.slug || slug}`)
 const absoluteCover = computed(() => {
   const cover = article.value?.coverImageUrl || ''

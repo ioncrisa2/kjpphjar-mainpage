@@ -8,7 +8,7 @@ const props = defineProps<{
 }>()
 
 const config = useRuntimeConfig()
-const baseUrl = computed(() => String(config.public.baseUrl || 'https://kjpphjar.com').replace(/\/$/, ''))
+const baseUrl = computed(() => String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace(/\/$/, ''))
 const previewTitle = computed(() => props.metaTitle.trim() || props.title.trim() || 'Judul artikel')
 const previewDescription = computed(() => props.metaDescription.trim() || props.excerpt.trim() || 'Deskripsi artikel akan tampil di sini.')
 const previewUrl = computed(() => `${baseUrl.value}/blog/${props.slug.trim() || 'slug-artikel'}`)

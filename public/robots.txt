@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://kjpphjar.com/sitemap.xml
+Sitemap: https://kjpp-hjar.co.id/sitemap.xml

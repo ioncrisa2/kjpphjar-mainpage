@@ -1,4 +1,7 @@
 <script setup lang="ts">
+const config = useRuntimeConfig()
+const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace(/\/$/, '')
+
 useHead({
   title: "KJPP HJA'R | Jasa Penilaian Publik & Layanan Konsultan Independen",
   meta: [
@@ -25,9 +28,9 @@ useHead({
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
         "name": "KJPP Henricus Judi Adrianto dan Rekan",
-        "image": "https://kjpphjar.com/assets/images/h-logo.png",
-        "@id": "https://kjpphjar.com",
-        "url": "https://kjpphjar.com",
+        "image": `${baseUrl}/assets/images/h-logo.png`,
+        "@id": baseUrl,
+        "url": baseUrl,
         "telephone": "+628117101066",
         "description": "Perusahaan jasa penilai publik dan konsultan independen berpengalaman.",
         "address": {

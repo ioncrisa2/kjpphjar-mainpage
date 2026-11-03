@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const runtimeConfig = useRuntimeConfig()
-const baseUrl = runtimeConfig.public.baseUrl || 'https://kjpphjar.com'
+const baseUrl = runtimeConfig.public.baseUrl || 'https://kjpp-hjar.co.id'
 
 // Generate BreadcrumbList Schema JSON-LD
 const schema = computed(() => {
