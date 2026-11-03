@@ -9,6 +9,26 @@ useHead({
 const { data: faqs } = await useFetch('/api/faq')
 const openIndexes = ref<number[]>([])
 
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      children: computed(() => {
+        if (!faqs.value?.length) return ''
+        return JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: faqs.value.map((f: any) => ({
+            '@type': 'Question',
+            name: f.question,
+            acceptedAnswer: { '@type': 'Answer', text: f.answer },
+          })),
+        })
+      }),
+    },
+  ],
+})
+
 function toggleFaq(index: number) {
   const i = openIndexes.value.indexOf(index)
   if (i > -1) {
@@ -50,13 +70,12 @@ function isOpen(index: number) {
             v-for="(faq, index) in faqs" 
             :key="faq._id" 
             class="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden bg-white dark:bg-gray-dark shadow-sm"
-            itemscope itemprop="mainEntity" itemtype="https://schema.org/Question"
           >
             <button 
               @click="toggleFaq(index)"
               class="w-full flex items-center justify-between p-5 text-left focus:outline-none hover:bg-gray-50 dark:hover:bg-white/5 transition"
             >
-              <h3 class="text-lg font-bold text-black dark:text-white" itemprop="name">
+              <h3 class="text-lg font-bold text-black dark:text-white">
                 {{ faq.question }}
               </h3>
               <div class="shrink-0 ml-4 text-primary">
@@ -66,33 +85,16 @@ function isOpen(index: number) {
             </button>
             <div 
               v-show="isOpen(index)" 
-              class="p-5 border-t border-gray-100 dark:border-gray-800 text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line"
-              itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"
+              class="p-5 border-t border-gray-100 dark:border-gray-800"
             >
-              <div itemprop="text">{{ faq.answer }}</div>
+              <!-- Jawaban sudah disanitasi di server (server/utils/faq.ts) -->
+              <div
+                class="prose prose-blue max-w-none text-gray-700 prose-a:text-primary dark:prose-invert dark:text-gray-300 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
+                v-html="faq.answer"
+              />
             </div>
           </div>
         </div>
-        
-        <!-- FAQ Schema JSON-LD -->
-        <Head>
-          <script type="application/ld+json">
-            {{
-              JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "FAQPage",
-                "mainEntity": faqs?.map((f: any) => ({
-                  "@type": "Question",
-                  "name": f.question,
-                  "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": f.answer
-                  }
-                })) || []
-              })
-            }}
-          </script>
-        </Head>
       </div>
     </section>
   </div>

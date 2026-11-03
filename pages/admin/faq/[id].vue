@@ -33,7 +33,7 @@ const saving = ref(false)
 const error = ref('')
 
 async function save() {
-  if (!form.value.question || !form.value.answer) {
+  if (!form.value.question.trim() || !hasRichTextContent(form.value.answer)) {
     error.value = 'Pertanyaan dan Jawaban harus diisi.'
     return
   }
@@ -81,7 +81,7 @@ async function save() {
 
         <div>
           <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Jawaban <span class="text-red-500">*</span></label>
-          <textarea v-model="form.answer" required class="admin-input min-h-[150px]" placeholder="Masukkan jawaban"></textarea>
+          <UiWysiwygEditor v-model="form.answer" :toolbar="FAQ_EDITOR_TOOLBAR" aria-label="Jawaban FAQ" />
         </div>
 
         <div>

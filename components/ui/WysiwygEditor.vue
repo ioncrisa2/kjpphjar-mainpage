@@ -3,7 +3,7 @@
     <ClientOnly fallback-tag="div" fallback="Loading editor...">
       <QuillEditor
         content-type="html"
-        toolbar="full"
+        :toolbar="toolbar"
         class="min-h-[250px]"
         @ready="handleReady"
         @text-change="handleTextChange"
@@ -48,6 +48,10 @@ const props = defineProps({
   ariaLabel: {
     type: String,
     default: 'Editor konten',
+  },
+  toolbar: {
+    type: [String, Array],
+    default: 'full',
   },
 })
 

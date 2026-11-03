@@ -13,7 +13,7 @@ const form = ref({
 })
 
 async function save() {
-  if (!form.value.question || !form.value.answer) {
+  if (!form.value.question.trim() || !hasRichTextContent(form.value.answer)) {
     error.value = 'Pertanyaan dan Jawaban harus diisi.'
     return
   }
@@ -57,8 +57,7 @@ async function save() {
 
         <div>
           <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">Jawaban <span class="text-red-500">*</span></label>
-          <textarea v-model="form.answer" required class="admin-input min-h-[150px]" placeholder="Masukkan jawaban dari pertanyaan di atas"></textarea>
-          <p class="text-xs text-gray-500 mt-1">Anda bisa menggunakan baris baru untuk memisahkan paragraf.</p>
+          <UiWysiwygEditor v-model="form.answer" :toolbar="FAQ_EDITOR_TOOLBAR" aria-label="Jawaban FAQ" />
         </div>
 
         <div>
