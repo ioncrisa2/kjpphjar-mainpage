@@ -9,6 +9,7 @@ const breadcrumbLabel = computed(() => {
     gallery: 'Galeri',
     branches: 'Cabang',
     leaders: 'Pimpinan',
+    staff: 'Staff',
     clients: 'Klien & Rekanan',
     services: 'Layanan',
     blog: 'Blog',

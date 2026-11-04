@@ -10,6 +10,7 @@ import { Gallery } from '~/server/models/Gallery'
 import { Leader } from '~/server/models/Leader'
 import { Service } from '~/server/models/Service'
 import { Setting } from '~/server/models/Setting'
+import { Staff } from '~/server/models/Staff'
 
 export interface BackupRegistryEntry {
   model: Model<any>
@@ -24,6 +25,7 @@ export const BACKUP_REGISTRY: readonly BackupRegistryEntry[] = [
   { model: Branch },
   { model: Service, uniqueKeys: ['slug'] },
   { model: Leader },
+  { model: Staff, containsPersonalData: true },
   { model: Client },
   { model: Gallery },
   { model: Career },

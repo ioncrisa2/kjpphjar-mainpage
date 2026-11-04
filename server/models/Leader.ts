@@ -6,6 +6,8 @@ export interface ILeader extends Document {
   photoUrl: string
   order: number
   bio?: string
+  mappiNumber?: string
+  publicValuerLicense?: string
   isActive: boolean
 }
 
@@ -16,6 +18,8 @@ const LeaderSchema = new Schema<ILeader>(
     photoUrl: { type: String, required: true },
     order: { type: Number, required: true, default: 0 },
     bio: { type: String },
+    mappiNumber: { type: String, trim: true, maxlength: 100, default: '' },
+    publicValuerLicense: { type: String, trim: true, maxlength: 100, default: '' },
     isActive: { type: Boolean, default: true },
   },
   { strict: true, timestamps: true }

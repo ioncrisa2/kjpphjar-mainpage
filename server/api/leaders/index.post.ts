@@ -33,6 +33,8 @@ export default defineEventHandler(async (event) => {
       name: body.name,
       position: body.position,
       bio: body.bio,
+      mappiNumber: body.mappiNumber,
+      publicValuerLicense: body.publicValuerLicense,
       order: body.order || 0,
       isActive: body.isActive === 'true',
       photoUrl: stored.url,

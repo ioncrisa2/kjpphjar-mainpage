@@ -22,6 +22,8 @@ export default defineEventHandler(async (event) => {
       name: body.name,
       position: body.position,
       bio: body.bio,
+      mappiNumber: body.mappiNumber,
+      publicValuerLicense: body.publicValuerLicense,
       order: body.order,
     }
     if (body.isActive !== undefined) updates.isActive = body.isActive === 'true'

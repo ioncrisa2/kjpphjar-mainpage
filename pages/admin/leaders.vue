@@ -14,6 +14,8 @@ const form = reactive({
   name: '',
   position: '',
   bio: '',
+  mappiNumber: '',
+  publicValuerLicense: '',
   order: 0,
   isActive: true
 })
@@ -24,6 +26,8 @@ function resetForm() {
   form.name = ''
   form.position = ''
   form.bio = ''
+  form.mappiNumber = ''
+  form.publicValuerLicense = ''
   form.order = 0
   form.isActive = true
   if (fileInput.value) fileInput.value.value = ''
@@ -40,6 +44,8 @@ function openEdit(item: any) {
   form.name = item.name
   form.position = item.position
   form.bio = item.bio || ''
+  form.mappiNumber = item.mappiNumber || ''
+  form.publicValuerLicense = item.publicValuerLicense || ''
   form.order = item.order || 0
   form.isActive = item.isActive !== false
   if (fileInput.value) fileInput.value.value = ''
@@ -60,6 +66,8 @@ async function submitForm() {
     formData.append('name', form.name)
     formData.append('position', form.position)
     formData.append('bio', form.bio)
+    formData.append('mappiNumber', form.mappiNumber)
+    formData.append('publicValuerLicense', form.publicValuerLicense)
     formData.append('order', String(form.order))
     formData.append('isActive', String(form.isActive))
 
@@ -123,6 +131,7 @@ async function deleteItem(leader: any) {
             <tr>
               <th class="px-6 py-3 text-left text-xs font-bold text-gray uppercase tracking-wider">Profil</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-gray uppercase tracking-wider">Jabatan</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray uppercase tracking-wider">No. MAPPI / Ijin PP</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-gray uppercase tracking-wider">Urutan</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-gray uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 text-right text-xs font-bold text-gray uppercase tracking-wider">Aksi</th>
@@ -142,6 +151,10 @@ async function deleteItem(leader: any) {
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="text-sm text-gray-900">{{ leader.position }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <div class="text-gray-900">MAPPI: {{ leader.mappiNumber || '-' }}</div>
+                <div class="text-gray-500">Ijin PP: {{ leader.publicValuerLicense || '-' }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ leader.order }}
@@ -175,6 +188,16 @@ async function deleteItem(leader: any) {
         <div>
           <label class="block text-sm font-medium text-gray-700">Jabatan</label>
           <input v-model="form.position" type="text" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nomor MAPPI</label>
+            <input v-model="form.mappiNumber" type="text" maxlength="100" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">No. Ijin Penilai Publik</label>
+            <input v-model="form.publicValuerLicense" type="text" maxlength="100" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          </div>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700">Biografi Singkat</label>

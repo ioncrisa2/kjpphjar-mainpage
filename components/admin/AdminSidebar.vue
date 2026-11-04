@@ -43,6 +43,7 @@ const categories: NavCategory[] = [
     icon: 'ph:buildings-bold',
     items: [
       { label: 'Pimpinan', icon: 'ph:user-circle-bold', to: '/admin/leaders' },
+      { label: 'Staff', icon: 'ph:users-three-bold', to: '/admin/staff' },
       { label: 'Cabang', icon: 'ph:map-pin-bold', to: '/admin/branches' },
       { label: 'Klien & Rekanan', icon: 'ph:handshake-bold', to: '/admin/clients' },
     ],
