@@ -60,6 +60,7 @@ useHead({
               jobTitle: leader.position || 'Penilai Publik',
               description: leader.bio || undefined,
               image: leader.photoUrl ? (leader.photoUrl.startsWith('http') ? leader.photoUrl : `${baseUrl}${leader.photoUrl}`) : undefined,
+              url: `${baseUrl}/pimpinan/${leader._id}`,
               worksFor: {
                 '@type': 'Organization',
                 name: 'KJPP Henricus Judi Adrianto dan Rekan',
@@ -249,7 +250,9 @@ function formatDate(value: string) {
                 <div>
                   <p class="text-xs font-extrabold uppercase tracking-wider text-primary">Penulis Artikel</p>
                   <h3 id="author-heading" class="mt-0.5 text-xl font-extrabold text-black dark:text-white sm:text-2xl">
-                    {{ article.leader.name }}
+                    <NuxtLink :to="`/pimpinan/${article.leader._id}`" class="transition hover:text-primary">
+                      {{ article.leader.name }}
+                    </NuxtLink>
                   </h3>
                   <p class="text-sm font-semibold text-gray-700 dark:text-slate-300">
                     {{ article.leader.position }} · KJPP HJA'R

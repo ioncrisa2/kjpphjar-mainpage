@@ -38,6 +38,16 @@ const schema = computed(() => {
     "itemListElement": itemListElement
   }
 })
+
+// Disuntikkan lewat useHead: tag <script> di dalam template dibuang oleh compiler Vue di sisi klien
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      children: computed(() => JSON.stringify(schema.value).replace(/</g, '\\u003c')),
+    },
+  ],
+})
 </script>
 
 <template>
@@ -66,12 +76,5 @@ const schema = computed(() => {
         </span>
       </li>
     </ol>
-
-    <!-- Schema Markup Injection -->
-    <Head>
-      <script type="application/ld+json">
-        {{ JSON.stringify(schema) }}
-      </script>
-    </Head>
   </nav>
 </template>

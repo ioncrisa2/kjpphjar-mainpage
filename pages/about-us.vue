@@ -99,10 +99,11 @@ const missions = [
         </div>
 
         <div v-else class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <div
+          <NuxtLink
             v-for="leader in leaders"
             :key="leader._id"
-            class="group text-center"
+            :to="`/pimpinan/${leader._id}`"
+            class="group block text-center"
           >
             <div class="overflow-hidden rounded-2xl">
               <img
@@ -116,11 +117,14 @@ const missions = [
               />
             </div>
             <div class="mt-4">
-              <h3 class="font-extrabold text-white text-lg leading-snug">{{ leader.name }}</h3>
+              <h3 class="font-extrabold text-white text-lg leading-snug transition group-hover:text-primary">{{ leader.name }}</h3>
               <p class="text-primary font-semibold mt-1">{{ leader.position }}</p>
-              <p v-if="leader.bio" class="text-gray-300 text-sm mt-2">{{ leader.bio }}</p>
+              <p v-if="leader.bio" class="text-gray-300 text-sm mt-2 line-clamp-3">{{ leader.bio }}</p>
+              <span class="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-primary">
+                Lihat profil <Icon name="ph:arrow-right-bold" class="transition group-hover:translate-x-1" aria-hidden="true" />
+              </span>
             </div>
-          </div>
+          </NuxtLink>
         </div>
       </div>
     </section>
