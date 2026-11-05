@@ -1,13 +1,26 @@
 <script setup lang="ts">
+import type { PublicStaffGroup } from '~/types/staff'
+
 useHead({
   title: "Tentang Kami | KJPP HJA'R",
   meta: [
-    { name: 'description', content: 'Kenali lebih jauh tentang KJPP Henricus Judi Adrianto dan Rekan — visi, misi, dan tim pimpinan kami.' },
+    { name: 'description', content: 'Kenali lebih jauh tentang KJPP Henricus Judi Adrianto dan Rekan — visi, misi, tim pimpinan, serta penilai dan staff kami.' },
   ],
 })
 
 const { data: leadersData } = await useFetch('/api/leaders')
 const leaders = computed(() => leadersData.value || [])
+
+const { data: staffData } = await useFetch<PublicStaffGroup[]>('/api/staff')
+const staffGroups = computed(() => staffData.value || [])
+
+/** Inisial untuk avatar staff, tanpa gelar di belakang koma. */
+function initials(name: string) {
+  const words = name.split(',')[0].trim().split(/\s+/).filter(Boolean)
+  const first = words[0]?.[0] ?? ''
+  const last = words.length > 1 ? words[words.length - 1][0] : ''
+  return (first + last).toUpperCase()
+}
 
 const missions = [
   { id: '01', text: 'Menciptakan Brand Image dan Brand Loyalty bagi pengguna jasa.' },
@@ -125,6 +138,54 @@ const missions = [
               </span>
             </div>
           </NuxtLink>
+        </div>
+      </div>
+    </section>
+
+    <!-- Penilai & Staff per kantor -->
+    <section v-if="staffGroups.length" id="staff" class="scroll-mt-28 py-14 lg:py-[100px]">
+      <div class="container">
+        <div class="heading text-center">
+          <span class="subtitle !text-black dark:!text-primary">Tim Profesional</span>
+          <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Penilai & <span class="text-primary">Staff</span> Kami</h2>
+          <p class="mx-auto mt-3 max-w-2xl text-gray">Tenaga profesional yang siap melayani kebutuhan penilaian Anda di kantor pusat maupun cabang.</p>
+        </div>
+
+        <div class="space-y-12">
+          <div
+            v-for="group in staffGroups"
+            :id="`staff-${group.branch._id}`"
+            :key="group.branch._id"
+            class="scroll-mt-28"
+          >
+            <div class="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-gray/10 pb-3">
+              <h3 class="flex items-center gap-2 text-xl font-extrabold text-black dark:text-white">
+                <Icon name="ph:map-pin-bold" class="text-primary" aria-hidden="true" />
+                {{ group.branch.name }}
+              </h3>
+              <span class="text-sm font-semibold text-gray">{{ group.branch.city }} · {{ group.staff.length }} orang</span>
+            </div>
+
+            <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <li
+                v-for="member in group.staff"
+                :key="member._id"
+                class="flex items-start gap-4 rounded-2xl border border-primary/20 p-5 transition hover:border-primary/50"
+              >
+                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-extrabold text-primary" aria-hidden="true">
+                  {{ initials(member.name) }}
+                </span>
+                <div class="min-w-0">
+                  <p class="font-extrabold leading-snug text-black dark:text-white">{{ member.name }}</p>
+                  <p class="mt-0.5 text-sm text-gray">{{ member.position }}</p>
+                  <p v-if="member.mappiNumber" class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
+                    <Icon name="ph:identification-card-bold" class="text-primary" aria-hidden="true" />
+                    No. MAPPI {{ member.mappiNumber }}
+                  </p>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>

@@ -4,7 +4,7 @@ useHead({ title: "Admin Staff | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
 
-const { data: staffList, refresh, pending } = await useFetch<any[]>('/api/staff')
+const { data: staffList, refresh, pending } = await useFetch<any[]>('/api/staff', { query: { admin: 'true' } })
 const { data: branches } = await useFetch<any[]>('/api/branches')
 
 const modalOpen = ref(false)
@@ -18,7 +18,9 @@ const form = reactive({
   name: '',
   position: '',
   branchId: '',
-  mappiNumber: ''
+  mappiNumber: '',
+  order: 0,
+  isActive: true
 })
 
 const search = ref('')
@@ -50,6 +52,8 @@ function resetForm() {
   form.position = ''
   form.branchId = ''
   form.mappiNumber = ''
+  form.order = 0
+  form.isActive = true
 }
 
 function openAdd() {
@@ -65,6 +69,8 @@ function openEdit(item: any) {
   form.position = item.position
   form.branchId = item.branchId?._id || ''
   form.mappiNumber = item.mappiNumber || ''
+  form.order = item.order || 0
+  form.isActive = item.isActive !== false
   modalOpen.value = true
 }
 
@@ -112,7 +118,7 @@ async function deleteItem(staff: any) {
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Staff</h1>
-        <p class="mt-1 text-sm text-gray">Daftar staff yang terdaftar di KJPP HJA'R, kantor pusat maupun cabang.</p>
+        <p class="mt-1 text-sm text-gray">Daftar staff kantor pusat maupun cabang. Staff aktif ditampilkan di halaman Tentang Kami dan Kontak.</p>
       </div>
       <button v-if="can('staff.create')" @click="openAdd" class="admin-btn-primary">
         + Tambah Staff
@@ -155,6 +161,8 @@ async function deleteItem(staff: any) {
               <th class="px-6 py-3 text-left text-xs font-bold text-gray uppercase tracking-wider">Jabatan</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-gray uppercase tracking-wider">Kantor</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-gray uppercase tracking-wider">No. MAPPI</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray uppercase tracking-wider">Urutan</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray uppercase tracking-wider">Status</th>
               <th class="px-6 py-3 text-right text-xs font-bold text-gray uppercase tracking-wider">Aksi</th>
             </tr>
           </thead>
@@ -167,6 +175,11 @@ async function deleteItem(staff: any) {
                 <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Kantor terhapus</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ staff.mappiNumber || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ staff.order || 0 }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span v-if="staff.isActive !== false" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
+                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Nonaktif</span>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button v-if="can('staff.update')" @click="openEdit(staff)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
                 <button v-if="can('staff.delete')" @click="deleteItem(staff)" class="text-red-600 hover:text-red-900">Hapus</button>
@@ -202,6 +215,16 @@ async function deleteItem(staff: any) {
         <div>
           <label class="block text-sm font-medium text-gray-700">Nomor MAPPI <span class="font-normal text-gray-500">(opsional)</span></label>
           <input v-model="form.mappiNumber" type="text" maxlength="100" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          <p class="mt-1 text-xs text-gray-500">Jika diisi, nomor MAPPI ikut tampil di website.</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Urutan Tampil</label>
+          <input v-model.number="form.order" type="number" min="0" max="9999" step="1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          <p class="mt-1 text-xs text-gray-500">Angka kecil tampil lebih dulu dalam kantor yang sama.</p>
+        </div>
+        <div class="flex items-center">
+          <input id="staff-active" v-model="form.isActive" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+          <label for="staff-active" class="ml-2 block text-sm text-gray-900">Aktif (ditampilkan di website)</label>
         </div>
 
         <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse gap-2">

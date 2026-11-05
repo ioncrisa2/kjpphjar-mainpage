@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { PublicStaffGroup, PublicStaffMember } from '~/types/staff'
+
 useHead({
   title: "Contact Us | KJPP HJA'R",
   meta: [{ name: 'description', content: 'Hubungi KJPP HJA\'R — kantor pusat di Palembang, cabang di Surabaya dan Balikpapan.' }],
@@ -6,6 +8,16 @@ useHead({
 
 const { data: branchesData } = await useFetch('/api/branches')
 const branches = computed(() => branchesData.value || [])
+
+// Ringkasan staff di kartu kantor; daftar lengkap ada di halaman Tentang Kami.
+const STAFF_PREVIEW_LIMIT = 6
+const { data: staffData } = await useFetch<PublicStaffGroup[]>('/api/staff')
+const staffByBranch = computed(() => new Map<string, PublicStaffMember[]>(
+  (staffData.value || []).map((group) => [group.branch._id, group.staff])
+))
+function branchStaff(branchId: string) {
+  return staffByBranch.value.get(branchId) ?? []
+}
 
 const form = ref({ fullname: '', email: '', phone: '', city: '', message: '' })
 const errors = ref<Record<string, string>>({})
@@ -332,6 +344,26 @@ function resetFormToNewMessage() {
                   <a :href="`mailto:${branch.email}`" class="hover:text-primary transition text-black dark:text-white">{{ branch.email }}</a>
                 </li>
               </ul>
+
+              <div v-if="branchStaff(branch._id).length" class="mt-6 border-t border-gray/10 pt-5">
+                <p class="text-xs font-bold uppercase tracking-wider text-gray">Tim di kantor ini</p>
+                <ul class="mt-3 grid gap-x-6 gap-y-3 lg:grid-cols-2">
+                  <li v-for="member in branchStaff(branch._id).slice(0, STAFF_PREVIEW_LIMIT)" :key="member._id" class="text-sm">
+                    <p class="font-bold text-black dark:text-white">{{ member.name }}</p>
+                    <p class="text-xs text-gray">
+                      {{ member.position }}<template v-if="member.mappiNumber"> · No. MAPPI {{ member.mappiNumber }}</template>
+                    </p>
+                  </li>
+                </ul>
+                <NuxtLink
+                  v-if="branchStaff(branch._id).length > STAFF_PREVIEW_LIMIT"
+                  :to="`/about-us#staff-${branch._id}`"
+                  class="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline"
+                >
+                  Lihat semua {{ branchStaff(branch._id).length }} staff
+                  <Icon name="ph:arrow-right-bold" aria-hidden="true" />
+                </NuxtLink>
+              </div>
             </div>
           </div>
         </div>

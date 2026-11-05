@@ -36,7 +36,7 @@ export function isPrivateApiRoute({ method, path, query }: ApiRequest): boolean 
     (path.startsWith('/api/gallery') && (isMutation || query.admin === 'true')) ||
     (path.startsWith('/api/branches') && isMutation) ||
     (path.startsWith('/api/leaders') && isMutation) ||
-    path === '/api/staff' ||
+    (path === '/api/staff' && (isMutation || query.admin === 'true')) ||
     path.startsWith('/api/staff/') ||
     (path.startsWith('/api/clients') && (isMutation || query.all === 'true')) ||
     (path.startsWith('/api/services') && isMutation) ||
@@ -116,7 +116,7 @@ const RULES: readonly RouteRule[] = [
 
   ...crud('/api/leaders', 'leaders'),
 
-  rule(GET, '/api/staff', 'staff.view'),
+  rule(GET, '/api/staff', 'staff.view', { admin: 'true' }),
   ...crud('/api/staff', 'staff'),
 
   ...crud('/api/branches', 'branches'),
