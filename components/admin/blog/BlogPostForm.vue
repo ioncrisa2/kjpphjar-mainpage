@@ -16,6 +16,15 @@ const categories = computed(() => categoryData.value?.items || [])
 const { data: leadersData } = await useFetch('/api/leaders')
 const leaders = computed(() => leadersData.value || [])
 
+// Pembatasan berikut juga ditegakkan server; di sini hanya menyesuaikan tampilan.
+const { can, session } = useAdminAuth()
+const canPublish = computed(() => can('blog.publish'))
+const canManageAll = computed(() => can('blog.manage_all'))
+const lockedAuthor = computed(() => {
+  const leader = leaders.value.find((l: any) => l._id === session.value?.leaderId)
+  return leader ? `${leader.name} — ${leader.position}` : session.value?.name || ''
+})
+
 const form = reactive({
   title: '',
   slug: '',
@@ -216,7 +225,7 @@ function submitForm() {
     <aside class="space-y-6 lg:sticky lg:top-6">
       <section class="admin-card space-y-5" aria-labelledby="publish-heading">
         <h2 id="publish-heading" class="text-lg font-extrabold text-black dark:text-white">Publikasi</h2>
-        <div>
+        <div v-if="canPublish">
           <label for="blog-status" class="admin-label">Status</label>
           <select id="blog-status" v-model="form.status" class="admin-input">
             <option value="draft">Draft</option>
@@ -224,12 +233,15 @@ function submitForm() {
             <option value="scheduled">Terjadwal</option>
           </select>
         </div>
-        <div v-if="form.status !== 'draft'">
+        <p v-else class="rounded-xl bg-amber-50 p-3 text-sm leading-6 text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">
+          Artikel disimpan sebagai <strong>draft</strong>. Editor akan meninjau dan menerbitkannya.
+        </p>
+        <div v-if="canPublish && form.status !== 'draft'">
           <label for="published-at" class="admin-label">Tanggal & waktu terbit</label>
           <input id="published-at" v-model="form.publishedAt" type="datetime-local" :required="form.status === 'scheduled'" class="admin-input">
           <p class="mt-1.5 text-xs text-gray">Zona waktu mengikuti perangkat admin.</p>
         </div>
-        <label class="flex cursor-pointer items-start gap-3 rounded-xl bg-blue-50 p-3 text-sm text-slate-800">
+        <label v-if="canManageAll" class="flex cursor-pointer items-start gap-3 rounded-xl bg-blue-50 p-3 text-sm text-slate-800">
           <input v-model="form.isFeatured" type="checkbox" class="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
           <span><strong class="block">Artikel unggulan</strong>Tampil pada banner utama halaman blog.</span>
         </label>
@@ -238,7 +250,7 @@ function submitForm() {
       <section class="admin-card space-y-5" aria-labelledby="classification-heading">
         <div class="flex items-center justify-between gap-3">
           <h2 id="classification-heading" class="text-lg font-extrabold text-black dark:text-white">Klasifikasi</h2>
-          <NuxtLink to="/admin/blog/categories" class="text-xs font-bold text-primary hover:underline">Kelola</NuxtLink>
+          <NuxtLink v-if="can('blog.categories')" to="/admin/blog/categories" class="text-xs font-bold text-primary hover:underline">Kelola</NuxtLink>
         </div>
         <div>
           <label for="blog-category" class="admin-label">Kategori</label>
@@ -253,7 +265,12 @@ function submitForm() {
           <label class="admin-label">Tags</label>
           <AdminBlogTagInput v-model="form.tags" />
         </div>
-        <div>
+        <div v-if="!canManageAll">
+          <span class="admin-label">Penulis</span>
+          <p class="text-sm font-semibold text-black dark:text-white">{{ lockedAuthor }}</p>
+          <p class="mt-1 text-xs text-gray">Penulis mengikuti akun Anda dan tidak dapat diubah.</p>
+        </div>
+        <div v-if="canManageAll">
           <label for="blog-leader" class="admin-label">Penulis (Pimpinan Rekan)</label>
           <select id="blog-leader" v-model="form.leaderId" class="admin-input" @change="onLeaderChange">
             <option value="">Nama Manual / Tim Redaksi</option>
@@ -262,7 +279,7 @@ function submitForm() {
             </option>
           </select>
         </div>
-        <div>
+        <div v-if="canManageAll">
           <label for="blog-author" class="admin-label">Nama Tampilan Penulis</label>
           <input id="blog-author" v-model="form.author" type="text" maxlength="100" class="admin-input" placeholder="Contoh: Admin / Tim Redaksi / Nama Penulis">
         </div>

@@ -1,48 +1,22 @@
-import { requireAdmin } from '~/server/utils/require-admin'
+import { hasPermission, requireAuth } from '~/server/utils/require-auth'
+import { isPrivateApiRoute, resolveRoutePermission } from '~/server/utils/route-permissions'
 
 export default defineEventHandler(async (event) => {
-  const url = getRequestURL(event)
-  const path = url.pathname
-  const method = event.method.toUpperCase()
-  const query = getQuery(event)
-  const isMutation = !['GET', 'HEAD', 'OPTIONS'].includes(method)
+  const request = {
+    method: event.method.toUpperCase(),
+    path: getRequestURL(event).pathname,
+    query: getQuery(event),
+  }
+  if (!isPrivateApiRoute(request)) return
 
-  const isPublicContactSubmission =
-    path === '/api/contacts/submit' && method === 'POST'
-  const isPublicAnalyticsTrack =
-    path === '/api/analytics/track' && method === 'POST'
-  const isPublicBlogView =
-    method === 'PATCH' && /^\/api\/blog\/[^/]+\/view$/.test(path)
+  // Berjalan sebelum handler membaca body, sehingga upload dari user tanpa izin
+  // ditolak sebelum file diproses.
+  const user = await requireAuth(event)
+  const required = resolveRoutePermission(request)
 
-  // Guard every private read and every CMS mutation. Public collector/write
-  // exceptions are kept explicit so a newly added route is not opened by
-  // accident.
-  const isAdminRoute =
-    path.startsWith('/api/admin/') ||
-    (path.startsWith('/api/analytics/') && !isPublicAnalyticsTrack) ||
-    path === '/api/settings/backup' ||
-    path === '/api/settings/restore' ||
-    (path === '/api/settings' && isMutation) ||
-    (path.startsWith('/api/categories') && isMutation) ||
-    (path.startsWith('/api/contact-persons') && isMutation) ||
-    (path.startsWith('/api/gallery') && isMutation) ||
-    (path.startsWith('/api/branches') && isMutation) ||
-    (path.startsWith('/api/leaders') && isMutation) ||
-    path === '/api/staff' ||
-    path.startsWith('/api/staff/') ||
-    (path.startsWith('/api/clients') && (isMutation || query.all === 'true')) ||
-    (path.startsWith('/api/services') && isMutation) ||
-    (path.startsWith('/api/faq') && (isMutation || query.admin === 'true')) ||
-    (path.startsWith('/api/blog') &&
-      ((isMutation && !isPublicBlogView) || query.admin === 'true')) ||
-    (path.startsWith('/api/careers') &&
-      (isMutation || query.admin === 'true')) ||
-    (path.startsWith('/api/contacts') && !isPublicContactSubmission)
-
-  if (!isAdminRoute) return
-
-  // Revalidate the account on every private request. A signed token alone is
-  // insufficient because the user may have been removed or demoted since the
-  // token was issued.
-  await requireAdmin(event)
+  // Default-deny: rute privat yang belum dipetakan hanya untuk super admin.
+  const allowed = required ? hasPermission(user, required) : user.isSuperAdmin
+  if (!allowed) {
+    throw createError({ statusCode: 403, statusMessage: 'Anda tidak memiliki akses untuk tindakan ini.' })
+  }
 })

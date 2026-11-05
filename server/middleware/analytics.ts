@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { getPublicSettings } from '~/server/utils/settings'
-import { requireAdmin } from '~/server/utils/require-admin'
+import { requireAuth } from '~/server/utils/require-auth'
 import {
   createAnalyticsPageView,
   getAnalyticsInitialCookieName,
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     const settings = await getPublicSettings()
     if (settings.maintenanceMode.isActive) {
       try {
-        await requireAdmin(event)
+        await requireAuth(event)
       } catch {
         return
       }

@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto'
 import { createLogicalBackup } from '~/server/utils/database-backup'
-import { requireAdmin } from '~/server/utils/require-admin'
+import { requirePermission } from '~/server/utils/require-auth'
 
 export default defineEventHandler(async (event) => {
-  await requireAdmin(event)
+  await requirePermission(event, 'settings.backup')
   const backup = await createLogicalBackup()
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').replace('T', '_')
   const filename = `kjpphjar-backup_${timestamp}.json`

@@ -19,6 +19,10 @@ const breadcrumbLabel = computed(() => {
     settings: 'Pengaturan',
     contacts: 'Inbox Kontak',
     'contact-persons': 'Kontak Footer',
+    faq: 'FAQ',
+    users: 'Pengguna',
+    roles: 'Role & Hak Akses',
+    profile: 'Profil Saya',
     create: 'Tambah Baru',
   }
   const segments = path.split('/').filter(Boolean)
@@ -26,14 +30,15 @@ const breadcrumbLabel = computed(() => {
 })
 
 const { unreadCount, fetchUnreadCount } = useUnreadContacts()
-const { data: adminInfo } = useFetch<{ authenticated: boolean; username?: string; name?: string }>('/api/auth/me')
+const { session, can, clearSession } = useAdminAuth()
 
 onMounted(() => {
-  fetchUnreadCount()
+  if (can('contacts.view')) fetchUnreadCount()
 })
 
 async function logout() {
   await $fetch('/api/auth/logout', { method: 'POST' })
+  clearSession()
   await navigateTo('/admin/login')
 }
 </script>
@@ -63,20 +68,27 @@ async function logout() {
     <div class="flex items-center gap-3">
       <!-- Admin Profile Quick Link -->
       <NuxtLink
-        to="/admin/settings"
+        to="/admin/profile"
         class="inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs font-bold text-black hover:bg-stone-100 dark:text-white dark:hover:bg-gray-800 transition"
-        title="Buka Profil & Pengaturan Admin"
+        title="Buka Profil Saya"
       >
         <div class="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">
           <Icon name="ph:user-bold" class="h-3.5 w-3.5" />
         </div>
-        <span class="hidden md:inline">{{ adminInfo?.name || 'Administrator' }}</span>
+        <span class="hidden md:inline">{{ session?.name || 'Administrator' }}</span>
+        <span
+          v-if="session?.roleName"
+          class="hidden lg:inline rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+        >
+          {{ session.roleName }}
+        </span>
       </NuxtLink>
 
       <div class="h-4 w-px bg-gray/20"></div>
 
       <!-- Inbox Link with Badge -->
       <NuxtLink
+        v-if="can('contacts.view')"
         to="/admin/contacts"
         class="relative inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-stone-100 hover:text-primary dark:text-gray-300 dark:hover:bg-gray-800"
       >
@@ -90,7 +102,7 @@ async function logout() {
         </span>
       </NuxtLink>
 
-      <div class="h-4 w-px bg-gray/20"></div>
+      <div v-if="can('contacts.view')" class="h-4 w-px bg-gray/20"></div>
 
       <!-- Lihat Website Button -->
       <NuxtLink

@@ -8,12 +8,18 @@ import {
   sanitizePlainText,
   toBlogPostDto,
 } from '~/server/utils/blog'
+import { ownedRecordsFilter } from '~/server/utils/ownership'
+import { requireAuth } from '~/server/utils/require-auth'
 
 export default defineEventHandler(async (event) => {
+  const user = await requireAuth(event)
   await connectDB()
   const query = getQuery(event)
   const { page, limit, skip } = clampPagination(query.page, query.limit)
   const filters: Record<string, any>[] = []
+
+  const ownership = ownedRecordsFilter(user, 'blog.manage_all')
+  if (Object.keys(ownership).length) filters.push(ownership)
 
   const search = sanitizePlainText(query.q || query.search, 80)
   if (search) {

@@ -1,11 +1,17 @@
 <script setup lang="ts">
+import type { PermissionRequirement } from '~/shared/permissions'
+
 const route = useRoute()
 const { isCollapsed, toggleSidebar } = useAdminSidebar()
+const { can, isSuperAdmin } = useAdminAuth()
 
 interface NavItem {
   label: string
   icon: string
   to: string
+  /** Tanpa permission: tampil untuk semua user yang login. */
+  permission?: PermissionRequirement
+  superAdminOnly?: boolean
 }
 
 interface NavCategory {
@@ -15,14 +21,14 @@ interface NavCategory {
   items: NavItem[]
 }
 
-const categories: NavCategory[] = [
+const allCategories: NavCategory[] = [
   {
     key: 'main',
     label: 'Utama',
     icon: 'ph:squares-four-bold',
     items: [
       { label: 'Dashboard', icon: 'ph:squares-four-bold', to: '/admin' },
-      { label: 'Analitik', icon: 'ph:chart-line-up-bold', to: '/admin/analytics' },
+      { label: 'Analitik', icon: 'ph:chart-line-up-bold', to: '/admin/analytics', permission: 'analytics.view' },
     ],
   },
   {
@@ -30,11 +36,11 @@ const categories: NavCategory[] = [
     label: 'Konten Website',
     icon: 'ph:folder-bold',
     items: [
-      { label: 'Layanan', icon: 'ph:briefcase-bold', to: '/admin/services' },
-      { label: 'FAQ', icon: 'ph:question-bold', to: '/admin/faq' },
-      { label: 'Blog', icon: 'ph:article-bold', to: '/admin/blog' },
-      { label: 'Karir', icon: 'ph:identification-card-bold', to: '/admin/careers' },
-      { label: 'Galeri', icon: 'ph:images-bold', to: '/admin/gallery' },
+      { label: 'Layanan', icon: 'ph:briefcase-bold', to: '/admin/services', permission: 'services.view' },
+      { label: 'FAQ', icon: 'ph:question-bold', to: '/admin/faq', permission: 'faq.view' },
+      { label: 'Blog', icon: 'ph:article-bold', to: '/admin/blog', permission: 'blog.view' },
+      { label: 'Karir', icon: 'ph:identification-card-bold', to: '/admin/careers', permission: 'careers.view' },
+      { label: 'Galeri', icon: 'ph:images-bold', to: '/admin/gallery', permission: 'gallery.view' },
     ],
   },
   {
@@ -42,10 +48,10 @@ const categories: NavCategory[] = [
     label: 'Profil & Rekanan',
     icon: 'ph:buildings-bold',
     items: [
-      { label: 'Pimpinan', icon: 'ph:user-circle-bold', to: '/admin/leaders' },
-      { label: 'Staff', icon: 'ph:users-three-bold', to: '/admin/staff' },
-      { label: 'Cabang', icon: 'ph:map-pin-bold', to: '/admin/branches' },
-      { label: 'Klien & Rekanan', icon: 'ph:handshake-bold', to: '/admin/clients' },
+      { label: 'Pimpinan', icon: 'ph:user-circle-bold', to: '/admin/leaders', permission: 'leaders.view' },
+      { label: 'Staff', icon: 'ph:users-three-bold', to: '/admin/staff', permission: 'staff.view' },
+      { label: 'Cabang', icon: 'ph:map-pin-bold', to: '/admin/branches', permission: 'branches.view' },
+      { label: 'Klien & Rekanan', icon: 'ph:handshake-bold', to: '/admin/clients', permission: 'clients.view' },
     ],
   },
   {
@@ -53,8 +59,8 @@ const categories: NavCategory[] = [
     label: 'Kontak & Pesan',
     icon: 'ph:chats-circle-bold',
     items: [
-      { label: 'Inbox Kontak', icon: 'ph:envelope-simple-bold', to: '/admin/contacts' },
-      { label: 'Kontak Footer', icon: 'ph:phone-bold', to: '/admin/contact-persons' },
+      { label: 'Inbox Kontak', icon: 'ph:envelope-simple-bold', to: '/admin/contacts', permission: 'contacts.view' },
+      { label: 'Kontak Footer', icon: 'ph:phone-bold', to: '/admin/contact-persons', permission: 'contact_persons.view' },
     ],
   },
   {
@@ -62,10 +68,30 @@ const categories: NavCategory[] = [
     label: 'Sistem',
     icon: 'ph:sliders-horizontal-bold',
     items: [
-      { label: 'Pengaturan', icon: 'ph:gear-six-bold', to: '/admin/settings' },
+      {
+        label: 'Pengaturan',
+        icon: 'ph:gear-six-bold',
+        to: '/admin/settings',
+        permission: ['settings.manage', 'settings.backup', 'settings.restore'],
+      },
+      { label: 'Pengguna', icon: 'ph:users-bold', to: '/admin/users', superAdminOnly: true },
+      { label: 'Role & Hak Akses', icon: 'ph:shield-check-bold', to: '/admin/roles', superAdminOnly: true },
+      { label: 'Profil Saya', icon: 'ph:user-gear-bold', to: '/admin/profile' },
     ],
   },
 ]
+
+function isItemVisible(item: NavItem) {
+  if (item.superAdminOnly) return isSuperAdmin.value
+  return !item.permission || can(item.permission)
+}
+
+// Kategori yang semua menunya tersembunyi ikut disembunyikan.
+const categories = computed(() =>
+  allCategories
+    .map((cat) => ({ ...cat, items: cat.items.filter(isItemVisible) }))
+    .filter((cat) => cat.items.length > 0)
+)
 
 // State to track open categories in expanded mode
 const openCategories = ref<Record<string, boolean>>({
@@ -79,7 +105,7 @@ const openCategories = ref<Record<string, boolean>>({
 const { unreadCount, fetchUnreadCount } = useUnreadContacts()
 
 onMounted(() => {
-  fetchUnreadCount()
+  if (can('contacts.view')) fetchUnreadCount()
 })
 
 function isItemActive(itemTo: string): boolean {
@@ -97,7 +123,7 @@ function isCategoryActive(cat: NavCategory): boolean {
 watch(
   () => route.path,
   () => {
-    categories.forEach((cat) => {
+    categories.value.forEach((cat) => {
       if (isCategoryActive(cat)) {
         openCategories.value[cat.key] = true
       }

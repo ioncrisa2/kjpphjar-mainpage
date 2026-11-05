@@ -227,6 +227,10 @@ export async function createLogicalBackup() {
         reason: 'Credential hashes sengaja tidak disertakan dalam backup melalui browser.',
       },
       {
+        collection: 'roles',
+        reason: 'Hak akses dikelola bersama akun pengguna; role sistem dibuat otomatis saat aplikasi berjalan.',
+      },
+      {
         collection: 'analyticslogs',
         reason: 'Log analitik mentah bersifat sementara, memiliki TTL 90 hari, dan tidak disertakan dalam backup operasional.',
       },

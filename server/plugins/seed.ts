@@ -1,14 +1,63 @@
 import { connectDB } from '~/server/utils/db'
 import { User } from '~/server/models/User'
+import { Role } from '~/server/models/Role'
 import bcrypt from 'bcryptjs'
+import { SUPER_ADMIN_ROLE_KEY, type Permission } from '~/shared/permissions'
 
 import { Branch } from '~/server/models/Branch'
 import { Service } from '~/server/models/Service'
 import { Leader } from '~/server/models/Leader'
+
+// Contoh role untuk Penilai Publik / Pimpinan Cabang. Hanya dibuat sekali saat
+// koleksi role masih kosong, sehingga perubahan atau penghapusan oleh admin
+// tidak dikembalikan pada restart berikutnya.
+const CONTRIBUTOR_PERMISSIONS: Permission[] = [
+  'blog.view',
+  'blog.create',
+  'blog.update',
+  'gallery.view',
+  'gallery.create',
+  'gallery.update',
+  'clients.view',
+  'clients.create',
+  'clients.update',
+]
+
+async function seedRoles() {
+  const isFirstRun = (await Role.countDocuments()) === 0
+
+  // Role sistem selalu dipastikan ada; permission-nya tidak dipakai karena
+  // super admin selalu memiliki semua akses.
+  await Role.updateOne(
+    { key: SUPER_ADMIN_ROLE_KEY },
+    {
+      $set: { isSystem: true, permissions: [] },
+      $setOnInsert: {
+        name: 'Super Admin',
+        description: 'Akses penuh ke seluruh panel, termasuk kelola pengguna dan role.',
+      },
+    },
+    { upsert: true }
+  )
+
+  if (isFirstRun) {
+    await Role.create({
+      key: 'kontributor',
+      name: 'Kontributor Cabang',
+      description:
+        'Penilai Publik / Pimpinan Cabang: menulis artikel (draft), mengunggah foto galeri, dan menambah klien. Hanya data milik sendiri.',
+      permissions: CONTRIBUTOR_PERMISSIONS,
+    })
+    console.log('✅ Default roles created')
+  }
+}
+
 export default defineNitroPlugin(async () => {
   try {
     await connectDB()
-    
+
+    await seedRoles()
+
     // 1. Seed Admin User
     const adminCount = await User.countDocuments()
     if (adminCount === 0) {

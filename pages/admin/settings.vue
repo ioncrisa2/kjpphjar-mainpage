@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { PermissionRequirement } from '~/shared/permissions'
 import {
   MAX_RESTORE_BYTES,
   createDefaultAppSettings,
@@ -7,84 +8,23 @@ import {
   type RestorePreviewResponse,
 } from '~/types/settings'
 
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: ['settings.manage', 'settings.backup', 'settings.restore'] })
 useHead({ title: "Pengaturan Aplikasi | Admin KJPP HJA'R" })
 
-type TabId = 'general' | 'profile' | 'maintenance' | 'backup'
+// Profil & ganti password dipindah ke /admin/profile agar semua user bisa memakainya.
+type TabId = 'general' | 'maintenance' | 'backup'
 
-const tabs: Array<{ id: TabId; label: string; description: string }> = [
-  { id: 'general', label: 'Umum & Footer', description: 'Identitas dan informasi publik' },
-  { id: 'profile', label: 'Profil & Keamanan', description: 'Nama admin dan ganti password' },
-  { id: 'maintenance', label: 'Maintenance', description: 'Akses website publik' },
-  { id: 'backup', label: 'Backup & Restore', description: 'Cadangan data aplikasi' },
+const { can } = useAdminAuth()
+
+const allTabs: Array<{ id: TabId; label: string; description: string; permission: PermissionRequirement }> = [
+  { id: 'general', label: 'Umum & Footer', description: 'Identitas dan informasi publik', permission: 'settings.manage' },
+  { id: 'maintenance', label: 'Maintenance', description: 'Akses website publik', permission: 'settings.manage' },
+  { id: 'backup', label: 'Backup & Restore', description: 'Cadangan data aplikasi', permission: ['settings.backup', 'settings.restore'] },
 ]
+const tabs = allTabs.filter((tab) => can(tab.permission))
 
-const activeTab = ref<TabId>('general')
+const activeTab = ref<TabId>(tabs[0]?.id || 'backup')
 const { data: settings, pending: loadingSettings, refresh } = await useAppSettings()
-
-// Admin Profile & Security state
-const { data: adminInfo, refresh: refreshAdminInfo } = await useFetch<{
-  authenticated: boolean
-  username?: string
-  name?: string
-  role?: string
-}>('/api/auth/me')
-
-const profileForm = reactive({
-  name: '',
-  currentPassword: '',
-  newPassword: '',
-  confirmPassword: '',
-})
-const profileSaving = ref(false)
-
-watch(
-  adminInfo,
-  (val) => {
-    if (val?.name) profileForm.name = val.name
-  },
-  { immediate: true }
-)
-
-async function updateProfile() {
-  feedback.type = ''
-
-  if (profileForm.newPassword) {
-    if (profileForm.newPassword.length < 12) {
-      showFeedback('error', 'Password baru minimal harus 12 karakter.')
-      return
-    }
-    if (profileForm.newPassword !== profileForm.confirmPassword) {
-      showFeedback('error', 'Konfirmasi password baru tidak cocok.')
-      return
-    }
-    if (!profileForm.currentPassword) {
-      showFeedback('error', 'Password saat ini wajib diisi untuk verifikasi.')
-      return
-    }
-  }
-
-  profileSaving.value = true
-  try {
-    const res = await $fetch<{ success: boolean; message: string }>('/api/auth/profile', {
-      method: 'PUT',
-      body: {
-        name: profileForm.name,
-        currentPassword: profileForm.currentPassword || undefined,
-        newPassword: profileForm.newPassword || undefined,
-      },
-    })
-    showFeedback('success', res.message || 'Profil berhasil diperbarui.')
-    profileForm.currentPassword = ''
-    profileForm.newPassword = ''
-    profileForm.confirmPassword = ''
-    await refreshAdminInfo()
-  } catch (err: any) {
-    showFeedback('error', err?.data?.statusMessage || err?.message || 'Gagal memperbarui profil.')
-  } finally {
-    profileSaving.value = false
-  }
-}
 
 const form = reactive<AppSettings>(createDefaultAppSettings())
 const expectedEndLocal = ref('')
@@ -450,115 +390,6 @@ async function commitRestore() {
           </button>
         </div>
       </form>
-
-      <!-- Tab Profil & Keamanan -->
-      <form
-        v-else-if="activeTab === 'profile'"
-        id="settings-panel-profile"
-        role="tabpanel"
-        aria-labelledby="settings-tab-profile"
-        class="p-6 sm:p-8 space-y-8"
-        @submit.prevent="updateProfile"
-      >
-        <!-- Info Akun -->
-        <section aria-labelledby="account-heading">
-          <h2 id="account-heading" class="text-base font-extrabold text-black dark:text-white">
-            Informasi Akun Administrator
-          </h2>
-          <p class="mt-1 text-sm text-gray">Kelola nama tampilan dan identitas login admin.</p>
-
-          <div class="mt-5 grid gap-5 md:grid-cols-2">
-            <div>
-              <label for="admin-username" class="admin-label">Username (Login ID)</label>
-              <input
-                id="admin-username"
-                :value="adminInfo?.username || 'admin'"
-                disabled
-                class="admin-input bg-stone-100 dark:bg-gray-800 text-gray-500 cursor-not-allowed"
-              />
-              <p class="mt-1 text-xs text-gray">Username tidak dapat diubah demi keamanan sesi.</p>
-            </div>
-            <div>
-              <label for="admin-name" class="admin-label">Nama Lengkap Tampilan</label>
-              <input
-                id="admin-name"
-                v-model="profileForm.name"
-                required
-                maxlength="120"
-                placeholder="Misal: Administrator Utama"
-                class="admin-input"
-              />
-            </div>
-          </div>
-        </section>
-
-        <!-- Ganti Password -->
-        <section class="border-t border-gray/10 pt-8" aria-labelledby="password-heading">
-          <div class="flex items-center gap-2">
-            <Icon name="ph:shield-check-bold" class="h-5 w-5 text-primary" />
-            <h2 id="password-heading" class="text-base font-extrabold text-black dark:text-white">
-              Ganti Password Admin
-            </h2>
-          </div>
-          <p class="mt-1 text-sm text-gray">
-            Kosongkan bagian password ini jika Anda hanya ingin memperbarui nama tampilan.
-          </p>
-
-          <div class="mt-5 space-y-5 max-w-xl">
-            <div>
-              <label for="current-password" class="admin-label">Password Saat Ini</label>
-              <input
-                id="current-password"
-                v-model="profileForm.currentPassword"
-                type="password"
-                autocomplete="current-password"
-                placeholder="Masukkan password aktif saat ini"
-                class="admin-input"
-              />
-            </div>
-
-            <div class="grid gap-5 md:grid-cols-2">
-              <div>
-                <label for="new-password" class="admin-label">Password Baru</label>
-                <input
-                  id="new-password"
-                  v-model="profileForm.newPassword"
-                  type="password"
-                  autocomplete="new-password"
-                  placeholder="Minimal 12 karakter"
-                  class="admin-input"
-                />
-              </div>
-              <div>
-                <label for="confirm-password" class="admin-label">Konfirmasi Password Baru</label>
-                <input
-                  id="confirm-password"
-                  v-model="profileForm.confirmPassword"
-                  type="password"
-                  autocomplete="new-password"
-                  placeholder="Ulangi password baru"
-                  class="admin-input"
-                />
-              </div>
-            </div>
-
-            <div class="rounded-xl bg-blue-50/70 p-4 text-xs leading-5 text-blue-900 dark:bg-blue-500/10 dark:text-blue-200">
-              <p class="font-bold mb-1">Syarat Keamanan Password:</p>
-              <ul class="list-disc list-inside space-y-0.5">
-                <li>Panjang minimal 12 karakter</li>
-                <li>Disarankan kombinasi huruf besar, huruf kecil, angka, dan simbol</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <div class="mt-8 flex justify-end border-t border-gray/10 pt-6">
-          <button type="submit" class="admin-btn-primary" :disabled="profileSaving">
-            {{ profileSaving ? 'Menyimpan…' : 'Simpan Perubahan Akun' }}
-          </button>
-        </div>
-      </form>
-
       <form
         v-else-if="activeTab === 'maintenance'"
         id="settings-panel-maintenance"
@@ -625,17 +456,21 @@ async function commitRestore() {
       </form>
 
       <section
-        v-else
+        v-else-if="activeTab === 'backup'"
         id="settings-panel-backup"
         role="tabpanel"
         aria-labelledby="settings-tab-backup"
         class="p-6 sm:p-8"
       >
-        <div class="flex flex-col gap-5 border-b border-gray/10 pb-8 sm:flex-row sm:items-start sm:justify-between">
+        <div
+          v-if="can('settings.backup')"
+          class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"
+          :class="can('settings.restore') ? 'border-b border-gray/10 pb-8' : ''"
+        >
           <div class="max-w-xl">
             <h2 class="text-base font-extrabold text-black dark:text-white">Download backup data</h2>
             <p class="mt-1 text-sm leading-6 text-gray">
-              Menghasilkan Extended JSON dari koleksi aplikasi. Password admin, log sementara, dan binary media tidak disertakan.
+              Menghasilkan Extended JSON dari koleksi aplikasi. Akun pengguna & role, log sementara, dan binary media tidak disertakan.
             </p>
           </div>
           <button type="button" class="admin-btn-primary shrink-0" :disabled="backupLoading" @click="downloadBackup">
@@ -643,7 +478,7 @@ async function commitRestore() {
           </button>
         </div>
 
-        <div class="pt-8">
+        <div v-if="can('settings.restore')" :class="can('settings.backup') ? 'pt-8' : ''">
           <div class="max-w-2xl">
             <h2 class="text-base font-extrabold text-black dark:text-white">Restore dengan mode merge</h2>
             <p class="mt-1 text-sm leading-6 text-gray">

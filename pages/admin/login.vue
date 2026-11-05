@@ -22,8 +22,12 @@ async function handleLogin() {
       body: form.value,
     })
     await navigateTo('/admin')
-  } catch (err: unknown) {
-    error.value = 'Username atau password salah.'
+  } catch (err: any) {
+    // 403 (akun nonaktif / role tidak dikenal) dan 429 membawa pesan yang perlu dibaca user.
+    const status = err?.statusCode ?? err?.response?.status
+    error.value = status === 403 || status === 429
+      ? err?.data?.statusMessage || 'Login ditolak.'
+      : 'Username atau password salah.'
   } finally {
     loading.value = false
   }

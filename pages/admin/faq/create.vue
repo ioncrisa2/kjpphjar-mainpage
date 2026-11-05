@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'faq.create' })
 useHead({ title: "Tambah FAQ | KJPP HJA'R" })
 
 const router = useRouter()

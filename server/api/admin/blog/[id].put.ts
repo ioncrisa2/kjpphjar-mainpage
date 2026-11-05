@@ -2,26 +2,31 @@ import mongoose from 'mongoose'
 import path from 'path'
 import { BlogPost } from '~/server/models/BlogPost'
 import { Category } from '~/server/models/Category'
-import { Leader } from '~/server/models/Leader'
 import { connectDB } from '~/server/utils/db'
 import {
   calculateReadingTime,
   createExcerpt,
-  getLegacyCompatibleStatus,
   normalizeSlug,
   normalizeTags,
   parseBoolean,
-  parsePublicationInput,
   sanitizeBlogContent,
   sanitizePlainText,
   stripHtml,
   toBlogPostDto,
 } from '~/server/utils/blog'
+import {
+  assertBlogPublicationUnlocked,
+  resolveBlogAuthor,
+  resolveBlogPublication,
+} from '~/server/utils/blog-access'
 import { processUploadedBlogImage } from '~/server/utils/image'
 import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
+import { assertCanManageRecord } from '~/server/utils/ownership'
+import { hasPermission, requireAuth } from '~/server/utils/require-auth'
 import { receiveSingleImage, removeFileIfExists } from '~/server/utils/upload'
 
 export default defineEventHandler(async (event) => {
+  const user = await requireAuth(event)
   await connectDB()
   const id = getRouterParam(event, 'id') || ''
   if (!mongoose.isValidObjectId(id)) {
@@ -35,6 +40,8 @@ export default defineEventHandler(async (event) => {
   try {
     const existing = await BlogPost.findById(id)
     if (!existing) throw createError({ statusCode: 404, statusMessage: 'Artikel tidak ditemukan.' })
+    assertCanManageRecord(user, existing, 'blog.manage_all', 'Anda hanya dapat mengubah artikel milik sendiri.')
+    assertBlogPublicationUnlocked(user, existing.toObject())
 
     const title = sanitizePlainText(body.title, 180)
     const slug = normalizeSlug(body.slug, title)
@@ -49,23 +56,8 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const leaderId = sanitizePlainText(body.leaderId, 30) || null
-    let authorName = sanitizePlainText(body.author, 100) || 'Admin'
-    if (leaderId) {
-      if (!mongoose.isValidObjectId(leaderId)) {
-        throw createError({ statusCode: 400, statusMessage: 'Pimpinan penulis tidak valid.' })
-      }
-      const leaderDoc = await Leader.findById(leaderId).select('name').lean()
-      if (leaderDoc) {
-        authorName = leaderDoc.name
-      }
-    }
-
-    const publication = parsePublicationInput(
-      body.status || getLegacyCompatibleStatus(existing.toObject()),
-      body.publishedAt,
-      existing.publishedAt,
-    )
+    const { leaderId, author: authorName } = await resolveBlogAuthor(user, body)
+    const publication = resolveBlogPublication(user, body, existing.toObject())
 
     const removeCover = parseBoolean(body.removeCover)
     if (file && !removeCover) {
@@ -87,11 +79,15 @@ export default defineEventHandler(async (event) => {
       tags: normalizeTags(body.tags),
       categoryId,
       leaderId,
-      isFeatured: parseBoolean(body.isFeatured),
+      // Artikel unggulan hanya diatur oleh pemegang blog.manage_all.
+      isFeatured: hasPermission(user, 'blog.manage_all')
+        ? parseBoolean(body.isFeatured)
+        : existing.isFeatured,
       readingTime: calculateReadingTime(content),
       metaTitle: sanitizePlainText(body.metaTitle, 70),
       metaDescription: sanitizePlainText(body.metaDescription, 180),
       author: authorName,
+      updatedBy: user.id,
       ...publication,
     }
 

@@ -3,9 +3,11 @@ import { Client } from '~/server/models/Client'
 import { connectDB } from '~/server/utils/db'
 import { processUploadedImage } from '~/server/utils/image'
 import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
+import { requireAuth } from '~/server/utils/require-auth'
 import { receiveSingleImage, removeFileIfExists } from '~/server/utils/upload'
 
 export default defineEventHandler(async (event) => {
+  const user = await requireAuth(event)
   await connectDB()
   const { body, file } = await receiveSingleImage(event)
   let storedLogoUrl = ''
@@ -35,6 +37,8 @@ export default defineEventHandler(async (event) => {
       order: body.order || 0,
       isActive: body.isActive === 'true',
       logoUrl: stored.url,
+      createdBy: user.id,
+      updatedBy: user.id,
     })
     didPersist = true
     return client

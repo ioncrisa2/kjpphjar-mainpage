@@ -1,6 +1,6 @@
 import { ContactSubmission } from '~/server/models/ContactSubmission'
 import { connectDB } from '~/server/utils/db'
-import { requireAdmin } from '~/server/utils/require-admin'
+import { requirePermission } from '~/server/utils/require-auth'
 
 function escapeCsvCell(val: any): string {
   if (val === null || val === undefined) return '""'
@@ -9,7 +9,7 @@ function escapeCsvCell(val: any): string {
 }
 
 export default defineEventHandler(async (event) => {
-  await requireAdmin(event)
+  await requirePermission(event, 'contacts.export')
   await connectDB()
 
   const items = await ContactSubmission.find().sort({ submittedAt: -1 }).lean()

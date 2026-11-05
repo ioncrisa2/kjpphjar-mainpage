@@ -1,6 +1,8 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'contacts.view' })
 useHead({ title: "Inbox Pesan | KJPP HJA'R" })
+
+const { can } = useAdminAuth()
 
 const page = ref(1)
 const showUnreadOnly = ref(false)
@@ -34,7 +36,8 @@ async function openDetail(contact: any) {
   selectedContact.value = contact
   detailModalOpen.value = true
   
-  if (!contact.isRead) {
+  // Menandai dibaca butuh contacts.update; tanpa itu pesan hanya dilihat.
+  if (!contact.isRead && can('contacts.update')) {
     try {
       await $fetch(`/api/contacts/${contact._id}`, {
         method: 'PATCH',
@@ -63,7 +66,7 @@ watch(showUnreadOnly, () => {
       </div>
 
       <!-- Export to Excel Button -->
-      <div>
+      <div v-if="can('contacts.export')">
         <a
           href="/api/contacts/export"
           download

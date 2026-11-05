@@ -1,6 +1,8 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'analytics.view' })
 useHead({ title: "Analitik | Admin KJPP HJA'R" })
+
+const { can } = useAdminAuth()
 
 type AnalyticsRange = 7 | 30 | 90
 
@@ -464,7 +466,7 @@ async function purgeExpiredLogs() {
         </div>
       </template>
 
-      <section class="admin-card flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" aria-labelledby="retention-heading">
+      <section v-if="can('analytics.purge')" class="admin-card flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" aria-labelledby="retention-heading">
         <div>
           <h2 id="retention-heading" class="text-sm font-extrabold text-black dark:text-white">Retensi data</h2>
           <p class="mt-1 max-w-2xl text-xs leading-5 text-gray">

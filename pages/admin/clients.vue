@@ -1,6 +1,10 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'clients.view' })
 useHead({ title: "Admin Klien | KJPP HJA'R" })
+
+const { can } = useAdminAuth()
+// Mengurutkan menyentuh semua klien, jadi khusus clients.manage_all.
+const canReorder = computed(() => can('clients.manage_all'))
 
 const { data: clientsResponse, refresh, pending } = await useFetch('/api/clients?all=true')
 const clients = computed(() => clientsResponse.value?.items || [])
@@ -156,9 +160,13 @@ async function saveOrder() {
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Rekan & Klien</h1>
-        <p class="mt-1 text-sm text-gray">Kelola logo klien yang tampil di website. Anda bisa drag & drop (geser) kartu klien di bawah untuk mengatur urutannya.</p>
+        <p class="mt-1 text-sm text-gray">
+          Kelola logo klien yang tampil di website.
+          <template v-if="canReorder">Anda bisa drag &amp; drop (geser) kartu klien di bawah untuk mengatur urutannya.</template>
+          <template v-else>Daftar ini hanya menampilkan klien yang Anda tambahkan.</template>
+        </p>
       </div>
-      <button @click="openAdd" class="admin-btn-primary">
+      <button v-if="can('clients.create')" @click="openAdd" class="admin-btn-primary">
         + Tambah Klien
       </button>
     </div>
@@ -173,13 +181,14 @@ async function saveOrder() {
         <div
           v-for="(client, index) in clients"
           :key="client._id"
-          draggable="true"
+          :draggable="canReorder"
           @dragstart="onDragStart(index, $event)"
           @dragover="onDragOver(index, $event)"
           @dragleave="onDragLeave(index, $event)"
           @drop="onDrop(index, $event)"
           :class="[
-            'border rounded-lg p-4 flex flex-col items-center relative group bg-white cursor-move transition-all duration-200',
+            'border rounded-lg p-4 flex flex-col items-center relative group bg-white transition-all duration-200',
+            canReorder ? 'cursor-move' : '',
             draggedIndex === index ? 'opacity-50 ring-2 ring-blue-500 ring-offset-2' : '',
             dragOverIndex === index && draggedIndex !== index ? 'ring-2 ring-blue-300 ring-offset-2 bg-blue-50 transform scale-[1.02]' : ''
           ]"
@@ -190,11 +199,11 @@ async function saveOrder() {
           <h3 class="text-sm font-medium text-gray-900 text-center line-clamp-1 w-full" :title="client.name">{{ client.name }}</h3>
           <p class="text-xs text-gray-500 mt-1">{{ client.category || 'Tanpa Kategori' }}</p>
           
-          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center space-x-4">
-            <button @click="openEdit(client)" class="text-white hover:text-blue-300">
+          <div v-if="can('clients.update') || can('clients.delete')" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center space-x-4">
+            <button v-if="can('clients.update')" @click="openEdit(client)" class="text-white hover:text-blue-300">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
             </button>
-            <button @click="deleteItem(client)" class="text-white hover:text-red-400">
+            <button v-if="can('clients.delete')" @click="deleteItem(client)" class="text-white hover:text-red-400">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
             </button>
           </div>

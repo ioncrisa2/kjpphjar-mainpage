@@ -1,6 +1,8 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'staff.view' })
 useHead({ title: "Admin Staff | KJPP HJA'R" })
+
+const { can } = useAdminAuth()
 
 const { data: staffList, refresh, pending } = await useFetch<any[]>('/api/staff')
 const { data: branches } = await useFetch<any[]>('/api/branches')
@@ -112,7 +114,7 @@ async function deleteItem(staff: any) {
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Staff</h1>
         <p class="mt-1 text-sm text-gray">Daftar staff yang terdaftar di KJPP HJA'R, kantor pusat maupun cabang.</p>
       </div>
-      <button @click="openAdd" class="admin-btn-primary">
+      <button v-if="can('staff.create')" @click="openAdd" class="admin-btn-primary">
         + Tambah Staff
       </button>
     </div>
@@ -166,8 +168,8 @@ async function deleteItem(staff: any) {
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ staff.mappiNumber || '-' }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button @click="openEdit(staff)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
-                <button @click="deleteItem(staff)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <button v-if="can('staff.update')" @click="openEdit(staff)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
+                <button v-if="can('staff.delete')" @click="deleteItem(staff)" class="text-red-600 hover:text-red-900">Hapus</button>
               </td>
             </tr>
           </tbody>

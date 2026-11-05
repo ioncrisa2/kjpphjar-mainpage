@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BlogPostForm from '~/components/admin/blog/BlogPostForm.vue'
 
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'blog.create' })
 useHead({ title: "Tulis Artikel | KJPP HJA'R" })
 
 const router = useRouter()

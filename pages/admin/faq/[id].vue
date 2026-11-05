@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'faq.update' })
 useHead({ title: "Edit FAQ | KJPP HJA'R" })
 
 const route = useRoute()

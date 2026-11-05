@@ -1,6 +1,8 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'leaders.view' })
 useHead({ title: "Admin Pimpinan | KJPP HJA'R" })
+
+const { can } = useAdminAuth()
 
 const { data: leaders, refresh, pending } = await useFetch('/api/leaders')
 
@@ -114,7 +116,7 @@ async function deleteItem(leader: any) {
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Pimpinan</h1>
         <p class="mt-1 text-sm text-gray">Kelola profil pimpinan KJPP HJA'R.</p>
       </div>
-      <button @click="openAdd" class="admin-btn-primary">
+      <button v-if="can('leaders.create')" @click="openAdd" class="admin-btn-primary">
         + Tambah Pimpinan
       </button>
     </div>
@@ -164,8 +166,8 @@ async function deleteItem(leader: any) {
                 <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Nonaktif</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button @click="openEdit(leader)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
-                <button @click="deleteItem(leader)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <button v-if="can('leaders.update')" @click="openEdit(leader)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
+                <button v-if="can('leaders.delete')" @click="deleteItem(leader)" class="text-red-600 hover:text-red-900">Hapus</button>
               </td>
             </tr>
           </tbody>

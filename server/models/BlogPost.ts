@@ -21,6 +21,9 @@ export interface IBlogPost extends Document {
   isPublished: boolean
   leaderId?: Types.ObjectId | null
   author?: string
+  /** User pembuat. Data lama tanpa createdBy dianggap milik admin. */
+  createdBy?: Types.ObjectId | null
+  updatedBy?: Types.ObjectId | null
   createdAt: Date
   updatedAt: Date
 }
@@ -49,6 +52,8 @@ const BlogPostSchema = new Schema<IBlogPost>(
     },
     isPublished: { type: Boolean, default: false },
     author: { type: String, maxlength: 100 },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+    updatedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
   },
   { strict: true, timestamps: true }
 )

@@ -1,6 +1,8 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'branches.view' })
 useHead({ title: "Admin Cabang | KJPP HJA'R" })
+
+const { can } = useAdminAuth()
 
 const { data: branches, refresh, pending } = await useFetch('/api/branches')
 
@@ -104,7 +106,7 @@ async function deleteItem(branch: any) {
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Cabang</h1>
         <p class="mt-1 text-sm text-gray">Kelola informasi cabang KJPP HJA'R.</p>
       </div>
-      <button @click="openAdd" class="admin-btn-primary">
+      <button v-if="can('branches.create')" @click="openAdd" class="admin-btn-primary">
         + Tambah Cabang
       </button>
     </div>
@@ -140,8 +142,8 @@ async function deleteItem(branch: any) {
                 <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Nonaktif</span>
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium">
-                <button @click="openEdit(branch)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
-                <button @click="deleteItem(branch)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <button v-if="can('branches.update')" @click="openEdit(branch)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
+                <button v-if="can('branches.delete')" @click="deleteItem(branch)" class="text-red-600 hover:text-red-900">Hapus</button>
               </td>
             </tr>
           </tbody>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'services.view' })
 useHead({ title: "Admin Layanan | KJPP HJA'R" })
+
+const { can } = useAdminAuth()
 
 const { data: servicesResponse, refresh, pending } = await useFetch('/api/services')
 const services = computed(() => servicesResponse.value || [])
@@ -91,7 +93,7 @@ async function saveOrder(items: any[]) {
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Layanan Kami</h1>
         <p class="mt-1 text-sm text-gray">Kelola informasi layanan. Anda bisa drag & drop (geser) baris di bawah untuk mengatur urutannya.</p>
       </div>
-      <NuxtLink to="/admin/services/create" class="admin-btn-primary">
+      <NuxtLink v-if="can('services.create')" to="/admin/services/create" class="admin-btn-primary">
         + Tambah Layanan
       </NuxtLink>
     </div>
@@ -115,7 +117,7 @@ async function saveOrder(items: any[]) {
           </thead>
           <tbody class="bg-white divide-y divide-gray/10">
             <tr v-for="(service, index) in services" :key="service._id"
-                draggable="true"
+                :draggable="can('services.update')"
                 @dragstart="onDragStart(index, $event)"
                 @dragover="onDragOver(index, $event)"
                 @dragleave="onDragLeave(index, $event)"
@@ -145,8 +147,8 @@ async function saveOrder(items: any[]) {
                 <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Nonaktif</span>
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium">
-                <NuxtLink :to="`/admin/services/${service._id}`" class="text-primary hover:text-blue-900 mr-4">Edit</NuxtLink>
-                <button @click="deleteItem(service)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <NuxtLink v-if="can('services.update')" :to="`/admin/services/${service._id}`" class="text-primary hover:text-blue-900 mr-4">Edit</NuxtLink>
+                <button v-if="can('services.delete')" @click="deleteItem(service)" class="text-red-600 hover:text-red-900">Hapus</button>
               </td>
             </tr>
           </tbody>

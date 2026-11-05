@@ -5,7 +5,7 @@ import {
   parseLogicalBackup,
   validateLogicalBackup,
 } from '~/server/utils/database-backup'
-import { requireAdmin } from '~/server/utils/require-admin'
+import { requirePermission } from '~/server/utils/require-auth'
 
 async function readLimitedBody(event: H3Event) {
   const contentLength = Number(getRequestHeader(event, 'content-length') || 0)
@@ -39,7 +39,7 @@ async function readLimitedBody(event: H3Event) {
 }
 
 export default defineEventHandler(async (event) => {
-  const admin = await requireAdmin(event)
+  const admin = await requirePermission(event, 'settings.restore')
   const contentType = getRequestHeader(event, 'content-type') || ''
   if (!contentType.toLowerCase().includes('application/json')) {
     throw createError({

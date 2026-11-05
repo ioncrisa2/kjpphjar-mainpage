@@ -1,12 +1,12 @@
 import { AnalyticsLog } from '~/server/models/AnalyticsLog'
 import { setAnalyticsNoStore } from '~/server/utils/analytics'
 import { connectDB } from '~/server/utils/db'
-import { requireAdmin } from '~/server/utils/require-admin'
+import { requirePermission } from '~/server/utils/require-auth'
 
 const RETENTION_DAYS = 90
 
 export default defineEventHandler(async (event) => {
-  await requireAdmin(event)
+  await requirePermission(event, 'analytics.purge')
   setAnalyticsNoStore(event)
 
   const body = (await readBody<{ confirmation?: unknown }>(event)) || {}

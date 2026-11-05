@@ -1,13 +1,20 @@
 import path from 'node:path'
+import mongoose from 'mongoose'
 import { Client } from '~/server/models/Client'
 import { connectDB } from '~/server/utils/db'
 import { processUploadedImage } from '~/server/utils/image'
 import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
+import { assertCanManageRecord } from '~/server/utils/ownership'
+import { hasPermission, requireAuth } from '~/server/utils/require-auth'
 import { receiveSingleImage, removeFileIfExists } from '~/server/utils/upload'
 
 export default defineEventHandler(async (event) => {
+  const user = await requireAuth(event)
   await connectDB()
   const id = getRouterParam(event, 'id')
+  if (!mongoose.isValidObjectId(id)) {
+    throw createError({ statusCode: 404, statusMessage: 'Klien tidak ditemukan' })
+  }
   const { body, file } = await receiveSingleImage(event)
   let newLogoUrl = ''
   let didPersistUpdate = false
@@ -17,12 +24,15 @@ export default defineEventHandler(async (event) => {
     if (!existing) {
       throw createError({ statusCode: 404, statusMessage: 'Klien tidak ditemukan' })
     }
+    assertCanManageRecord(user, existing, 'clients.manage_all', 'Anda hanya dapat mengubah klien milik sendiri.')
 
     const updates: Record<string, any> = {
       name: body.name,
       category: body.category,
-      order: body.order,
+      updatedBy: user.id,
     }
+    // Urutan tampil memengaruhi semua klien, jadi khusus manage_all.
+    if (hasPermission(user, 'clients.manage_all')) updates.order = body.order
     if (body.isActive !== undefined) updates.isActive = body.isActive === 'true'
 
     if (file) {

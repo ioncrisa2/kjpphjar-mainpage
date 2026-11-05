@@ -3,9 +3,11 @@ import { Gallery } from '~/server/models/Gallery'
 import { connectDB } from '~/server/utils/db'
 import { generateThumbnail, processUploadedImage } from '~/server/utils/image'
 import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
+import { hasPermission, requireAuth } from '~/server/utils/require-auth'
 import { receiveSingleImage, removeFileIfExists } from '~/server/utils/upload'
 
 export default defineEventHandler(async (event) => {
+  const user = await requireAuth(event)
   await connectDB()
   const { body, file } = await receiveSingleImage(event)
   const storedUrls: string[] = []
@@ -46,7 +48,10 @@ export default defineEventHandler(async (event) => {
       thumbnailUrl: thumbnail.url,
       title: body.title || '',
       category: body.category || '',
-      isFeatured: body.isFeatured === 'true',
+      // Foto unggulan hanya diatur oleh pemegang gallery.manage_all.
+      isFeatured: hasPermission(user, 'gallery.manage_all') && body.isFeatured === 'true',
+      createdBy: user.id,
+      updatedBy: user.id,
     })
     didPersist = true
     return gallery

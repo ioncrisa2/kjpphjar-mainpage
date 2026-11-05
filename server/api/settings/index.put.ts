@@ -1,8 +1,8 @@
-import { requireAdmin } from '~/server/utils/require-admin'
+import { requirePermission } from '~/server/utils/require-auth'
 import { updatePublicSettings } from '~/server/utils/settings'
 
 export default defineEventHandler(async (event) => {
-  await requireAdmin(event)
+  await requirePermission(event, 'settings.manage')
   const body = await readBody(event)
   const settings = await updatePublicSettings(body)
 

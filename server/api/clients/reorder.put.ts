@@ -1,7 +1,10 @@
 import { Client } from '~/server/models/Client'
 import { connectDB } from '~/server/utils/db'
+import { requirePermission } from '~/server/utils/require-auth'
 
 export default defineEventHandler(async (event) => {
+  // Mengurutkan menyentuh semua klien, termasuk milik orang lain.
+  await requirePermission(event, 'clients.manage_all')
   await connectDB()
   const body = await readBody(event)
 

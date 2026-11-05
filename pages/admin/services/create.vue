@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'services.create' })
 useHead({ title: "Tambah Layanan | KJPP HJA'R" })
 
 const router = useRouter()

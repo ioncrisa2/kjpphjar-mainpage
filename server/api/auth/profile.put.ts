@@ -1,16 +1,18 @@
 import bcrypt from 'bcryptjs'
 import { User } from '~/server/models/User'
+import { setAuthCookie } from '~/server/utils/auth'
 import { connectDB } from '~/server/utils/db'
-import { requireAdmin } from '~/server/utils/require-admin'
+import { requireAuth } from '~/server/utils/require-auth'
 
 export default defineEventHandler(async (event) => {
-  const admin = await requireAdmin(event)
+  // Semua user panel boleh mengubah nama dan password miliknya sendiri.
+  const session = await requireAuth(event)
   const body = await readBody(event)
 
   await connectDB()
-  const user = await User.findOne({ username: admin.username })
+  const user = await User.findById(session.id)
   if (!user) {
-    throw createError({ statusCode: 404, statusMessage: 'Akun admin tidak ditemukan.' })
+    throw createError({ statusCode: 404, statusMessage: 'Akun tidak ditemukan.' })
   }
 
   const { name, currentPassword, newPassword } = body || {}
@@ -45,15 +47,20 @@ export default defineEventHandler(async (event) => {
     }
 
     user.password = await bcrypt.hash(newPassword, 12)
+    // Sesi di perangkat lain berakhir; sesi saat ini diperbarui di bawah.
+    user.tokenVersion = (user.tokenVersion ?? 0) + 1
   }
 
   await user.save()
+  if (newPassword) {
+    setAuthCookie(event, { id: String(user._id), tokenVersion: user.tokenVersion })
+  }
 
   return {
     success: true,
     message: newPassword
-      ? 'Profil dan password admin berhasil diperbarui.'
-      : 'Profil admin berhasil diperbarui.',
+      ? 'Profil dan password berhasil diperbarui. Sesi di perangkat lain telah diakhiri.'
+      : 'Profil berhasil diperbarui.',
     user: {
       username: user.username,
       name: user.name,

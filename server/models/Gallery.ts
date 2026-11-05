@@ -1,4 +1,4 @@
-import mongoose, { Schema, type Document } from 'mongoose'
+import mongoose, { Schema, type Document, type Types } from 'mongoose'
 
 export interface IGallery extends Document {
   filename: string
@@ -9,6 +9,9 @@ export interface IGallery extends Document {
   category?: string
   isFeatured: boolean
   order: number
+  /** User pembuat. Data lama tanpa createdBy dianggap milik admin. */
+  createdBy?: Types.ObjectId | null
+  updatedBy?: Types.ObjectId | null
 }
 
 const GallerySchema = new Schema<IGallery>(
@@ -21,6 +24,8 @@ const GallerySchema = new Schema<IGallery>(
     category: { type: String },
     isFeatured: { type: Boolean, default: false },
     order: { type: Number, default: 0 },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+    updatedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
   },
   { strict: true, timestamps: true }
 )

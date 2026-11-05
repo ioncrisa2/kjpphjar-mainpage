@@ -2,7 +2,6 @@ import mongoose from 'mongoose'
 import path from 'path'
 import { BlogPost } from '~/server/models/BlogPost'
 import { Category } from '~/server/models/Category'
-import { Leader } from '~/server/models/Leader'
 import { connectDB } from '~/server/utils/db'
 import {
   calculateReadingTime,
@@ -10,17 +9,19 @@ import {
   normalizeSlug,
   normalizeTags,
   parseBoolean,
-  parsePublicationInput,
   sanitizeBlogContent,
   sanitizePlainText,
   stripHtml,
   toBlogPostDto,
 } from '~/server/utils/blog'
+import { resolveBlogAuthor, resolveBlogPublication } from '~/server/utils/blog-access'
 import { processUploadedBlogImage } from '~/server/utils/image'
 import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
+import { hasPermission, requireAuth } from '~/server/utils/require-auth'
 import { receiveSingleImage, removeFileIfExists } from '~/server/utils/upload'
 
 export default defineEventHandler(async (event) => {
+  const user = await requireAuth(event)
   await connectDB()
   const { body, file } = await receiveSingleImage(event)
   let storedCoverUrl = ''
@@ -41,19 +42,8 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const leaderId = sanitizePlainText(body.leaderId, 30) || null
-    let authorName = sanitizePlainText(body.author, 100) || 'Admin'
-    if (leaderId) {
-      if (!mongoose.isValidObjectId(leaderId)) {
-        throw createError({ statusCode: 400, statusMessage: 'Pimpinan penulis tidak valid.' })
-      }
-      const leaderDoc = await Leader.findById(leaderId).select('name').lean()
-      if (leaderDoc) {
-        authorName = leaderDoc.name
-      }
-    }
-
-    const publication = parsePublicationInput(body.status, body.publishedAt)
+    const { leaderId, author: authorName } = await resolveBlogAuthor(user, body)
+    const publication = resolveBlogPublication(user, body)
     let coverImageUrl = ''
     if (file) {
       const filename = `${path.parse(file.filename).name}.webp`
@@ -77,12 +67,14 @@ export default defineEventHandler(async (event) => {
       tags: normalizeTags(body.tags),
       categoryId,
       leaderId,
-      isFeatured: parseBoolean(body.isFeatured),
+      isFeatured: hasPermission(user, 'blog.manage_all') && parseBoolean(body.isFeatured),
       views: 0,
       readingTime: calculateReadingTime(content),
       metaTitle: sanitizePlainText(body.metaTitle, 70),
       metaDescription: sanitizePlainText(body.metaDescription, 180),
       author: authorName,
+      createdBy: user.id,
+      updatedBy: user.id,
       ...publication,
     })
     didPersist = true

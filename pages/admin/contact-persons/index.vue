@@ -1,5 +1,7 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'contact_persons.view' })
+
+const { can } = useAdminAuth()
 
 const { data: contacts, refresh } = await useFetch('/api/contact-persons')
 
@@ -115,7 +117,7 @@ const onDrop = async (dropIndex: number) => {
   <div>
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold">Manajemen Kontak Footer</h1>
-      <button @click="openAddModal" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+      <button v-if="can('contact_persons.create')" @click="openAddModal" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
         <i class="fas fa-plus mr-2"></i> Tambah Kontak
       </button>
     </div>
@@ -148,7 +150,7 @@ const onDrop = async (dropIndex: number) => {
           <tr 
             v-for="(item, index) in items" 
             :key="item._id"
-            draggable="true"
+            :draggable="can('contact_persons.update')"
             @dragstart="onDragStart(index)"
             @dragover.prevent
             @drop="onDrop(index)"
@@ -168,8 +170,8 @@ const onDrop = async (dropIndex: number) => {
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <button @click="openEditModal(item)" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
-              <button @click="deleteContact(item)" class="text-red-600 hover:text-red-900">Hapus</button>
+              <button v-if="can('contact_persons.update')" @click="openEditModal(item)" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</button>
+              <button v-if="can('contact_persons.delete')" @click="deleteContact(item)" class="text-red-600 hover:text-red-900">Hapus</button>
             </td>
           </tr>
         </tbody>

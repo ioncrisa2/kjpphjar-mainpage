@@ -5,7 +5,7 @@ import {
   setAnalyticsNoStore,
 } from '~/server/utils/analytics'
 import { connectDB } from '~/server/utils/db'
-import { requireAdmin } from '~/server/utils/require-admin'
+import { requirePermission } from '~/server/utils/require-auth'
 
 interface BreakdownResult {
   _id: string
@@ -27,7 +27,7 @@ function withPercentage(items: BreakdownResult[], total: number) {
 }
 
 export default defineEventHandler(async (event) => {
-  await requireAdmin(event)
+  await requirePermission(event, 'analytics.view')
   setAnalyticsNoStore(event)
   await connectDB()
 

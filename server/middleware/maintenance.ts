@@ -1,5 +1,5 @@
 import { getPublicSettings } from '~/server/utils/settings'
-import { requireAdmin } from '~/server/utils/require-admin'
+import { requireAuth } from '~/server/utils/require-auth'
 
 const STATIC_PREFIXES = [
   '/_nuxt/',
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
   if (!settings.maintenanceMode.isActive) return
 
   try {
-    await requireAdmin(event)
+    await requireAuth(event)
     return
   } catch {
     // A missing or invalid admin session receives the maintenance response.

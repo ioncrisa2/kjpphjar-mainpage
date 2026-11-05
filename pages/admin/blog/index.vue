@@ -1,6 +1,12 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'blog.view' })
 useHead({ title: "Admin Blog | KJPP HJA'R" })
+
+const { can } = useAdminAuth()
+// Tanpa blog.publish, artikel terbit/terjadwal dikunci (hanya editor yang bisa mengubah).
+function isLocked(article: Record<string, any>) {
+  return !can('blog.publish') && article.status !== 'draft'
+}
 
 const page = ref(1)
 const searchDraft = ref('')
@@ -72,13 +78,13 @@ async function deleteItem(article: Record<string, any>) {
     <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Blog & artikel</h1>
-        <p class="mt-1 text-sm text-gray">Kelola publikasi, kategori, SEO, dan performa artikel.</p>
+        <p class="mt-1 text-sm text-gray">{{ can('blog.manage_all') ? 'Kelola publikasi, kategori, SEO, dan performa artikel.' : 'Artikel yang Anda tulis. Artikel baru disimpan sebagai draft sampai diterbitkan editor.' }}</p>
       </div>
       <div class="flex flex-wrap gap-2">
-        <NuxtLink to="/admin/blog/categories" class="admin-btn-ghost">
+        <NuxtLink v-if="can('blog.categories')" to="/admin/blog/categories" class="admin-btn-ghost">
           <Icon name="ph:folders-bold" /> Kategori
         </NuxtLink>
-        <NuxtLink to="/admin/blog/create" class="admin-btn-primary">
+        <NuxtLink v-if="can('blog.create')" to="/admin/blog/create" class="admin-btn-primary">
           <Icon name="ph:plus-bold" /> Tulis artikel
         </NuxtLink>
       </div>
@@ -125,7 +131,7 @@ async function deleteItem(article: Record<string, any>) {
         <h2 class="mt-4 text-lg font-bold text-black dark:text-white">{{ search || status || categoryId ? 'Tidak ada artikel yang cocok' : 'Belum ada artikel' }}</h2>
         <p class="mx-auto mt-2 max-w-md text-sm text-gray">{{ search || status || categoryId ? 'Ubah kata kunci atau reset filter untuk melihat artikel lain.' : 'Mulai dengan menulis artikel pertama untuk halaman publik.' }}</p>
         <button v-if="search || status || categoryId" type="button" class="admin-btn-ghost mt-5" @click="resetFilters">Reset filter</button>
-        <NuxtLink v-else to="/admin/blog/create" class="admin-btn-primary mt-5">Tulis artikel pertama</NuxtLink>
+        <NuxtLink v-else-if="can('blog.create')" to="/admin/blog/create" class="admin-btn-primary mt-5">Tulis artikel pertama</NuxtLink>
       </div>
       <div v-else class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray/10">
@@ -165,10 +171,13 @@ async function deleteItem(article: Record<string, any>) {
                 <p v-if="article.publishedAt" class="mt-1.5 text-xs text-gray">{{ new Date(article.publishedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) }}</p>
               </td>
               <td class="whitespace-nowrap px-6 py-4 text-right">
-                <NuxtLink :to="`/admin/blog/${article._id}`" class="inline-flex rounded-lg p-2 text-primary transition hover:bg-blue-50" :aria-label="`Edit ${article.title}`">
+                <span v-if="isLocked(article)" class="inline-flex rounded-lg p-2 text-gray" title="Artikel sudah terbit atau terjadwal; hanya editor yang bisa mengubahnya." :aria-label="`${article.title} terkunci`">
+                  <Icon name="ph:lock-simple-bold" class="text-lg" />
+                </span>
+                <NuxtLink v-else-if="can('blog.update')" :to="`/admin/blog/${article._id}`" class="inline-flex rounded-lg p-2 text-primary transition hover:bg-blue-50" :aria-label="`Edit ${article.title}`">
                   <Icon name="ph:pencil-simple-bold" class="text-lg" />
                 </NuxtLink>
-                <button type="button" class="inline-flex rounded-lg p-2 text-red-600 transition hover:bg-red-50" :aria-label="`Hapus ${article.title}`" @click="deleteItem(article)">
+                <button v-if="can('blog.delete') && !isLocked(article)" type="button" class="inline-flex rounded-lg p-2 text-red-600 transition hover:bg-red-50" :aria-label="`Hapus ${article.title}`" @click="deleteItem(article)">
                   <Icon name="ph:trash-bold" class="text-lg" />
                 </button>
               </td>

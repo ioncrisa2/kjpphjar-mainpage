@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'blog.categories' })
 useHead({ title: "Kategori Blog | KJPP HJA'R" })
 
 const { data, pending, refresh } = await useFetch('/api/admin/categories')

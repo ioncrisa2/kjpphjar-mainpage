@@ -1,8 +1,9 @@
 import bcrypt from 'bcryptjs'
 import type { H3Event } from 'h3'
-import { generateToken } from '~/server/utils/auth'
+import { setAuthCookie } from '~/server/utils/auth'
 import { User } from '~/server/models/User'
 import { connectDB } from '~/server/utils/db'
+import { resolveRole } from '~/server/utils/require-auth'
 import { enforcePersistentRequestRateLimit } from '~/server/utils/request-rate-limit'
 
 const MAX_LOGIN_BODY_BYTES = 4 * 1024
@@ -62,20 +63,24 @@ export default defineEventHandler(async (event) => {
   }
 
   const isValid = await bcrypt.compare(password, user.password)
-  
-  if (!isValid || user.role !== 'admin') {
+
+  if (!isValid) {
     throw createError({ statusCode: 401, statusMessage: 'Username atau password salah.' })
   }
 
-  // Set JWT
-  const token = generateToken(username)
-  setCookie(event, 'admin_token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 7 * 24 * 60 * 60 // 7 days
-  })
+  // Status akun hanya diungkap setelah password terbukti benar.
+  if (user.isActive === false) {
+    throw createError({ statusCode: 403, statusMessage: 'Akun Anda dinonaktifkan. Hubungi administrator.' })
+  }
+  const role = await resolveRole(user.role)
+  if (!role) {
+    throw createError({ statusCode: 403, statusMessage: 'Role akun tidak dikenali. Hubungi administrator.' })
+  }
+
+  user.lastLoginAt = new Date()
+  await user.save()
+
+  setAuthCookie(event, { id: String(user._id), tokenVersion: user.tokenVersion ?? 0 })
 
   return {
     success: true,
@@ -83,7 +88,8 @@ export default defineEventHandler(async (event) => {
     user: {
       username: user.username,
       name: user.name,
-      role: user.role
+      role: user.role,
+      roleName: role.name,
     }
   }
 })

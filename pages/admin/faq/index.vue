@@ -1,6 +1,8 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'admin', middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'faq.view' })
 useHead({ title: "Admin FAQ | KJPP HJA'R" })
+
+const { can } = useAdminAuth()
 
 const { data: faqsResponse, refresh, pending } = await useFetch('/api/faq', { query: { admin: 'true' } })
 const faqs = computed(() => faqsResponse.value || [])
@@ -90,7 +92,7 @@ async function saveOrder(items: any[]) {
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Q&A (FAQ)</h1>
         <p class="mt-1 text-sm text-gray">Kelola pertanyaan yang sering diajukan. Anda bisa drag & drop (geser) baris di bawah untuk mengatur urutannya.</p>
       </div>
-      <NuxtLink to="/admin/faq/create" class="admin-btn-primary">
+      <NuxtLink v-if="can('faq.create')" to="/admin/faq/create" class="admin-btn-primary">
         + Tambah Pertanyaan
       </NuxtLink>
     </div>
@@ -113,7 +115,7 @@ async function saveOrder(items: any[]) {
           </thead>
           <tbody class="bg-white divide-y divide-gray/10">
             <tr v-for="(faq, index) in faqs" :key="faq._id"
-                draggable="true"
+                :draggable="can('faq.update')"
                 @dragstart="onDragStart(index, $event)"
                 @dragover="onDragOver(index, $event)"
                 @dragleave="onDragLeave(index, $event)"
@@ -139,8 +141,8 @@ async function saveOrder(items: any[]) {
                 <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Nonaktif</span>
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium">
-                <NuxtLink :to="`/admin/faq/${faq._id}`" class="text-primary hover:text-blue-900 mr-4">Edit</NuxtLink>
-                <button @click="deleteItem(faq)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <NuxtLink v-if="can('faq.update')" :to="`/admin/faq/${faq._id}`" class="text-primary hover:text-blue-900 mr-4">Edit</NuxtLink>
+                <button v-if="can('faq.delete')" @click="deleteItem(faq)" class="text-red-600 hover:text-red-900">Hapus</button>
               </td>
             </tr>
           </tbody>
