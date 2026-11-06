@@ -78,7 +78,7 @@ useHead({
       </div>
     </div>
     <!-- Main Content (Rich Text) -->
-    <div class="py-16 sm:py-24 bg-white">
+    <div class="py-16 sm:py-24">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <UiBreadcrumbs 
           :items="[
@@ -96,7 +96,7 @@ useHead({
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-black font-mulish mb-4">{{ service.title }}</h2>
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-black font-mulish mb-4 dark:text-white">{{ service.title }}</h2>
           <p v-if="service.titleEn" class="text-sm font-semibold text-primary uppercase tracking-widest mb-6">
             {{ service.titleEn }}
           </p>
@@ -109,15 +109,15 @@ useHead({
         <!-- We use the prose (Tailwind Typography) plugin to style raw HTML content automatically -->
         <article
           ref="serviceRef"
-          class="prose prose-lg prose-blue mx-auto max-w-none text-gray-900"
+          class="prose prose-lg prose-blue mx-auto max-w-none text-gray-900 dark:prose-invert dark:text-gray-300"
           v-html="service.content"
         ></article>
 
         <!-- CTA -->
-        <div class="mt-16 bg-gray-50 rounded-xl p-8 text-center border border-gray-200">
-          <h3 class="text-2xl font-bold text-black mb-4">Butuh Layanan Ini?</h3>
+        <div class="mt-16 bg-gray-50 rounded-xl p-8 text-center border border-gray-200 dark:bg-white/5 dark:border-white/10">
+          <h3 class="text-2xl font-bold text-black mb-4 dark:text-white">Butuh Layanan Ini?</h3>
           <p class="text-gray mb-8">Hubungi tim profesional kami untuk mendiskusikan kebutuhan Anda lebih lanjut.</p>
-          <NuxtLink to="/contact-us" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-blue-600 transition-colors md:py-4 md:text-lg md:px-10">
+          <NuxtLink to="/contact-us" class="inline-flex items-center justify-center rounded-xl bg-primary px-8 py-3 text-base font-bold text-black transition hover:bg-secondary hover:text-white md:px-10 md:py-4 md:text-lg">
             Hubungi Kami Sekarang
           </NuxtLink>
         </div>

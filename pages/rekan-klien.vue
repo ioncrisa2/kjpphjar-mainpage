@@ -41,12 +41,12 @@ const filteredClients = computed(() => {
     </div>
 
     <!-- Content Section -->
-    <div class="py-16 sm:py-24 bg-white">
+    <div class="py-16 sm:py-24">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <UiBreadcrumbs :items="[{ label: 'Rekan dan Klien' }]" class="mb-6" />
 
         <div class="text-center mb-12">
-           <h2 class="text-2xl sm:text-3xl font-extrabold text-black font-mulish">
+           <h2 class="text-2xl sm:text-3xl font-extrabold text-black font-mulish dark:text-white">
              Rekan dan Client yang pernah menggunakan Jasa KJPP Henricus Judi Adrianto dan Rekan
            </h2>
         </div>
@@ -58,7 +58,7 @@ const filteredClients = computed(() => {
             :key="cat"
             @click="activeCategory = cat"
             class="px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200"
-            :class="activeCategory === cat ? 'bg-primary text-black' : 'bg-gray-100 text-gray hover:bg-gray-200'"
+            :class="activeCategory === cat ? 'bg-primary text-black' : 'bg-gray-100 text-gray hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20'"
           >
             {{ cat }}
           </button>
@@ -67,10 +67,10 @@ const filteredClients = computed(() => {
         <!-- Grid Klien -->
         <div v-if="pending" class="text-center text-gray py-12">
           <div class="animate-pulse flex space-x-4 justify-center">
-            <div class="h-12 w-12 bg-gray-200 rounded-full"></div>
+            <div class="h-12 w-12 bg-gray-200 rounded-full dark:bg-white/10"></div>
             <div class="space-y-3">
-              <div class="h-4 w-32 bg-gray-200 rounded"></div>
-              <div class="h-4 w-24 bg-gray-200 rounded"></div>
+              <div class="h-4 w-32 bg-gray-200 rounded dark:bg-white/10"></div>
+              <div class="h-4 w-24 bg-gray-200 rounded dark:bg-white/10"></div>
             </div>
           </div>
         </div>

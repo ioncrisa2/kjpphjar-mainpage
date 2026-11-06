@@ -61,7 +61,7 @@ function isOpen(index: number) {
       <div class="container max-w-4xl">
         <UiBreadcrumbs :items="[{ label: 'Q&A (FAQ)' }]" />
         
-        <div v-if="!faqs || faqs.length === 0" class="text-center text-gray-500 py-10">
+        <div v-if="!faqs || faqs.length === 0" class="text-center text-gray-500 py-10 dark:text-gray-400">
           Belum ada pertanyaan yang tersedia.
         </div>
         

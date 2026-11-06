@@ -161,7 +161,7 @@ function formatDate(value: string) {
 </script>
 
 <template>
-  <div v-if="pending" class="min-h-screen bg-white pt-[106px] dark:bg-gray-dark" aria-label="Memuat artikel">
+  <div v-if="pending" class="min-h-screen bg-white pt-[106px] dark:bg-black" aria-label="Memuat artikel">
     <div class="bg-black px-4 py-20 sm:py-24">
       <div class="mx-auto max-w-4xl space-y-5 text-center">
         <div class="mx-auto h-7 w-32 animate-pulse rounded-full bg-white/10"></div>
@@ -176,7 +176,7 @@ function formatDate(value: string) {
       <div class="h-56 animate-pulse rounded-xl bg-slate-100 dark:bg-white/10"></div>
     </div>
   </div>
-  <div v-else-if="article" class="bg-white dark:bg-gray-dark">
+  <div v-else-if="article" class="bg-white dark:bg-black">
     <header class="relative overflow-hidden bg-black pt-[110px] sm:pt-[130px]">
       <div v-if="article.coverImageUrl" class="absolute inset-0">
         <img :src="article.coverImageUrl" alt="" class="h-full w-full object-cover opacity-25">

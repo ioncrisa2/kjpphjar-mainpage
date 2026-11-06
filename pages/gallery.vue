@@ -78,7 +78,7 @@ const filteredPhotos = computed(() => {
                 :href="photo.imageUrl"
                 :data-src="photo.imageUrl"
                 :data-sub-html="photo.title"
-                class="cursor-pointer overflow-hidden rounded-[24px] block"
+                class="block cursor-pointer overflow-hidden rounded-[24px] bg-gray-100 dark:bg-white/5"
               >
                 <img
                   :src="photo.thumbnailUrl"

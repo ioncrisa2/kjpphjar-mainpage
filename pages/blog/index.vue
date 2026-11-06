@@ -73,7 +73,7 @@ function formatDate(value: string) {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-dark">
+  <div class="bg-white dark:bg-black">
     <section class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
       <div class="container flex min-h-[300px] items-center py-12 md:min-h-[400px]">
         <div class="max-w-3xl text-center md:text-left">
