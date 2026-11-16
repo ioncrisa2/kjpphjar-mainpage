@@ -17,7 +17,10 @@ function plainTextToHtml(value: string) {
 }
 
 export function sanitizeFaqAnswer(value: unknown) {
-  const source = String(value ?? '').replace(/\r\n?/g, '\n').trim()
+  const source = String(value ?? '')
+    .replace(/\r\n?/g, '\n')
+    .replace(/\bhari kerja\s+hari kerja\b/gi, 'hari kerja')
+    .trim()
   return sanitizeBlogContent(htmlTagPattern.test(source) ? source : plainTextToHtml(source))
 }
 

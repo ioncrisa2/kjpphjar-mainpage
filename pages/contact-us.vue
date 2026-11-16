@@ -1,13 +1,31 @@
 <script setup lang="ts">
 import type { PublicStaffGroup, PublicStaffMember } from '~/types/staff'
 
-useHead({
-  title: "Contact Us | KJPP HJA'R",
-  meta: [{ name: 'description', content: 'Hubungi KJPP HJA\'R — kantor pusat di Palembang, cabang di Surabaya dan Balikpapan.' }],
+const config = useRuntimeConfig()
+const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace('://www.', '://').replace(/\/$/, '')
+const { company, headOffice, branches, buildProfessionalServiceJsonLd } = useCompanyProfile()
+
+const contactTitle = "Hubungi Kami – Kantor Pusat Palembang & Cabang | KJPP HJA'R"
+const contactDescription =
+  "Hubungi Kantor Pusat KJPP HJA'R di Palembang serta kantor cabang di Surabaya, Balikpapan, dan Tangerang Selatan untuk konsultasi dan penawaran penilaian."
+
+useSeoMeta({
+  title: contactTitle,
+  description: contactDescription,
+  ogTitle: contactTitle,
+  ogDescription: contactDescription,
+  twitterTitle: contactTitle,
+  twitterDescription: contactDescription,
 })
 
-const { data: branchesData } = await useFetch('/api/branches')
-const branches = computed(() => branchesData.value || [])
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify(buildProfessionalServiceJsonLd(baseUrl)),
+    },
+  ],
+})
 
 // Ringkasan staff di kartu kantor; daftar lengkap ada di halaman Tentang Kami.
 const STAFF_PREVIEW_LIMIT = 6
@@ -121,19 +139,20 @@ function resetFormToNewMessage() {
       </div>
     </div>
 
-    <!-- Form & Socials -->
+    <!-- Form & Head Office Info + Google Maps Embed -->
     <section class="bg-gradient-to-t from-white/[55%] to-transparent py-14 dark:bg-none lg:py-[50px]">
       <div class="container">
         <UiBreadcrumbs :items="[{ label: 'Contact Us' }]" class="mb-6" />
         <div class="relative z-10 lg:flex lg:gap-16">
           <div class="heading text-center lg:text-left">
-            <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Get in touch with us</h2>
-            <p class="mt-2 text-sm text-gray max-w-xl">Kirimkan pesan atau pertanyaan Anda kepada kami. Tim ahli kami siap membantu kebutuhan penilaian dan konsultasi properti Anda.</p>
+            <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Hubungi Kantor Kami</h2>
+            <p class="mt-2 text-sm text-gray max-w-xl">Kirimkan pesan atau pertanyaan Anda kepada kami. Tim penilai publik {{ company.name }} siap membantu kebutuhan penilaian properti, bisnis, studi kelayakan, dan pengawasan proyek Anda.</p>
           </div>
         </div>
 
-        <!-- Contact Form / Interactive Feedback Area -->
-        <div class="mt-8 max-w-2xl">
+        <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:items-start">
+          <!-- Contact Form / Interactive Feedback Area -->
+          <div>
           <!-- Interactive Success Card -->
           <Transition
             enter-active-class="transition duration-300 ease-out"
@@ -289,6 +308,69 @@ function resetFormToNewMessage() {
               </button>
             </form>
           </Transition>
+          </div>
+
+          <!-- Kantor Pusat Palembang, Jam Operasional & Google Maps Embed -->
+          <aside class="space-y-6 rounded-3xl border border-gray/15 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-dark">
+            <div>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-primary">
+                <Icon name="ph:buildings-bold" class="h-4 w-4" aria-hidden="true" />
+                {{ headOffice.name }}
+              </span>
+              <h3 class="mt-3 text-xl font-extrabold text-black dark:text-white">
+                {{ company.name }}
+              </h3>
+              <ul class="mt-4 space-y-3 text-sm text-gray-700 dark:text-gray-300">
+                <li class="flex items-start gap-3">
+                  <Icon name="ph:map-pin-bold" class="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <span>{{ headOffice.fullAddress }}</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <Icon name="ph:phone-bold" class="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <div>
+                    <a :href="`tel:${headOffice.phoneE164}`" class="font-bold text-black hover:text-primary dark:text-white">{{ headOffice.phone }}</a>
+                    <span class="mx-1.5 text-gray">·</span>
+                    <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="font-bold text-emerald-700 hover:underline dark:text-emerald-400">WhatsApp {{ headOffice.whatsapp }}</a>
+                  </div>
+                </li>
+                <li class="flex items-start gap-3">
+                  <Icon name="ph:envelope-simple-bold" class="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <a :href="`mailto:${headOffice.email}`" class="font-semibold text-black hover:text-primary dark:text-white">{{ headOffice.email }}</a>
+                </li>
+                <li class="flex items-start gap-3 rounded-xl bg-stone-50 p-3 dark:bg-white/5">
+                  <Icon name="ph:clock-bold" class="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+                  <div>
+                    <p class="font-extrabold text-black dark:text-white">Jam Operasional Kantor</p>
+                    <p class="mt-0.5 text-xs font-semibold text-gray-700 dark:text-gray-300">{{ company.operatingHours.display }}</p>
+                    <p class="text-xs text-gray">{{ company.operatingHours.weekendDisplay }}</p>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 class="mb-2 text-sm font-extrabold text-black dark:text-white">Peta Google Maps Kantor Pusat Palembang</h4>
+              <iframe
+                :src="headOffice.googleMapsEmbedUrl"
+                :title="`Peta Google Maps ${headOffice.name} ${company.name}`"
+                width="100%"
+                height="260"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+                class="h-64 w-full rounded-2xl border border-gray/15"
+              />
+              <a
+                :href="headOffice.googleMapsUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-primary dark:text-primary"
+              >
+                <span>Buka lokasi Kantor Pusat Palembang di Google Maps</span>
+                <Icon name="ph:arrow-square-out-bold" class="h-3.5 w-3.5" aria-hidden="true" />
+              </a>
+            </div>
+          </aside>
         </div>
       </div>
     </section>
@@ -298,7 +380,7 @@ function resetFormToNewMessage() {
       <div class="container">
         <div class="heading text-center">
           <p class="subtitle">Lokasi Kami</p>
-          <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Kantor & Cabang</h2>
+          <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Kantor &amp; Cabang</h2>
         </div>
 
         <div v-if="branches.length === 0" class="text-center text-gray py-10">Memuat data lokasi...</div>
@@ -306,7 +388,7 @@ function resetFormToNewMessage() {
         <div v-else class="space-y-10">
           <div
             v-for="branch in branches"
-            :key="branch._id"
+            :key="branch.id"
             class="flex flex-col gap-6 rounded-[32px] border border-gray/10 overflow-hidden sm:flex-row"
           >
             <!-- Map -->
@@ -333,11 +415,11 @@ function resetFormToNewMessage() {
               <ul class="mt-4 space-y-3 text-sm">
                 <li class="flex items-start gap-3">
                   <Icon name="ph:map-pin-bold" class="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  <a :href="branch.mapsUrl" target="_blank" class="hover:text-primary transition text-black dark:text-white">{{ branch.address }}</a>
+                  <a :href="branch.mapsUrl" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition text-black dark:text-white">{{ branch.address }}</a>
                 </li>
                 <li class="flex items-start gap-3">
                   <Icon name="ph:phone-bold" class="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  <a :href="`tel:${branch.phone}`" class="hover:text-primary transition text-black dark:text-white">{{ branch.phone }}</a>
+                  <a :href="branch.phoneHref" class="hover:text-primary transition text-black dark:text-white">{{ branch.phone }}</a>
                 </li>
                 <li class="flex items-start gap-3">
                   <Icon name="ph:envelope-simple-bold" class="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
@@ -345,10 +427,10 @@ function resetFormToNewMessage() {
                 </li>
               </ul>
 
-              <div v-if="branchStaff(branch._id).length" class="mt-6 border-t border-gray/10 pt-5">
+              <div v-if="branchStaff(branch.id).length" class="mt-6 border-t border-gray/10 pt-5">
                 <p class="text-xs font-bold uppercase tracking-wider text-gray">Tim di kantor ini</p>
                 <ul class="mt-3 grid gap-x-6 gap-y-3 lg:grid-cols-2">
-                  <li v-for="member in branchStaff(branch._id).slice(0, STAFF_PREVIEW_LIMIT)" :key="member._id" class="text-sm">
+                  <li v-for="member in branchStaff(branch.id).slice(0, STAFF_PREVIEW_LIMIT)" :key="member._id" class="text-sm">
                     <p class="font-bold text-black dark:text-white">{{ member.name }}</p>
                     <p class="text-xs text-gray">
                       {{ member.position }}<template v-if="member.mappiNumber"> · No. MAPPI {{ member.mappiNumber }}</template>
@@ -356,11 +438,11 @@ function resetFormToNewMessage() {
                   </li>
                 </ul>
                 <NuxtLink
-                  v-if="branchStaff(branch._id).length > STAFF_PREVIEW_LIMIT"
-                  :to="`/about-us#staff-${branch._id}`"
+                  v-if="branchStaff(branch.id).length > STAFF_PREVIEW_LIMIT"
+                  :to="`/about-us#staff-${branch.id}`"
                   class="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline"
                 >
-                  Lihat semua {{ branchStaff(branch._id).length }} staff
+                  Lihat semua {{ branchStaff(branch.id).length }} staff
                   <Icon name="ph:arrow-right-bold" aria-hidden="true" />
                 </NuxtLink>
               </div>

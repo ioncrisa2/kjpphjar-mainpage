@@ -1,9 +1,15 @@
 <script setup lang="ts">
-useHead({
-  title: "Layanan Kami | KJPP HJA'R",
-  meta: [
-    { name: 'description', content: "Daftar layanan profesional penilai publik dan konsultan dari KJPP HJA'R." }
-  ]
+const servicesTitle = "Layanan Penilaian Properti, Bisnis & Konsultasi | KJPP HJA'R Palembang"
+const servicesDescription =
+  "Layanan profesional KJPP HJA'R di Palembang dan Sumatera Selatan: penilaian properti, penilaian bisnis, studi kelayakan, dan pengawasan proyek independen."
+
+useSeoMeta({
+  title: servicesTitle,
+  description: servicesDescription,
+  ogTitle: servicesTitle,
+  ogDescription: servicesDescription,
+  twitterTitle: servicesTitle,
+  twitterDescription: servicesDescription,
 })
 
 const { data: services, pending } = await useFetch<any[]>('/api/services')

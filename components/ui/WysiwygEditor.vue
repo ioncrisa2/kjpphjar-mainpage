@@ -15,8 +15,52 @@
       type="file"
       accept="image/jpeg,image/png,image/webp"
       tabindex="-1"
-      @change="uploadImage"
+      @change="onSelectImageFile"
     >
+    <div
+      v-if="pendingImageFile"
+      class="border-t border-gray-200 bg-slate-50 p-4 text-sm text-gray-900"
+      role="region"
+      aria-label="Form unggah gambar blog"
+    >
+      <p class="font-bold text-gray-900">Unggah Gambar Artikel: {{ pendingImageFile.name }}</p>
+      <div class="mt-2">
+        <label for="wysiwyg-image-alt" class="mb-1 block text-xs font-bold text-gray-700">
+          Teks Alt Gambar (Wajib untuk SEO &amp; Aksesibilitas) <span class="text-red-600">*</span>
+        </label>
+        <input
+          id="wysiwyg-image-alt"
+          v-model="pendingImageAlt"
+          type="text"
+          required
+          maxlength="200"
+          placeholder="Contoh: Penilai publik KJPP HJA'R melakukan inspeksi ruko di Palembang"
+          class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary"
+          @keydown.enter.prevent="confirmUploadImage"
+        >
+        <p v-if="altValidationError" class="mt-1 text-xs font-semibold text-red-600" role="alert">
+          {{ altValidationError }}
+        </p>
+      </div>
+      <div class="mt-3 flex items-center gap-2">
+        <button
+          type="button"
+          :disabled="uploading"
+          class="rounded-lg bg-primary px-4 py-1.5 text-xs font-bold text-black transition hover:bg-sky-400 disabled:opacity-50"
+          @click="confirmUploadImage"
+        >
+          Unggah &amp; Sisipkan Gambar
+        </button>
+        <button
+          type="button"
+          :disabled="uploading"
+          class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+          @click="cancelPendingImage"
+        >
+          Batal
+        </button>
+      </div>
+    </div>
     <div
       v-if="uploading"
       class="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-800"
@@ -58,6 +102,9 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const imageInput = ref<HTMLInputElement | null>(null)
+const pendingImageFile = ref<File | null>(null)
+const pendingImageAlt = ref('')
+const altValidationError = ref('')
 const uploading = ref(false)
 const uploadError = ref('')
 let quillInstance: any = null
@@ -113,26 +160,58 @@ watch(
   (value) => scheduleHydration(value),
 )
 
-async function uploadImage(event: Event) {
+function onSelectImageFile(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   if (!file || !quillInstance || !props.imageUploadUrl) return
+  pendingImageFile.value = file
+  pendingImageAlt.value = ''
+  altValidationError.value = ''
+  uploadError.value = ''
+  input.value = ''
+}
 
+function cancelPendingImage() {
+  pendingImageFile.value = null
+  pendingImageAlt.value = ''
+  altValidationError.value = ''
+}
+
+async function confirmUploadImage() {
+  const file = pendingImageFile.value
+  const altText = pendingImageAlt.value.trim()
+  if (!file || !quillInstance || !props.imageUploadUrl) return
+
+  if (!altText) {
+    altValidationError.value = 'Teks alt wajib diisi sebelum mengunggah gambar.'
+    return
+  }
+
+  altValidationError.value = ''
   uploading.value = true
   uploadError.value = ''
   try {
     const body = new FormData()
     body.append('image', file)
+    body.append('alt', altText)
     const result = await $fetch<{ url: string }>(props.imageUploadUrl, { method: 'POST', body })
     const selection = quillInstance.getSelection(true)
     const index = selection?.index ?? Math.max(0, quillInstance.getLength() - 1)
     quillInstance.insertEmbed(index, 'image', result.url, 'user')
+    await nextTick()
+    const imgs = quillInstance.root?.querySelectorAll?.(`img[src="${result.url}"]`) || []
+    for (const img of imgs) {
+      if (!img.getAttribute('alt')) {
+        img.setAttribute('alt', altText)
+      }
+    }
     quillInstance.setSelection(index + 1, 0, 'silent')
+    handleTextChange()
+    cancelPendingImage()
   } catch (error: any) {
     uploadError.value = error?.data?.statusMessage || 'Gambar gagal diunggah. Coba file lain.'
   } finally {
     uploading.value = false
-    input.value = ''
   }
 }
 </script>

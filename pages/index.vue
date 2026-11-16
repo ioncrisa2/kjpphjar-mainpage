@@ -1,18 +1,22 @@
 <script setup lang="ts">
 const config = useRuntimeConfig()
-const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace(/\/$/, '')
+const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace('://www.', '://').replace(/\/$/, '')
+const { company, branches, buildProfessionalServiceJsonLd } = useCompanyProfile()
+
+const homeTitle = "KJPP Palembang – Jasa Penilai Publik Sumatera Selatan | HJA'R"
+const homeDescription =
+  "KJPP HJA'R di Palembang melayani jasa penilai publik independen untuk properti, bisnis & studi kelayakan di Sumsel dan seluruh Sumatera sejak 2013."
+
+useSeoMeta({
+  title: homeTitle,
+  description: homeDescription,
+  ogTitle: homeTitle,
+  ogDescription: homeDescription,
+  twitterTitle: homeTitle,
+  twitterDescription: homeDescription,
+})
 
 useHead({
-  title: "KJPP HJA'R | Jasa Penilaian Publik & Layanan Konsultan Independen",
-  meta: [
-    {
-      name: 'description',
-      content:
-        'KJPP Henricus Judi Adrianto dan Rekan menyediakan layanan konsultan dan penilaian publik independen. Terpercaya menangani berbagai proyek di seluruh Indonesia sejak 2013.',
-    },
-    { property: 'og:title', content: "KJPP HJA'R | Jasa Penilaian Publik & Layanan Konsultan Independen" },
-    { property: 'og:description', content: 'KJPP Henricus Judi Adrianto dan Rekan menyediakan layanan konsultan dan penilaian publik independen terpercaya.' },
-  ],
   link: [
     {
       rel: 'preload',
@@ -24,41 +28,23 @@ useHead({
   script: [
     {
       type: 'application/ld+json',
-      children: JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "LocalBusiness",
-        "name": "KJPP Henricus Judi Adrianto dan Rekan",
-        "image": `${baseUrl}/assets/images/h-logo.png`,
-        "@id": baseUrl,
-        "url": baseUrl,
-        "telephone": "+628117101066",
-        "description": "Perusahaan jasa penilai publik dan konsultan independen berpengalaman.",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Gedung Kantor Pusat",
-          "addressLocality": "Jakarta",
-          "addressRegion": "DKI Jakarta",
-          "addressCountry": "ID"
-        }
-      })
-    }
-  ]
+      children: JSON.stringify(buildProfessionalServiceJsonLd(baseUrl)),
+    },
+  ],
 })
 
 const { data: servicesData } = await useFetch<any[]>('/api/services')
 const { data: galleryData } = await useFetch<{ items: any[] }>('/api/gallery', { query: { featured: 'true', limit: 6 } })
 const { data: clientsData } = await useFetch<{ items: any[] }>('/api/clients')
-const { data: branchesData } = await useFetch<any[]>('/api/branches')
 const { data: categoriesData } = await useFetch<{ items: Array<{ slug: string }> }>('/api/categories')
 
 const services = computed(() => servicesData.value || [])
 const featuredPhotos = computed(() => galleryData.value?.items || [])
 const clients = computed(() => clientsData.value?.items || [])
 const featuredClients = computed(() => clients.value.slice(0, 6))
-const branches = computed(() => branchesData.value || [])
 const branchCitiesSummary = computed(() => {
   const cities = branches.value.map((b) => b.city).filter(Boolean)
-  return cities.length ? cities.slice(0, 3).join(' · ') : 'Kantor pusat & cabang'
+  return cities.length ? cities.slice(0, 4).join(' · ') : 'Palembang · Surabaya · Balikpapan · Tangerang Selatan'
 })
 const activeCategorySlugs = computed(
   () => new Set((categoriesData.value?.items || []).map((cat) => cat.slug))
@@ -68,30 +54,50 @@ const firmFacts = computed(() => [
   {
     value: '2013',
     label: 'Tahun Berdiri',
-    detail: 'Akta Notaris 28 November 2013',
+    detail: 'Kantor Pusat di Palembang sejak 28 November 2013',
   },
   {
-    value: branches.value.length > 0 ? String(branches.value.length) : 'Nasional',
+    value: branches.value.length > 0 ? String(branches.value.length) : '4',
     label: 'Kantor Layanan',
     detail: branchCitiesSummary.value,
   },
   {
-    value: services.value.length > 0 ? String(services.value.length) : 'Multi-sektor',
+    value: services.value.length > 0 ? String(services.value.length) : '4',
     label: 'Layanan Penilaian',
-    detail: 'Properti, bisnis & studi kelayakan',
+    detail: 'Properti, bisnis, studi kelayakan & pengawasan proyek',
   },
   {
     value: clients.value.length > 0 ? `${clients.value.length}+` : 'KEPI & SPI',
     label: clients.value.length > 0 ? 'Klien & Rekanan' : 'Standar Profesi',
-    detail: clients.value.length > 0 ? 'Perbankan, BUMN & korporasi swasta' : 'Sesuai standar penilai Indonesia',
+    detail: clients.value.length > 0 ? 'Perbankan, BUMN, BUMD & pemda' : 'Sesuai standar penilai Indonesia',
   },
 ])
 
 const chooseUs = [
-  { title: 'Tim Solid', desc: 'Didukung tim manajemen dan penilai bersertifikat MAPPI yang berpengalaman.', image: '/assets/images/team.jpg' },
-  { title: 'Skalabilitas', desc: 'Siap melayani kebutuhan penilaian perusahaan berskala kecil, menengah, hingga korporasi besar.', image: '/assets/images/scale.jpg' },
-  { title: 'Efektif & Efisien', desc: 'Menggunakan jadwal kerja terstruktur, terukur, dan pelaporan tepat waktu.', image: '/assets/images/efektif&efisien.jpg' },
-  { title: 'Kerahasiaan', desc: 'Menjamin kerahasiaan data dan dokumen klien sesuai kode etik dan pakta integritas.', image: '/assets/images/rahasia.jpg' },
+  {
+    title: 'Tim Solid',
+    desc: 'Didukung tim manajemen dan penilai bersertifikat MAPPI yang berpengalaman.',
+    image: '/assets/images/team.jpg',
+    alt: "Tim penilai publik dan staf profesional KJPP HJA'R Palembang yang bersertifikat MAPPI",
+  },
+  {
+    title: 'Skalabilitas',
+    desc: 'Siap melayani kebutuhan penilaian perusahaan berskala kecil, menengah, hingga korporasi besar.',
+    image: '/assets/images/scale.jpg',
+    alt: 'Layanan penilaian aset untuk perorangan, UMKM, perbankan, hingga korporasi besar di Sumatera',
+  },
+  {
+    title: 'Efektif & Efisien',
+    desc: 'Menggunakan jadwal kerja terstruktur, terukur, dan pelaporan tepat waktu.',
+    image: '/assets/images/efektif&efisien.jpg',
+    alt: 'Proses inspeksi lapangan dan penyusunan laporan penilaian publik yang terstruktur dan tepat waktu',
+  },
+  {
+    title: 'Kerahasiaan',
+    desc: 'Menjamin kerahasiaan data dan dokumen klien sesuai kode etik dan pakta integritas.',
+    image: '/assets/images/rahasia.jpg',
+    alt: 'Jaminan kerahasiaan data dan dokumen penilaian klien sesuai Kode Etik Penilai Indonesia (KEPI)',
+  },
 ]
 
 function formatServiceCode(index: number) {
@@ -108,21 +114,30 @@ function formatServiceCode(index: number) {
           <div class="space-y-5 pt-24 pb-10 text-center md:text-left">
             <p class="text-xl font-bold text-primary">Selamat Datang</p>
             <h1 class="text-3xl font-black uppercase sm:leading-tight lg:text-4xl">
-              KJPP Henricus Judi Adrianto dan Rekan
+              KJPP di Palembang, Sumatera Selatan – Henricus Judi Adrianto &amp; Rekan
             </h1>
             <p class="text-xl font-semibold max-w-xl">
               KJPP HJA'R merupakan perusahaan jasa penilai publik dan konsultan independen yang
               menawarkan berbagai layanan profesional.
             </p>
-            <NuxtLink to="/layanan" class="btn rounded-md bg-white !text-black hover:!bg-stone-100 inline-flex items-center gap-2">
-              <Icon name="ph:squares-four-bold" class="h-5 w-5" aria-hidden="true" />
-              <span class="text-lg">Layanan Kami</span>
-            </NuxtLink>
+            <p class="text-base leading-relaxed text-gray-200 max-w-2xl">
+              Berkantor pusat di <NuxtLink to="/kjpp-palembang" class="font-bold text-primary underline decoration-primary/60 underline-offset-4 hover:text-white">Palembang</NuxtLink> sejak tahun 2013, KJPP Henricus Judi Adrianto &amp; Rekan melayani kebutuhan penilaian properti, penilaian bisnis, studi kelayakan, dan pengawasan proyek di seluruh kabupaten/kota <NuxtLink to="/kjpp-sumatera-selatan" class="font-bold text-primary underline decoration-primary/60 underline-offset-4 hover:text-white">Sumatera Selatan</NuxtLink> serta berbagai provinsi di pulau <NuxtLink to="/kjpp-sumatera" class="font-bold text-primary underline decoration-primary/60 underline-offset-4 hover:text-white">Sumatera</NuxtLink> dan Indonesia.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3 md:justify-start">
+              <NuxtLink to="/layanan" class="btn rounded-md bg-white !text-black hover:!bg-stone-100 inline-flex items-center gap-2">
+                <Icon name="ph:squares-four-bold" class="h-5 w-5" aria-hidden="true" />
+                <span class="text-lg">Layanan Kami</span>
+              </NuxtLink>
+              <NuxtLink to="/contact-us" class="btn rounded-md !bg-primary !text-black hover:!bg-sky-400 inline-flex items-center gap-2">
+                <Icon name="ph:phone-call-bold" class="h-5 w-5" aria-hidden="true" />
+                <span class="text-lg">Hubungi Kantor Palembang</span>
+              </NuxtLink>
+            </div>
           </div>
           <div class="mx-auto w-full max-w-[386px] hidden lg:block">
             <img
               src="/assets/images/pak-henricus.png"
-              alt="Pimpinan KJPP HJA'R"
+              alt="Henricus Judi Adrianto, Pimpinan Rekan KJPP HJA'R di Palembang"
               width="386"
               height="450"
               fetchpriority="high"
@@ -155,7 +170,7 @@ function formatServiceCode(index: number) {
           >
             <img
               :src="client.logoUrl"
-              :alt="client.name"
+              :alt="`Logo klien ${client.name} – mitra KJPP HJA'R`"
               width="120"
               height="48"
               loading="lazy"
@@ -255,7 +270,7 @@ function formatServiceCode(index: number) {
               <img
                 :src="item.image"
                 class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                :alt="item.title"
+                :alt="item.alt"
                 width="600"
                 height="375"
                 loading="lazy"
@@ -337,7 +352,7 @@ function formatServiceCode(index: number) {
           >
             <img
               :src="photo.thumbnailUrl"
-              :alt="photo.title || 'Galeri KJPP HJA\'R'"
+              :alt="photo.title ? `${photo.title} – dokumentasi penilaian KJPP HJA'R` : 'Dokumentasi kegiatan survei dan penilaian lapangan KJPP HJA\'R'"
               width="400"
               height="250"
               class="h-48 w-full object-cover transition duration-500 hover:scale-110"

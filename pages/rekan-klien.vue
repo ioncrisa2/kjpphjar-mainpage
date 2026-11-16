@@ -1,11 +1,15 @@
 <script setup lang="ts">
-useHead({
-  title: "Rekan & Klien | KJPP HJA'R",
-  meta: [
-    { name: 'description', content: "Daftar klien dan mitra bisnis yang telah mempercayakan layanan penilai publik dan konsultan kepada KJPP HJA'R." },
-    { property: 'og:title', content: "Rekan & Klien | KJPP HJA'R" },
-    { property: 'og:description', content: "Daftar klien dan mitra bisnis yang telah mempercayakan layanan penilai publik dan konsultan kepada KJPP HJA'R." }
-  ]
+const clientsTitle = "Rekan & Klien Institusi Perbankan, BUMN & Daerah | KJPP HJA'R"
+const clientsDescription =
+  "Daftar rekanan perbankan, BUMN, BUMD, pemerintah daerah, dan korporasi swasta yang mempercayakan jasa penilaian publik kepada KJPP HJA'R Palembang."
+
+useSeoMeta({
+  title: clientsTitle,
+  description: clientsDescription,
+  ogTitle: clientsTitle,
+  ogDescription: clientsDescription,
+  twitterTitle: clientsTitle,
+  twitterDescription: clientsDescription,
 })
 
 const { data: clients, pending } = await useFetch('/api/clients')
@@ -89,7 +93,7 @@ const filteredClients = computed(() => {
               <img
                 class="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
                 :src="client.logoUrl"
-                :alt="client.name"
+                :alt="`Logo ${client.name} – rekan dan klien KJPP HJA'R`"
                 width="160"
                 height="96"
                 loading="lazy"

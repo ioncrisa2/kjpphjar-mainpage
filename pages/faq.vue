@@ -1,9 +1,15 @@
 <script setup lang="ts">
-useHead({
-  title: "Q&A (FAQ) | KJPP HJA'R",
-  meta: [
-    { name: 'description', content: 'Pertanyaan yang sering diajukan seputar layanan penilai publik dan konsultan di KJPP HJA\'R.' }
-  ]
+const faqTitle = "Tanya Jawab (FAQ) Jasa Penilai Publik | KJPP HJA'R Palembang"
+const faqDescription =
+  "Jawaban atas pertanyaan umum seputar prosedur, dokumen, waktu kerja, biaya, dan legalitas jasa penilaian publik di KJPP HJA'R Palembang."
+
+useSeoMeta({
+  title: faqTitle,
+  description: faqDescription,
+  ogTitle: faqTitle,
+  ogDescription: faqDescription,
+  twitterTitle: faqTitle,
+  twitterDescription: faqDescription,
 })
 
 const { data: faqs } = await useFetch('/api/faq')
@@ -23,7 +29,7 @@ useHead({
             name: f.question,
             acceptedAnswer: { '@type': 'Answer', text: f.answer },
           })),
-        })
+        }).replace(/</g, '\\u003c')
       }),
     },
   ],
@@ -59,7 +65,7 @@ function isOpen(index: number) {
     <!-- FAQ Content -->
     <section class="py-14 lg:py-24">
       <div class="container max-w-4xl">
-        <UiBreadcrumbs :items="[{ label: 'Q&A (FAQ)' }]" />
+        <UiBreadcrumbs :items="[{ label: 'FAQ' }]" class="mb-6" />
         
         <div v-if="!faqs || faqs.length === 0" class="text-center text-gray-500 py-10 dark:text-gray-400">
           Belum ada pertanyaan yang tersedia.

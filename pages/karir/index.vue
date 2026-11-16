@@ -1,9 +1,15 @@
 <script setup lang="ts">
-useHead({
-  title: "Karir | KJPP HJA'R",
-  meta: [
-    { name: 'description', content: "Bergabunglah bersama tim profesional kami. Temukan peluang karir terbaru di KJPP HJA'R." }
-  ]
+const careerTitle = "Peluang Karir Penilai & Staf Profesional | KJPP HJA'R"
+const careerDescription =
+  "Temukan informasi lowongan kerja dan peluang berkarir sebagai penilai maupun staf profesional bersama KJPP Henricus Judi Adrianto & Rekan."
+
+useSeoMeta({
+  title: careerTitle,
+  description: careerDescription,
+  ogTitle: careerTitle,
+  ogDescription: careerDescription,
+  twitterTitle: careerTitle,
+  twitterDescription: careerDescription,
 })
 
 const { data: careers, pending } = await useFetch('/api/careers')

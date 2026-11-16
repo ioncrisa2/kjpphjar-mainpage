@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import type { PublicStaffGroup } from '~/types/staff'
 
-useHead({
-  title: "Tentang Kami | KJPP HJA'R",
-  meta: [
-    { name: 'description', content: 'Kenali lebih jauh tentang KJPP Henricus Judi Adrianto dan Rekan — visi, misi, tim pimpinan, serta penilai dan staff kami.' },
-  ],
+const { company, headOffice, branches } = useCompanyProfile()
+
+const aboutTitle = "Tentang Kami – Profil & Tim Penilai Publik Palembang | KJPP HJA'R"
+const aboutDescription =
+  "Profil KJPP Henricus Judi Adrianto & Rekan (HJA'R), kantor jasa penilai publik berizin Kemenkeu di Palembang sejak 2013 beserta tim pimpinan, cabang, dan legalitas."
+
+useSeoMeta({
+  title: aboutTitle,
+  description: aboutDescription,
+  ogTitle: aboutTitle,
+  ogDescription: aboutDescription,
+  twitterTitle: aboutTitle,
+  twitterDescription: aboutDescription,
 })
 
 const { data: leadersData } = await useFetch('/api/leaders')
@@ -46,25 +54,70 @@ const missions = [
               Siapa <span class="text-primary">kami?</span>
             </h2>
             <p class="mb-6 text-xl font-bold text-black dark:text-white">
-              Kami merupakan perusahaan Jasa Penilai Publik yang berdiri dengan tujuan untuk memberikan
-              jasa layanan konsultasi penilaian publik.
+              {{ company.name }} merupakan perusahaan Jasa Penilai Publik independen yang berkantor pusat di Palembang dan berdiri dengan tujuan memberikan layanan penilaian publik serta konsultasi profesional.
             </p>
             <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
-              KJPP Henricus Judi Adrianto dan Rekan berdiri pada 28 November 2013. Perusahaan kami
-              berdiri berdasarkan Akta Notaris (Terdahulu) Linda Aprianti No. 114 Tanggal 31 Oktober
-              2013 dan Akta Notaris (Perubahan Terbaru) Linta Aprianti No.01 Tanggal 3 Agustus 2019.
+              {{ company.name }} berdiri pada 28 November 2013 berdasarkan {{ company.foundedDeed }}. Kantor pusat kami berlokasi di {{ headOffice.fullAddress }}, dengan telepon resmi <a :href="`tel:${headOffice.phoneE164}`" class="font-bold text-primary hover:underline">{{ headOffice.phone }}</a> dan jaringan kantor cabang di Surabaya, Balikpapan, serta Tangerang Selatan.
             </p>
           </div>
           <div class="w-full px-4 lg:w-1/2">
             <img
               src="/assets/images/aboutbg.png"
-              alt="Tentang KJPP HJA'R"
+              alt="Kantor dan tim penilai publik KJPP Henricus Judi Adrianto & Rekan di Palembang"
               width="600"
               height="400"
               loading="lazy"
               decoding="async"
               class="w-full h-auto rounded-xl object-cover"
             />
+          </div>
+        </div>
+
+        <!-- Legalitas, Nomor Izin & Jaringan Kantor dari Satu Sumber Data -->
+        <div class="mt-14 grid gap-6 lg:grid-cols-2">
+          <div class="rounded-2xl border border-primary/25 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-dark">
+            <h2 class="text-xl font-extrabold text-black dark:text-white">
+              Izin Usaha &amp; Keanggotaan Profesi
+            </h2>
+            <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+              Seluruh penugasan dilaksanakan secara independen sesuai Kode Etik Penilai Indonesia (KEPI) dan Standar Penilaian Indonesia (SPI).
+            </p>
+            <dl class="mt-5 space-y-3 text-sm">
+              <div class="flex flex-col border-b border-gray/10 pb-2.5 sm:flex-row sm:justify-between">
+                <dt class="font-semibold text-gray">Nomor Izin Usaha KJPP (Kemenkeu)</dt>
+                <dd class="font-extrabold text-black dark:text-white">{{ company.licenses.kjppLicenseNumber }} ({{ company.licenses.kjppDecreeNumber }})</dd>
+              </div>
+              <div class="flex flex-col border-b border-gray/10 pb-2.5 sm:flex-row sm:justify-between">
+                <dt class="font-semibold text-gray">Izin Penilai Publik Pimpinan Rekan</dt>
+                <dd class="font-extrabold text-black dark:text-white">{{ company.licenses.managingPartnerValuerLicense }}</dd>
+              </div>
+              <div class="flex flex-col border-b border-gray/10 pb-2.5 sm:flex-row sm:justify-between">
+                <dt class="font-semibold text-gray">Keanggotaan Asosiasi Profesi</dt>
+                <dd class="font-extrabold text-black dark:text-white">{{ company.licenses.mappiMembership }}</dd>
+              </div>
+              <div class="flex flex-col sm:flex-row sm:justify-between">
+                <dt class="font-semibold text-gray">Pendaftaran OJK (STTD)</dt>
+                <dd class="font-extrabold text-black dark:text-white">{{ company.licenses.ojkRegistration }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="rounded-2xl border border-primary/25 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-dark">
+            <h2 class="text-xl font-extrabold text-black dark:text-white">
+              Kantor Pusat &amp; Jaringan Cabang
+            </h2>
+            <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+              Data alamat dan nomor telepon resmi seluruh kantor layanan {{ company.shortName }}:
+            </p>
+            <ul class="mt-4 space-y-3 text-sm">
+              <li v-for="branch in branches" :key="branch.id" class="border-b border-gray/10 pb-2.5 last:border-b-0 last:pb-0">
+                <p class="font-extrabold text-black dark:text-white">{{ branch.name }} ({{ branch.city }})</p>
+                <p class="text-xs text-gray-700 dark:text-gray-300">{{ branch.address }}</p>
+                <p class="mt-0.5 text-xs font-semibold text-primary">
+                  Telp: <a :href="branch.phoneHref" class="hover:underline">{{ branch.phone }}</a> · Email: <a :href="`mailto:${branch.email}`" class="hover:underline">{{ branch.email }}</a>
+                </p>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -113,7 +166,7 @@ const missions = [
             <div class="overflow-hidden rounded-2xl">
               <img
                 :src="leader.photoUrl"
-                :alt="leader.name"
+                :alt="`Foto ${leader.name}, ${leader.position} KJPP HJA'R`"
                 width="400"
                 height="400"
                 class="h-64 w-full object-cover transition duration-500 group-hover:scale-105"

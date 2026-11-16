@@ -1,7 +1,15 @@
 <script setup lang="ts">
-useHead({
-  title: "Galeri | KJPP HJA'R",
-  meta: [{ name: 'description', content: 'Galeri foto kegiatan dan momen KJPP Henricus Judi Adrianto dan Rekan.' }],
+const galleryTitle = "Galeri Kegiatan Inspeksi & Penilaian Lapangan | KJPP HJA'R"
+const galleryDescription =
+  "Dokumentasi kegiatan survei dan inspeksi lapangan tim penilai KJPP Henricus Judi Adrianto & Rekan pada berbagai objek properti, industri, dan aset."
+
+useSeoMeta({
+  title: galleryTitle,
+  description: galleryDescription,
+  ogTitle: galleryTitle,
+  ogDescription: galleryDescription,
+  twitterTitle: galleryTitle,
+  twitterDescription: galleryDescription,
 })
 
 import Lightgallery from 'lightgallery/vue'
@@ -82,7 +90,7 @@ const filteredPhotos = computed(() => {
               >
                 <img
                   :src="photo.thumbnailUrl"
-                  :alt="photo.title || 'Galeri'"
+                  :alt="photo.title ? `${photo.title} – dokumentasi kegiatan KJPP HJA'R` : 'Dokumentasi kegiatan survei penilaian lapangan KJPP HJA\'R'"
                   class="h-56 w-full object-cover transition duration-500 hover:scale-110"
                   loading="lazy"
                 />

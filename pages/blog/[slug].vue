@@ -21,8 +21,20 @@ const absoluteCover = computed(() => {
   if (!cover) return defaultOgImage
   return /^https?:\/\//i.test(cover) ? cover : `${baseUrl}${cover.startsWith('/') ? '' : '/'}${cover}`
 })
-const seoTitle = computed(() => article.value?.metaTitle || article.value?.title || 'Blog')
+const seoTitle = computed(() => {
+  const raw = String(article.value?.metaTitle || article.value?.title || 'Blog').trim()
+  return raw.replace(/\s*[|–-]\s*(?:KJPP\s+)?HJA['’]R\s*$/i, '').trim() || 'Blog'
+})
 const seoDescription = computed(() => article.value?.metaDescription || article.value?.excerpt || '')
+const articleHtml = computed(() => {
+  let html = String(article.value?.content || '').replace(/<(\/?)h1(\b[^>]*)>/gi, '<$1h2$2>')
+  if (!/<h2\b/i.test(html) && /<h3\b/i.test(html)) {
+    html = html
+      .replace(/<(\/?)h3(\b[^>]*)>/gi, '<$1h2$2>')
+      .replace(/<(\/?)h4(\b[^>]*)>/gi, '<$1h3$2>')
+  }
+  return html
+})
 const articleWordCount = computed(() => {
   const text = String(article.value?.content || '')
     .replace(/<[^>]*>/g, ' ')
@@ -205,7 +217,7 @@ function formatDate(value: string) {
           ]" 
         />
 
-        <article ref="articleRef" class="blog-article prose prose-lg prose-blue mx-auto mt-10 max-w-none text-gray-900 prose-headings:font-extrabold prose-headings:text-black prose-a:text-primary prose-img:rounded-xl dark:prose-invert dark:text-slate-200 dark:prose-headings:text-white" v-html="article.content"></article>
+        <article ref="articleRef" class="blog-article prose prose-lg prose-blue mx-auto mt-10 max-w-none text-gray-900 prose-headings:font-extrabold prose-headings:text-black prose-a:text-primary prose-img:rounded-xl dark:prose-invert dark:text-slate-200 dark:prose-headings:text-white" v-html="articleHtml"></article>
 
         <div v-if="article.tags.length" class="mt-12 flex flex-wrap items-center gap-2 border-t border-gray/10 pt-8 dark:border-white/10">
           <span class="mr-1 text-sm font-bold text-black dark:text-white">Topik:</span>
@@ -235,7 +247,7 @@ function formatDate(value: string) {
               <img
                 v-if="article.leader.photoUrl"
                 :src="article.leader.photoUrl"
-                :alt="article.leader.name"
+                :alt="`Foto ${article.leader.name}, ${article.leader.position} KJPP HJA'R`"
                 width="96"
                 height="96"
                 class="h-24 w-24 rounded-full border-2 border-primary object-cover shadow-md"

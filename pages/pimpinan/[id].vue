@@ -34,9 +34,11 @@ const absolutePhoto = computed(() => {
   return /^https?:\/\//i.test(photo) ? photo : `${baseUrl}${photo.startsWith('/') ? '' : '/'}${photo}`
 })
 const seoTitle = computed(() => `${leader.value?.name} — ${leader.value?.position}`)
-const seoDescription = computed(() =>
-  leader.value?.bio || `${leader.value?.name}, ${leader.value?.position} di KJPP Henricus Judi Adrianto & Rekan.`
-)
+const seoDescription = computed(() => {
+  if (leader.value?.bio) return leader.value.bio
+  const creds = credentials.value.map((c) => `${c.label} ${c.value}`).join(', ')
+  return `Profil ${leader.value?.name}, ${leader.value?.position} di KJPP Henricus Judi Adrianto & Rekan${creds ? ` (${creds})` : ''}.`
+})
 
 useSeoMeta({
   title: () => `${seoTitle.value} | KJPP HJA'R`,
@@ -117,7 +119,7 @@ useHead({
             <div class="overflow-hidden rounded-2xl shadow-lg">
               <img
                 :src="leader.photoUrl"
-                :alt="leader.name"
+                :alt="`Foto profil ${leader.name}, ${leader.position} KJPP Henricus Judi Adrianto & Rekan`"
                 width="600"
                 height="750"
                 class="aspect-[4/5] w-full object-cover"

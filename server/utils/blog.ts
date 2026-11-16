@@ -73,8 +73,20 @@ export function sanitizePlainText(value: unknown, maxLength = 500) {
   return stripHtml(value).slice(0, maxLength).trim()
 }
 
+export function normalizeContentHeadings(html: string) {
+  // Pastikan tidak ada H1 ganda di dalam isi artikel/layanan
+  let result = html.replace(/<(\/?)h1(\b[^>]*)>/gi, '<$1h2$2>')
+  // Jika artikel langsung memakai H3 tanpa adanya H2, naikkan H3 menjadi H2 (dan H4 menjadi H3)
+  if (!/<h2\b/i.test(result) && /<h3\b/i.test(result)) {
+    result = result
+      .replace(/<(\/?)h3(\b[^>]*)>/gi, '<$1h2$2>')
+      .replace(/<(\/?)h4(\b[^>]*)>/gi, '<$1h3$2>')
+  }
+  return result
+}
+
 export function sanitizeBlogContent(value: unknown) {
-  return xss(String(value ?? ''), {
+  const sanitized = xss(String(value ?? ''), {
     whiteList: contentWhiteList,
     stripIgnoreTag: true,
     stripIgnoreTagBody: ['script', 'style', 'iframe', 'object', 'embed'],
@@ -107,6 +119,8 @@ export function sanitizeBlogContent(value: unknown) {
       return undefined
     },
   })
+
+  return normalizeContentHeadings(sanitized)
 }
 
 export function calculateReadingTime(content: unknown, wordsPerMinute = 200) {

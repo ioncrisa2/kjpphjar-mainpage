@@ -65,9 +65,11 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   siteName: 'KJPP Henricus Judi Adrianto & Rekan',
   footerAddress: {
     headOffice:
-      'Ruko Terminal, Jl. Sako Raya Jl. Siaran No.18, Sialang, Kec. Sako, Kota Palembang, Sumatera Selatan 30163',
-    googleMapsEmbedUrl: '',
-    googleMapsUrl: '',
+      'Ruko Terminal Sako No. 18, Jl. Sako Raya / Jl. Siaran, Sialang, Kec. Sako, Kota Palembang, Sumatera Selatan 30163',
+    googleMapsEmbedUrl:
+      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3984.5997561!2d104.7884349!3d-2.9309659!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMsKwNTUnNTEuNSJTIDEwNMKwNDcnMjYuMiJF!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid',
+    googleMapsUrl:
+      "https://www.google.com/maps/place/2%C2%B055'51.5%22S+104%C2%B047'26.2%22E/@-2.9310068,104.7887215,17.33z/data=!4m4!3m3!8m2!3d-2.9309659!4d104.7906236?entry=ttu",
   },
   socialMedia: {
     instagram: 'https://www.instagram.com/kjpphenricusdanrekan/',
@@ -76,11 +78,11 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
     youtube: '',
   },
   generalContacts: {
-    email: '',
-    phone: '',
+    email: 'henricusja@yahoo.com',
+    phone: '(0711) 5615793',
     whatsapp: '628117101066',
   },
-  copyrightText: 'KJPP Henricus Judi Adrianto dan Rekan',
+  copyrightText: 'KJPP Henricus Judi Adrianto & Rekan',
   maintenanceMode: {
     isActive: false,
     message:

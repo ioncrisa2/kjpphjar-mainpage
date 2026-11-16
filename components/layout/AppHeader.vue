@@ -35,7 +35,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
       <div class="flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" @click="closeMenu">
-          <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" width="160" height="40" class="h-10 w-auto" />
+          <img src="/assets/images/h-logo.png" alt="Logo KJPP Henricus Judi Adrianto & Rekan (KJPP HJA'R) Palembang" width="160" height="40" class="h-10 w-auto" />
         </NuxtLink>
 
         <!-- Nav -->
@@ -55,7 +55,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
           >
             <!-- Header menu on mobile (Logo & Close) -->
             <div class="flex items-center justify-between p-5 lg:hidden border-b border-gray-800">
-              <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" width="128" height="32" class="h-8 w-auto" />
+              <img src="/assets/images/h-logo.png" alt="Logo KJPP Henricus Judi Adrianto & Rekan (KJPP HJA'R)" width="128" height="32" class="h-8 w-auto" />
               <button type="button" class="p-2" @click="closeMenu" aria-label="Tutup Menu Navigasi">
                 <Icon name="ph:x-bold" class="h-7 w-7 text-white hover:text-primary transition-colors" aria-hidden="true" />
               </button>
