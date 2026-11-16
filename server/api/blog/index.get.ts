@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
       })
       .populate({
         path: 'leaderId',
-        select: 'name position photoUrl bio',
+        select: 'name slug position photoUrl bio',
       })
       .sort({ publishedAt: -1, createdAt: -1 })
       .skip(skip)

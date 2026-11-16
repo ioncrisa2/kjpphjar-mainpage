@@ -7,7 +7,14 @@ if (error.value || !leader.value) {
   throw createError({ statusCode: 404, statusMessage: 'Pimpinan tidak ditemukan', fatal: true })
 }
 
-const { data: articlesData } = await useFetch('/api/blog', { query: { author: id, limit: 3 } })
+if (leader.value.slug && id !== leader.value.slug) {
+  await navigateTo(`/pimpinan/${leader.value.slug}`, { redirectCode: 301 })
+}
+
+const leaderObjectId = computed(() => String(leader.value?._id || id))
+const leaderSlug = computed(() => String(leader.value?.slug || id))
+
+const { data: articlesData } = await useFetch('/api/blog', { query: { author: leaderObjectId, limit: 3 } })
 const articles = computed(() => articlesData.value?.items || [])
 const totalArticles = computed(() => articlesData.value?.total || 0)
 
@@ -18,16 +25,17 @@ const credentials = computed(() => [
 ].filter((item) => item.value))
 
 const config = useRuntimeConfig()
-const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace(/\/$/, '')
-const canonicalUrl = computed(() => `${baseUrl}/pimpinan/${id}`)
+const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace('://www.', '://').replace(/\/$/, '')
+const canonicalUrl = computed(() => `${baseUrl}/pimpinan/${leaderSlug.value}`)
+const defaultOgImage = `${baseUrl}/assets/images/og-default.jpg`
 const absolutePhoto = computed(() => {
   const photo = leader.value?.photoUrl || ''
-  if (!photo) return ''
+  if (!photo) return defaultOgImage
   return /^https?:\/\//i.test(photo) ? photo : `${baseUrl}${photo.startsWith('/') ? '' : '/'}${photo}`
 })
 const seoTitle = computed(() => `${leader.value?.name} — ${leader.value?.position}`)
 const seoDescription = computed(() =>
-  leader.value?.bio || `${leader.value?.name}, ${leader.value?.position} di KJPP Henricus Judi Adrianto dan Rekan.`
+  leader.value?.bio || `${leader.value?.name}, ${leader.value?.position} di KJPP Henricus Judi Adrianto & Rekan.`
 )
 
 useSeoMeta({
@@ -35,13 +43,19 @@ useSeoMeta({
   description: () => seoDescription.value,
   ogTitle: () => seoTitle.value,
   ogDescription: () => seoDescription.value,
-  ogImage: () => absolutePhoto.value,
+  ogImage: () => defaultOgImage,
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
   ogUrl: () => canonicalUrl.value,
   ogType: 'profile',
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => seoTitle.value,
+  twitterDescription: () => seoDescription.value,
+  twitterImage: () => defaultOgImage,
 })
 
 useHead({
-  link: [{ rel: 'canonical', href: canonicalUrl }],
+  link: [{ key: 'canonical', rel: 'canonical', href: canonicalUrl }],
   script: [
     {
       type: 'application/ld+json',
@@ -161,7 +175,7 @@ useHead({
           </div>
           <NuxtLink
             v-if="totalArticles > articles.length"
-            :to="{ path: '/blog', query: { author: id } }"
+            :to="{ path: '/blog', query: { author: leaderObjectId } }"
             class="hidden shrink-0 text-sm font-bold text-primary hover:underline sm:inline"
           >
             Lihat semua ({{ totalArticles }})
@@ -172,7 +186,7 @@ useHead({
         </div>
         <NuxtLink
           v-if="totalArticles > articles.length"
-          :to="{ path: '/blog', query: { author: id } }"
+          :to="{ path: '/blog', query: { author: leaderObjectId } }"
           class="mt-6 inline-block text-sm font-bold text-primary hover:underline sm:hidden"
         >
           Lihat semua artikel ({{ totalArticles }})

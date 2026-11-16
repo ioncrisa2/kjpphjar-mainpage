@@ -259,6 +259,7 @@ export function toLeaderDto(leader: Record<string, any>) {
   return {
     _id: String(leader._id),
     name: leader.name,
+    slug: normalizeSlug(leader.slug, leader.name),
     position: leader.position,
     photoUrl: leader.photoUrl || '',
     bio: leader.bio || '',

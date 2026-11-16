@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     })
     .populate({
       path: 'leaderId',
-      select: 'name position photoUrl bio isActive',
+      select: 'name slug position photoUrl bio isActive',
     })
     .lean()
   if (!post) {

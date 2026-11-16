@@ -107,7 +107,7 @@ const missions = [
           <NuxtLink
             v-for="leader in leaders"
             :key="leader._id"
-            :to="`/pimpinan/${leader._id}`"
+            :to="`/pimpinan/${leader.slug || leader._id}`"
             class="group block text-center"
           >
             <div class="overflow-hidden rounded-2xl">

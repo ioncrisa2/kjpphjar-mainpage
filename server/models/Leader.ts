@@ -2,6 +2,7 @@ import mongoose, { Schema, type Document } from 'mongoose'
 
 export interface ILeader extends Document {
   name: string
+  slug?: string
   position: string
   photoUrl: string
   order: number
@@ -14,6 +15,7 @@ export interface ILeader extends Document {
 const LeaderSchema = new Schema<ILeader>(
   {
     name: { type: String, required: true },
+    slug: { type: String, trim: true, lowercase: true, index: true },
     position: { type: String, required: true },
     photoUrl: { type: String, required: true },
     order: { type: Number, required: true, default: 0 },

@@ -13,11 +13,12 @@ if (error.value) {
 const { data: relatedData } = await useFetch(`/api/blog/${slug}/related`)
 const relatedArticles = computed(() => relatedData.value?.items || [])
 const config = useRuntimeConfig()
-const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace(/\/$/, '')
+const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace('://www.', '://').replace(/\/$/, '')
 const canonicalUrl = computed(() => `${baseUrl}/blog/${article.value?.slug || slug}`)
+const defaultOgImage = `${baseUrl}/assets/images/og-default.jpg`
 const absoluteCover = computed(() => {
   const cover = article.value?.coverImageUrl || ''
-  if (!cover) return ''
+  if (!cover) return defaultOgImage
   return /^https?:\/\//i.test(cover) ? cover : `${baseUrl}${cover.startsWith('/') ? '' : '/'}${cover}`
 })
 const seoTitle = computed(() => article.value?.metaTitle || article.value?.title || 'Blog')
@@ -46,7 +47,7 @@ useSeoMeta({
 })
 
 useHead({
-  link: [{ rel: 'canonical', href: canonicalUrl }],
+  link: [{ key: 'canonical', rel: 'canonical', href: canonicalUrl }],
   script: [
     {
       type: 'application/ld+json',
@@ -60,7 +61,7 @@ useHead({
               jobTitle: leader.position || 'Penilai Publik',
               description: leader.bio || undefined,
               image: leader.photoUrl ? (leader.photoUrl.startsWith('http') ? leader.photoUrl : `${baseUrl}${leader.photoUrl}`) : undefined,
-              url: `${baseUrl}/pimpinan/${leader._id}`,
+              url: `${baseUrl}/pimpinan/${leader.slug || leader._id}`,
               worksFor: {
                 '@type': 'Organization',
                 name: 'KJPP Henricus Judi Adrianto dan Rekan',
@@ -250,7 +251,7 @@ function formatDate(value: string) {
                 <div>
                   <p class="text-xs font-extrabold uppercase tracking-wider text-primary">Penulis Artikel</p>
                   <h3 id="author-heading" class="mt-0.5 text-xl font-extrabold text-black dark:text-white sm:text-2xl">
-                    <NuxtLink :to="`/pimpinan/${article.leader._id}`" class="transition hover:text-primary">
+                    <NuxtLink :to="`/pimpinan/${article.leader.slug || article.leader._id}`" class="transition hover:text-primary">
                       {{ article.leader.name }}
                     </NuxtLink>
                   </h3>

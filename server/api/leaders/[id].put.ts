@@ -2,6 +2,7 @@ import path from 'node:path'
 import { Leader } from '~/server/models/Leader'
 import { connectDB } from '~/server/utils/db'
 import { processUploadedImage } from '~/server/utils/image'
+import { toLeaderSlug } from '~/server/utils/leader'
 import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
 import { receiveSingleImage, removeFileIfExists } from '~/server/utils/upload'
 
@@ -20,6 +21,7 @@ export default defineEventHandler(async (event) => {
 
     const updates: Record<string, any> = {
       name: body.name,
+      slug: toLeaderSlug(body.name || existing.name, body.slug),
       position: body.position,
       bio: body.bio,
       mappiNumber: body.mappiNumber,

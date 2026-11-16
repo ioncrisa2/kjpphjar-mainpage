@@ -57,15 +57,23 @@ export default defineNuxtConfig({
     mailTo: process.env.MAIL_TO || '',
     // Public — exposed to client
     public: {
-      baseUrl: process.env.NUXT_PUBLIC_BASE_URL || (isProduction ? 'https://kjpp-hjar.co.id' : 'http://localhost:3000'),
+      baseUrl: (process.env.NUXT_PUBLIC_BASE_URL || 'https://kjpp-hjar.co.id').replace('://www.', '://').replace(/\/$/, ''),
       whatsappNumber: process.env.WHATSAPP_NUMBER || '628117101066',
     },
+  },
+
+  // Site config for canonical & sitemap
+  site: {
+    url: 'https://kjpp-hjar.co.id',
   },
 
   // Sitemap config
   sitemap: {
     strictNuxtContentPaths: false,
     exclude: ['/admin/**', '/maintenance'],
+    defaults: {
+      lastmod: new Date().toISOString(),
+    },
     sources: [
       '/api/_sitemap-urls'
     ]
@@ -93,6 +101,11 @@ export default defineNuxtConfig({
         },
         { property: 'og:type', content: 'website' },
         { property: 'og:site_name', content: "KJPP HJA'R" },
+        { property: 'og:image', content: 'https://kjpp-hjar.co.id/assets/images/og-default.jpg' },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:image', content: 'https://kjpp-hjar.co.id/assets/images/og-default.jpg' },
       ],
       link: [
         { rel: 'icon', type: 'image/png', href: '/favicon.png' },
