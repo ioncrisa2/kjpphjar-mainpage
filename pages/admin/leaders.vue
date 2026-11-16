@@ -3,6 +3,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'leaders.view'
 useHead({ title: "Admin Pimpinan | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
+const toast = useToast()
 
 const { data: leaders, refresh, pending } = await useFetch('/api/leaders')
 
@@ -10,7 +11,8 @@ const modalOpen = ref(false)
 const saving = ref(false)
 const isEditing = ref(false)
 const editId = ref('')
-const fileInput = ref<HTMLInputElement | null>(null)
+const selectedPhoto = ref<File | null>(null)
+const editingPhotoUrl = ref('')
 
 const form = reactive({
   name: '',
@@ -32,7 +34,8 @@ function resetForm() {
   form.publicValuerLicense = ''
   form.order = 0
   form.isActive = true
-  if (fileInput.value) fileInput.value.value = ''
+  selectedPhoto.value = null
+  editingPhotoUrl.value = ''
 }
 
 function openAdd() {
@@ -50,14 +53,15 @@ function openEdit(item: any) {
   form.publicValuerLicense = item.publicValuerLicense || ''
   form.order = item.order || 0
   form.isActive = item.isActive !== false
-  if (fileInput.value) fileInput.value.value = ''
+  selectedPhoto.value = null
+  editingPhotoUrl.value = item.photoUrl || ''
   modalOpen.value = true
 }
 
 async function submitForm() {
-  const file = fileInput.value?.files?.[0]
+  const file = selectedPhoto.value
   if (!isEditing.value && !file) {
-    alert('Foto wajib diunggah untuk pimpinan baru')
+    toast.error('Foto wajib diunggah untuk pimpinan baru.')
     return
   }
 
@@ -82,15 +86,27 @@ async function submitForm() {
     })
     
     modalOpen.value = false
+    toast.success(isEditing.value ? 'Data pimpinan diperbarui.' : 'Pimpinan berhasil ditambahkan.')
     refresh()
   } catch (err: any) {
-    alert(err.data?.statusMessage || 'Gagal menyimpan data')
+    toast.error(err.data?.statusMessage || 'Gagal menyimpan data.')
   } finally {
     saving.value = false
   }
 }
 
 const { ask } = useConfirm()
+
+function leaderActions(leader: any) {
+  const actions: Array<{ label: string; icon?: string; variant?: 'default' | 'danger'; onClick?: () => void }> = []
+  if (can('leaders.update')) {
+    actions.push({ label: 'Edit Pimpinan', icon: 'ph:pencil-simple-bold', onClick: () => openEdit(leader) })
+  }
+  if (can('leaders.delete')) {
+    actions.push({ label: 'Hapus', icon: 'ph:trash-bold', variant: 'danger', onClick: () => deleteItem(leader) })
+  }
+  return actions
+}
 
 async function deleteItem(leader: any) {
   const confirmed = await ask({
@@ -102,9 +118,10 @@ async function deleteItem(leader: any) {
   if (!confirmed) return
   try {
     await $fetch(`/api/leaders/${leader._id}`, { method: 'DELETE' })
+    toast.success('Pimpinan berhasil dihapus.')
     refresh()
   } catch (err) {
-    alert('Gagal menghapus data')
+    toast.error('Gagal menghapus data.')
   }
 }
 </script>
@@ -139,7 +156,7 @@ async function deleteItem(leader: any) {
               <th class="px-6 py-3 text-right text-xs font-bold text-gray uppercase tracking-wider">Aksi</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray/10">
+          <tbody class="divide-y divide-gray/10 bg-white dark:bg-gray-dark">
             <tr v-for="leader in leaders" :key="leader._id">
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex items-center">
@@ -147,27 +164,26 @@ async function deleteItem(leader: any) {
                     <img class="h-10 w-10 rounded-full object-cover" :src="leader.photoUrl" :alt="leader.name">
                   </div>
                   <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">{{ leader.name }}</div>
+                    <div class="text-sm font-bold text-black dark:text-white">{{ leader.name }}</div>
                   </div>
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900">{{ leader.position }}</div>
+                <div class="text-sm text-black dark:text-gray-200">{{ leader.position }}</div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <div class="text-gray-900">MAPPI: {{ leader.mappiNumber || '-' }}</div>
-                <div class="text-gray-500">Ijin PP: {{ leader.publicValuerLicense || '-' }}</div>
+                <div class="text-black dark:text-gray-200">MAPPI: {{ leader.mappiNumber || '-' }}</div>
+                <div class="text-gray">Ijin PP: {{ leader.publicValuerLicense || '-' }}</div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-6 py-4 whitespace-nowrap text-sm tabular-nums text-gray">
                 {{ leader.order }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span v-if="leader.isActive" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
-                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Nonaktif</span>
+                <span v-if="leader.isActive" class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
+                <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button v-if="can('leaders.update')" @click="openEdit(leader)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
-                <button v-if="can('leaders.delete')" @click="deleteItem(leader)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <UiActionMenu v-if="leaderActions(leader).length" :items="leaderActions(leader)" :label="`Aksi untuk ${leader.name}`" />
               </td>
             </tr>
           </tbody>
@@ -176,50 +192,58 @@ async function deleteItem(leader: any) {
     </div>
 
     <!-- Modal Form -->
-    <UiModal v-model="modalOpen" :title="isEditing ? 'Edit Pimpinan' : 'Tambah Pimpinan Baru'">
+    <UiModal v-model="modalOpen" :title="isEditing ? 'Edit Pimpinan' : 'Tambah Pimpinan Baru'" size="lg">
       <form @submit.prevent="submitForm" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Foto</label>
-          <input type="file" ref="fileInput" accept="image/*" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm" :required="!isEditing">
-          <p v-if="isEditing" class="mt-1 text-xs text-gray-500">Biarkan kosong jika tidak ingin mengubah foto.</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Nama</label>
-          <input v-model="form.name" type="text" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Jabatan</label>
-          <input v-model="form.position" type="text" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-        </div>
+        <UiMediaInput
+          v-model="selectedPhoto"
+          :existing-url="editingPhotoUrl"
+          label="Foto"
+          accept="image/*"
+          preview-aspect="square"
+          :required="!isEditing"
+          :hint="isEditing ? 'Biarkan jika tidak ingin mengubah foto.' : 'Gunakan foto potret beresolusi baik.'"
+        />
         <div class="grid gap-4 sm:grid-cols-2">
           <div>
-            <label class="block text-sm font-medium text-gray-700">Nomor MAPPI</label>
-            <input v-model="form.mappiNumber" type="text" maxlength="100" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+            <label class="admin-label">Nama</label>
+            <input v-model="form.name" type="text" required class="admin-input">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700">No. Ijin Penilai Publik</label>
-            <input v-model="form.publicValuerLicense" type="text" maxlength="100" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+            <label class="admin-label">Jabatan</label>
+            <input v-model="form.position" type="text" required class="admin-input">
           </div>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Biografi Singkat</label>
-          <textarea v-model="form.bio" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm"></textarea>
+          <label class="admin-label">Biografi Singkat</label>
+          <textarea v-model="form.bio" rows="3" class="admin-input resize-y"></textarea>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Urutan Tampil (Order)</label>
-          <input v-model="form.order" type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-        </div>
-        <div class="flex items-center mt-6">
-          <input v-model="form.isActive" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-          <label class="ml-2 block text-sm text-gray-900">Aktif (Ditampilkan)</label>
-        </div>
+        <UiAdvancedOptions label="Kredensial & Opsi Lanjutan" hint="Nomor MAPPI, ijin penilai publik, urutan tampil, dan status">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label class="admin-label">Nomor MAPPI</label>
+              <input v-model="form.mappiNumber" type="text" maxlength="100" class="admin-input">
+            </div>
+            <div>
+              <label class="admin-label">No. Ijin Penilai Publik</label>
+              <input v-model="form.publicValuerLicense" type="text" maxlength="100" class="admin-input">
+            </div>
+            <div>
+              <label class="admin-label">Urutan Tampil (Order)</label>
+              <input v-model="form.order" type="number" class="admin-input">
+            </div>
+            <div class="flex items-center gap-2 sm:pt-7">
+              <input id="leader-active" v-model="form.isActive" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+              <label for="leader-active" class="text-sm font-semibold text-black dark:text-white">Aktif (Ditampilkan)</label>
+            </div>
+          </div>
+        </UiAdvancedOptions>
         
-        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse gap-2">
-          <button type="submit" :disabled="saving" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:w-auto sm:text-sm disabled:opacity-50">
-            {{ saving ? 'Menyimpan...' : 'Simpan' }}
-          </button>
-          <button type="button" @click="modalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+        <div class="flex flex-col-reverse gap-2 border-t border-gray/10 pt-4 sm:flex-row sm:justify-end">
+          <button type="button" @click="modalOpen = false" class="admin-btn-ghost justify-center">
             Batal
+          </button>
+          <button type="submit" :disabled="saving" class="admin-btn-primary justify-center">
+            {{ saving ? 'Menyimpan...' : 'Simpan' }}
           </button>
         </div>
       </form>

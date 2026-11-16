@@ -184,7 +184,7 @@ function resetFormToNewMessage() {
                 <button
                   type="button"
                   @click="resetFormToNewMessage"
-                  class="btn !rounded-xl mt-6 inline-flex items-center gap-2 !bg-primary !text-black hover:!bg-secondary hover:!text-white transition"
+                  class="btn !rounded-xl mt-6 inline-flex items-center gap-2 !bg-primary !text-black hover:!bg-sky-400 transition"
                 >
                   <Icon name="ph:plus-bold" class="h-4 w-4" />
                   <span>Kirim Pesan Lainnya</span>
@@ -331,16 +331,16 @@ function resetFormToNewMessage() {
               <h3 class="text-xl font-extrabold text-primary">{{ branch.name }}</h3>
               <p class="text-gray font-semibold mt-1">{{ branch.city }}</p>
               <ul class="mt-4 space-y-3 text-sm">
-                <li class="flex gap-3">
-                  <span class="text-primary mt-0.5">📍</span>
+                <li class="flex items-start gap-3">
+                  <Icon name="ph:map-pin-bold" class="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                   <a :href="branch.mapsUrl" target="_blank" class="hover:text-primary transition text-black dark:text-white">{{ branch.address }}</a>
                 </li>
-                <li class="flex gap-3">
-                  <span class="text-primary mt-0.5">📞</span>
+                <li class="flex items-start gap-3">
+                  <Icon name="ph:phone-bold" class="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                   <a :href="`tel:${branch.phone}`" class="hover:text-primary transition text-black dark:text-white">{{ branch.phone }}</a>
                 </li>
-                <li class="flex gap-3">
-                  <span class="text-primary mt-0.5">✉️</span>
+                <li class="flex items-start gap-3">
+                  <Icon name="ph:envelope-simple-bold" class="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                   <a :href="`mailto:${branch.email}`" class="hover:text-primary transition text-black dark:text-white">{{ branch.email }}</a>
                 </li>
               </ul>

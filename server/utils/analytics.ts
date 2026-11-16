@@ -1,6 +1,18 @@
 import { createHmac, randomUUID } from 'node:crypto'
 import type { H3Event } from 'h3'
 import {
+  ANALYTICS_RANGES,
+  ANALYTICS_TIMEZONE,
+  calculatePeriodDeltaPercent,
+  createJakartaDateKeys,
+  createJakartaDateKeysFromStart,
+  getAnalyticsPeriodBounds,
+  getJakartaStartOfDay,
+  parseAnalyticsRange,
+  type AnalyticsPeriodBounds,
+  type AnalyticsRange,
+} from '~/shared/analytics'
+import {
   AnalyticsLog,
   type AnalyticsBrowser,
   type AnalyticsDevice,
@@ -10,14 +22,21 @@ import {
 import { connectDB } from '~/server/utils/db'
 import { getTrustedClientAddress } from '~/server/utils/request-rate-limit'
 
-export const ANALYTICS_RANGES = [7, 30, 90] as const
-export type AnalyticsRange = (typeof ANALYTICS_RANGES)[number]
+export {
+  ANALYTICS_RANGES,
+  ANALYTICS_TIMEZONE,
+  calculatePeriodDeltaPercent,
+  createJakartaDateKeys,
+  createJakartaDateKeysFromStart,
+  getAnalyticsPeriodBounds,
+  getJakartaStartOfDay,
+  parseAnalyticsRange,
+  type AnalyticsPeriodBounds,
+  type AnalyticsRange,
+}
 
-export const ANALYTICS_TIMEZONE = 'Asia/Jakarta'
 export const ANALYTICS_INITIAL_COOKIE_PREFIX = 'kjpp_analytics_initial_'
 
-const DAY_MS = 24 * 60 * 60 * 1000
-const JAKARTA_OFFSET_MS = 7 * 60 * 60 * 1000
 const MAX_PATH_LENGTH = 300
 const EVENT_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const BOT_PATTERN =
@@ -69,13 +88,6 @@ export interface AnalyticsPageViewDocument {
   browser: AnalyticsBrowser
   ipHash?: string
   visitedAt: Date
-}
-
-export interface AnalyticsPeriodBounds {
-  startToday: Date
-  start7Days: Date
-  start30Days: Date
-  startRange: Date
 }
 
 export function normalizeAnalyticsPath(input: unknown): string | null {
@@ -248,48 +260,6 @@ export function isDuplicateAnalyticsEvent(error: unknown): boolean {
       typeof error === 'object' &&
       'code' in error &&
       (error as { code?: number }).code === 11000
-  )
-}
-
-export function parseAnalyticsRange(value: unknown): AnalyticsRange {
-  const parsed = Number(value)
-  return ANALYTICS_RANGES.includes(parsed as AnalyticsRange) ? (parsed as AnalyticsRange) : 30
-}
-
-export function getJakartaStartOfDay(date = new Date()): Date {
-  const shifted = new Date(date.getTime() + JAKARTA_OFFSET_MS)
-  return new Date(
-    Date.UTC(shifted.getUTCFullYear(), shifted.getUTCMonth(), shifted.getUTCDate()) -
-      JAKARTA_OFFSET_MS
-  )
-}
-
-export function getAnalyticsPeriodBounds(
-  range: AnalyticsRange,
-  now = new Date()
-): AnalyticsPeriodBounds {
-  const startToday = getJakartaStartOfDay(now)
-  return {
-    startToday,
-    start7Days: new Date(startToday.getTime() - 6 * DAY_MS),
-    start30Days: new Date(startToday.getTime() - 29 * DAY_MS),
-    startRange: new Date(startToday.getTime() - (range - 1) * DAY_MS),
-  }
-}
-
-function toJakartaDateKey(date: Date): string {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: ANALYTICS_TIMEZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(date)
-}
-
-export function createJakartaDateKeys(range: AnalyticsRange, now = new Date()): string[] {
-  const { startRange } = getAnalyticsPeriodBounds(range, now)
-  return Array.from({ length: range }, (_, index) =>
-    toJakartaDateKey(new Date(startRange.getTime() + index * DAY_MS))
   )
 }
 

@@ -88,13 +88,11 @@ useHead({
           class="mb-6"
         />
         <div class="text-center mb-12">
-          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl border border-primary/20 bg-primary/10 mb-6">
             <ClientOnly v-if="service.icon">
-              <Icon :name="getNuxtIconName(service.icon)" class="text-3xl text-primary" />
+              <Icon :name="getNuxtIconName(service.icon)" class="text-3xl text-primary" aria-hidden="true" />
             </ClientOnly>
-            <svg v-else class="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+            <Icon v-else name="ph:buildings-bold" class="h-8 w-8 text-primary" aria-hidden="true" />
           </div>
           <h2 class="text-2xl sm:text-3xl font-extrabold text-black font-mulish mb-4 dark:text-white">{{ service.title }}</h2>
           <p v-if="service.titleEn" class="text-sm font-semibold text-primary uppercase tracking-widest mb-6">
@@ -117,8 +115,9 @@ useHead({
         <div class="mt-16 bg-gray-50 rounded-xl p-8 text-center border border-gray-200 dark:bg-white/5 dark:border-white/10">
           <h3 class="text-2xl font-bold text-black mb-4 dark:text-white">Butuh Layanan Ini?</h3>
           <p class="text-gray mb-8">Hubungi tim profesional kami untuk mendiskusikan kebutuhan Anda lebih lanjut.</p>
-          <NuxtLink to="/contact-us" class="inline-flex items-center justify-center rounded-xl bg-primary px-8 py-3 text-base font-bold text-black transition hover:bg-secondary hover:text-white md:px-10 md:py-4 md:text-lg">
-            Hubungi Kami Sekarang
+          <NuxtLink to="/contact-us" class="btn !rounded-xl inline-flex items-center justify-center gap-2 md:px-10 md:py-4 md:text-base">
+            <span>Hubungi Kami Sekarang</span>
+            <Icon name="ph:arrow-right-bold" class="h-4 w-4" aria-hidden="true" />
           </NuxtLink>
         </div>
       </div>

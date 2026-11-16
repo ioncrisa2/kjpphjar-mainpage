@@ -36,7 +36,7 @@ const feedback = reactive<{ type: 'success' | 'error' | ''; message: string }>({
 
 const backupLoading = ref(false)
 const restoreFile = ref<File | null>(null)
-const restoreInput = ref<HTMLInputElement | null>(null)
+const restoreMediaInput = ref<{ clear: () => void } | null>(null)
 const restorePreview = ref<RestorePreviewResponse | null>(null)
 const previewLoading = ref(false)
 const restoreLoading = ref(false)
@@ -141,19 +141,9 @@ async function downloadBackup() {
   }
 }
 
-function selectRestoreFile(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0] || null
+function onRestoreFileChange(file: File | null) {
   restorePreview.value = null
   restoreConfirmation.value = ''
-
-  if (file && file.size > MAX_RESTORE_BYTES) {
-    restoreFile.value = null
-    input.value = ''
-    showFeedback('error', 'Ukuran file melebihi batas 4 MB.')
-    return
-  }
-
   restoreFile.value = file
 }
 
@@ -199,7 +189,7 @@ async function commitRestore() {
     restoreFile.value = null
     restorePreview.value = null
     restoreConfirmation.value = ''
-    if (restoreInput.value) restoreInput.value.value = ''
+    restoreMediaInput.value?.clear()
   } catch (error: any) {
     showFeedback('error', error?.message || 'Restore gagal dijalankan.')
   } finally {
@@ -228,7 +218,11 @@ async function commitRestore() {
           : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300'
       "
     >
-      <span aria-hidden="true">{{ feedback.type === 'success' ? '✓' : '!' }}</span>
+      <Icon
+        :name="feedback.type === 'success' ? 'ph:check-circle-bold' : 'ph:warning-circle-bold'"
+        class="mt-0.5 h-4 w-4 shrink-0"
+        aria-hidden="true"
+      />
       <span>{{ feedback.message }}</span>
     </div>
 
@@ -490,16 +484,17 @@ async function commitRestore() {
           </div>
 
           <div class="mt-5 rounded-xl border border-gray/20 p-5">
-            <label for="restore-file" class="admin-label">File backup JSON</label>
-            <input
+            <UiMediaInput
               id="restore-file"
-              ref="restoreInput"
-              type="file"
+              ref="restoreMediaInput"
+              v-model="restoreFile"
+              label="File backup JSON"
               accept="application/json,.json"
-              class="block w-full text-sm text-gray file:mr-4 file:rounded-lg file:border-0 file:bg-primary/10 file:px-4 file:py-2.5 file:font-bold file:text-primary hover:file:bg-primary/20"
-              @change="selectRestoreFile"
+              :max-bytes="MAX_RESTORE_BYTES"
+              hint="Maksimum 4 MB. Jalankan preview sebelum restore."
+              @update:model-value="onRestoreFileChange"
+              @error="(msg) => showFeedback('error', msg)"
             />
-            <p class="mt-2 text-xs text-gray">Maksimum 4 MB. Jalankan preview sebelum restore.</p>
 
             <button
               type="button"

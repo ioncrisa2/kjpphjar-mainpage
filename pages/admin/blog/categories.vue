@@ -3,6 +3,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'blog.categori
 useHead({ title: "Kategori Blog | KJPP HJA'R" })
 
 const { data, pending, refresh } = await useFetch('/api/admin/categories')
+const toast = useToast()
 const categories = computed(() => data.value?.items || [])
 const saving = ref(false)
 const editingId = ref('')
@@ -32,10 +33,11 @@ async function saveCategory() {
       method: editingId.value ? 'PUT' : 'POST',
       body: form,
     })
+    toast.success(editingId.value ? 'Kategori diperbarui.' : 'Kategori ditambahkan.')
     resetForm()
     await refresh()
   } catch (error: any) {
-    alert(error?.data?.statusMessage || 'Kategori gagal disimpan.')
+    toast.error(error?.data?.statusMessage || 'Kategori gagal disimpan.')
   } finally {
     saving.value = false
   }
@@ -53,10 +55,11 @@ async function deleteCategory(category: Record<string, any>) {
   if (!confirmed) return
   try {
     await $fetch(`/api/admin/categories/${category._id}`, { method: 'DELETE' })
+    toast.success('Kategori berhasil dihapus.')
     if (editingId.value === category._id) resetForm()
     await refresh()
   } catch (error: any) {
-    alert(error?.data?.statusMessage || 'Kategori gagal dihapus.')
+    toast.error(error?.data?.statusMessage || 'Kategori gagal dihapus.')
   }
 }
 </script>

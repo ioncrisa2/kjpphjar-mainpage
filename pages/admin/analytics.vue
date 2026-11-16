@@ -27,6 +27,20 @@ interface OverviewResponse {
     last30Days: PeriodStats
   }
   trend: TrendPoint[]
+  comparison?: {
+    current: PeriodStats
+    previous: PeriodStats
+    deltaPercent: {
+      views: number | null
+    }
+    trend: TrendPoint[]
+  }
+  selectedPath?: {
+    path: string
+    views: number
+    uniqueVisitors: number
+    trend: TrendPoint[]
+  }
 }
 
 interface TopPageItem {
@@ -70,6 +84,9 @@ interface DashboardData {
 }
 
 const selectedRange = ref<AnalyticsRange>(30)
+const comparePeriod = ref(true)
+const metricFilter = ref<'all' | 'views' | 'uniqueVisitors'>('all')
+const comparedPath = ref('')
 const requestFetch = useRequestFetch()
 const numberFormatter = new Intl.NumberFormat('id-ID')
 const dateTimeFormatter = new Intl.DateTimeFormat('id-ID', {
@@ -82,17 +99,44 @@ const palette = ['#47BDFF', '#B476E5', '#0F766E', '#F59E0B', '#64748B', '#E85D75
 const { data, pending, error, refresh } = await useAsyncData<DashboardData>(
   'admin-analytics-dashboard',
   async () => {
+    const overviewQuery: Record<string, string | number> = { range: selectedRange.value }
+    if (comparePeriod.value && !comparedPath.value) overviewQuery.compare = '1'
+    if (comparedPath.value) overviewQuery.path = comparedPath.value
+
     const query = { range: selectedRange.value }
     const [overview, topPages, devices, sources] = await Promise.all([
-      requestFetch<OverviewResponse>('/api/analytics/overview', { query }),
+      requestFetch<OverviewResponse>('/api/analytics/overview', { query: overviewQuery }),
       requestFetch<TopPagesResponse>('/api/analytics/top-pages', { query }),
       requestFetch<DevicesResponse>('/api/analytics/devices', { query }),
       requestFetch<SourcesResponse>('/api/analytics/sources', { query }),
     ])
     return { overview, topPages, devices, sources }
   },
-  { watch: [selectedRange] }
+  { watch: [selectedRange, comparePeriod, comparedPath] }
 )
+
+const activeComparisonPoints = computed(() => {
+  if (comparedPath.value && data.value?.overview.selectedPath) {
+    return data.value.overview.selectedPath.trend
+  }
+  if (comparePeriod.value && data.value?.overview.comparison) {
+    return data.value.overview.comparison.trend
+  }
+  return []
+})
+
+const activeComparisonLabel = computed(() => {
+  if (comparedPath.value && data.value?.overview.selectedPath) {
+    return `Halaman ${data.value.overview.selectedPath.path}`
+  }
+  return `${selectedRange.value} hari sebelumnya`
+})
+
+const deltaViewsPercent = computed(() => data.value?.overview.comparison?.deltaPercent.views ?? null)
+
+function togglePathCompare(path: string) {
+  comparedPath.value = comparedPath.value === path ? '' : path
+}
 
 const periodCards = computed(() => {
   if (!data.value) return []
@@ -214,12 +258,21 @@ async function purgeExpiredLogs() {
         </p>
       </div>
 
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+      <div class="flex flex-wrap items-end gap-3">
+        <label class="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-gray/20 bg-white px-3.5 py-2 text-xs font-bold text-black transition hover:border-primary dark:border-white/15 dark:bg-gray-dark dark:text-white">
+          <input
+            v-model="comparePeriod"
+            type="checkbox"
+            class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            :disabled="pending || Boolean(comparedPath)"
+          />
+          <span>Bandingkan periode sebelumnya</span>
+        </label>
         <label class="block">
           <span class="mb-1.5 block text-xs font-bold text-black dark:text-white">Rentang tren</span>
           <select
             v-model.number="selectedRange"
-            class="admin-input min-w-40 py-2.5"
+            class="admin-input min-w-36 py-2.5"
             :disabled="pending"
           >
             <option :value="7">7 hari</option>
@@ -321,11 +374,68 @@ async function purgeExpiredLogs() {
                 </h2>
                 <p class="mt-1 text-xs text-gray">Aktivitas harian dalam {{ selectedRange }} hari terakhir.</p>
               </div>
-              <p class="rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-black dark:text-white">
-                {{ numberFormatter.format(selectedRangeViews) }} views
-              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <!-- Metric Toggle -->
+                <div class="inline-flex rounded-xl border border-gray/15 bg-stone-50 p-0.5 text-xs font-bold dark:border-white/10 dark:bg-gray-800" role="group" aria-label="Filter metrik grafik">
+                  <button
+                    v-for="opt in [
+                      { value: 'all', label: 'Semua' },
+                      { value: 'views', label: 'Views' },
+                      { value: 'uniqueVisitors', label: 'Unik' },
+                    ] as const"
+                    :key="opt.value"
+                    type="button"
+                    class="rounded-lg px-2.5 py-1 transition"
+                    :class="metricFilter === opt.value ? 'bg-white text-black shadow-xs dark:bg-gray-dark dark:text-white' : 'text-gray hover:text-black dark:hover:text-white'"
+                    @click="metricFilter = opt.value"
+                  >
+                    {{ opt.label }}
+                  </button>
+                </div>
+
+                <!-- Selected range total + delta -->
+                <div class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-black dark:text-white">
+                  <span class="tabular-nums">{{ numberFormatter.format(selectedRangeViews) }} views</span>
+                  <span
+                    v-if="comparePeriod && !comparedPath && deltaViewsPercent !== null"
+                    class="rounded-full px-1.5 py-0.5 text-[10px] font-extrabold tabular-nums"
+                    :class="
+                      deltaViewsPercent > 0
+                        ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                        : deltaViewsPercent < 0
+                        ? 'bg-red-500/15 text-red-700 dark:text-red-300'
+                        : 'bg-gray/15 text-gray'
+                    "
+                  >
+                    {{ deltaViewsPercent > 0 ? `+${deltaViewsPercent}%` : `${deltaViewsPercent}%` }}
+                  </span>
+                </div>
+              </div>
             </div>
-            <AdminAnalyticsTrendChart :points="data.overview.trend" class="mt-5" />
+
+            <!-- Active path comparison chip -->
+            <div v-if="comparedPath && data.overview.selectedPath" class="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-gray/15 bg-stone-50 px-3.5 py-2 text-xs dark:border-white/10 dark:bg-gray-800/60">
+              <span class="text-gray">
+                Membandingkan halaman <strong class="text-black dark:text-white">{{ data.overview.selectedPath.path }}</strong>
+                ({{ numberFormatter.format(data.overview.selectedPath.views) }} views)
+              </span>
+              <button
+                type="button"
+                class="inline-flex items-center gap-1 font-bold text-primary hover:underline"
+                @click="comparedPath = ''"
+              >
+                <Icon name="ph:x-bold" class="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Hapus perbandingan</span>
+              </button>
+            </div>
+
+            <AdminAnalyticsTrendChart
+              :points="data.overview.trend"
+              :comparison-points="activeComparisonPoints"
+              :comparison-label="activeComparisonLabel"
+              :metric="metricFilter"
+              class="mt-5"
+            />
           </section>
 
           <section class="admin-card min-w-0" aria-labelledby="top-pages-heading">
@@ -333,7 +443,7 @@ async function purgeExpiredLogs() {
               <h2 id="top-pages-heading" class="text-lg font-extrabold text-black dark:text-white">
                 Halaman teratas
               </h2>
-              <p class="mt-1 text-xs text-gray">10 halaman dengan page views terbanyak.</p>
+              <p class="mt-1 text-xs text-gray">Klik baris untuk membandingkan tren halaman di grafik.</p>
             </div>
 
             <div v-if="data.topPages.items.length" class="mt-5 overflow-x-auto">
@@ -346,10 +456,22 @@ async function purgeExpiredLogs() {
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray/10">
-                  <tr v-for="item in data.topPages.items" :key="item.path">
+                  <tr
+                    v-for="item in data.topPages.items"
+                    :key="item.path"
+                    class="cursor-pointer transition-colors"
+                    :class="comparedPath === item.path ? 'bg-primary/10 dark:bg-primary/15' : 'hover:bg-stone-50 dark:hover:bg-white/5'"
+                    @click="togglePathCompare(item.path)"
+                  >
                     <td class="max-w-52 py-3 pr-3">
-                      <span class="block truncate font-semibold text-black dark:text-white" :title="item.path">
-                        {{ item.path }}
+                      <span class="flex items-center gap-1.5 font-semibold text-black dark:text-white" :title="item.path">
+                        <span class="truncate">{{ item.path }}</span>
+                        <Icon
+                          v-if="comparedPath === item.path"
+                          name="ph:chart-line-up-bold"
+                          class="h-3.5 w-3.5 shrink-0 text-primary"
+                          aria-hidden="true"
+                        />
                       </span>
                       <span class="text-xs text-gray">
                         {{ numberFormatter.format(item.uniqueVisitors) }} perkiraan unik

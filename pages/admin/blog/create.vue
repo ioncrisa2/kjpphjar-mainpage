@@ -5,16 +5,17 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'blog.create' 
 useHead({ title: "Tulis Artikel | KJPP HJA'R" })
 
 const router = useRouter()
+const toast = useToast()
 const saving = ref(false)
 
 async function saveArticle(payload: FormData) {
   saving.value = true
   try {
     await $fetch('/api/admin/blog', { method: 'POST', body: payload })
-    alert('Artikel berhasil disimpan.')
+    toast.success('Artikel berhasil disimpan.')
     await router.push('/admin/blog')
   } catch (error: any) {
-    alert(error?.data?.statusMessage || 'Artikel gagal disimpan.')
+    toast.error(error?.data?.statusMessage || 'Artikel gagal disimpan.')
   } finally {
     saving.value = false
   }

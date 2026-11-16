@@ -57,9 +57,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
             <div class="flex items-center justify-between p-5 lg:hidden border-b border-gray-800">
               <img src="/assets/images/h-logo.png" alt="KJPP HJA'R" width="128" height="32" class="h-8 w-auto" />
               <button type="button" class="p-2" @click="closeMenu" aria-label="Tutup Menu Navigasi">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-8 w-8 text-white hover:text-primary transition-colors" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <Icon name="ph:x-bold" class="h-7 w-7 text-white hover:text-primary transition-colors" aria-hidden="true" />
               </button>
             </div>
 
@@ -86,24 +84,18 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
               aria-label="Ganti Tema Warna (Terang / Gelap)"
               @click="store.toggleTheme(store.theme === 'light' ? 'dark' : 'light')"
             >
-              <svg v-if="store.theme === 'light'" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M8 4C8 8.4 11.6 12 16 12C17.4 12 18.8 11.6 20 11C19.5 16.1 15.2 20 10 20C4.5 20 0 15.5 0 10C0 4.8 4 0.5 9 0C8.4 1.2 8 2.6 8 4ZM2 10C2 14.4 5.6 18 10 18C12.9 18 15.5 16.5 17 14C16.7 14 16.4 14 16 14C10.5 14 6 9.5 6 4C6 3.7 6 3.4 6 3C3.6 4.4 2 7.1 2 10Z" fill="currentColor" />
-              </svg>
-              <svg v-else width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
-              </svg>
+              <Icon v-if="store.theme === 'light'" name="ph:moon-bold" class="h-5 w-5" aria-hidden="true" />
+              <Icon v-else name="ph:sun-bold" class="h-5 w-5" aria-hidden="true" />
             </button>
 
             <!-- Hamburger Button -->
             <button
               type="button"
-              class="flex h-10 w-10 items-center justify-center rounded-md bg-primary lg:hidden text-white"
+              class="flex h-10 w-10 items-center justify-center rounded-md bg-primary lg:hidden text-black"
               aria-label="Buka Menu Navigasi"
               @click="toggleMenu"
             >
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <Icon name="ph:list-bold" class="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
         </div>

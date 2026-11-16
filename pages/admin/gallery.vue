@@ -3,6 +3,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'gallery.view'
 useHead({ title: "Admin Galeri | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
+const toast = useToast()
 
 const page = ref(1)
 const { data, refresh, pending } = await useFetch('/api/gallery', {
@@ -14,7 +15,7 @@ const photos = computed(() => data.value?.items || [])
 
 const uploadModalOpen = ref(false)
 const uploading = ref(false)
-const fileInput = ref<HTMLInputElement | null>(null)
+const selectedFile = ref<File | null>(null)
 const uploadForm = reactive({
   title: '',
   category: '',
@@ -22,9 +23,9 @@ const uploadForm = reactive({
 })
 
 async function submitUpload() {
-  const file = fileInput.value?.files?.[0]
+  const file = selectedFile.value
   if (!file) {
-    alert('Pilih foto terlebih dahulu')
+    toast.error('Pilih foto terlebih dahulu.')
     return
   }
   
@@ -45,11 +46,11 @@ async function submitUpload() {
     uploadForm.title = ''
     uploadForm.category = ''
     uploadForm.isFeatured = false
-    if (fileInput.value) fileInput.value.value = ''
-    
+    selectedFile.value = null
+    toast.success('Foto berhasil diunggah.')
     refresh()
   } catch (err: any) {
-    alert(err.data?.statusMessage || 'Gagal mengupload foto')
+    toast.error(err.data?.statusMessage || 'Gagal mengupload foto.')
   } finally {
     uploading.value = false
   }
@@ -82,9 +83,10 @@ async function submitEdit() {
       body: editForm
     })
     editModalOpen.value = false
+    toast.success('Informasi foto diperbarui.')
     refresh()
   } catch (err: any) {
-    alert(err.data?.statusMessage || 'Gagal menyimpan perubahan')
+    toast.error(err.data?.statusMessage || 'Gagal menyimpan perubahan.')
   } finally {
     saving.value = false
   }
@@ -102,9 +104,10 @@ async function deletePhoto(photo: any) {
   if (!confirmed) return
   try {
     await $fetch(`/api/gallery/${photo._id}`, { method: 'DELETE' })
+    toast.success('Foto berhasil dihapus.')
     refresh()
   } catch (error) {
-    alert('Gagal menghapus foto.')
+    toast.error('Gagal menghapus foto.')
   }
 }
 </script>
@@ -117,7 +120,8 @@ async function deletePhoto(photo: any) {
         <p class="mt-1 text-sm text-gray">Kelola foto kegiatan dan momen yang tampil di website.</p>
       </div>
       <button v-if="can('gallery.create')" @click="uploadModalOpen = true" class="admin-btn-primary">
-        <span>📸</span> Upload Foto
+        <Icon name="ph:upload-simple-bold" class="h-4 w-4" aria-hidden="true" />
+        <span>Upload Foto</span>
       </button>
     </div>
 
@@ -135,8 +139,9 @@ async function deletePhoto(photo: any) {
             :alt="photo.title || 'Foto'"
             class="absolute inset-0 h-full w-full object-cover transition duration-300 group-hover:scale-105"
           />
-          <div v-if="photo.isFeatured" class="absolute top-2 left-2 bg-primary text-black text-xs font-bold px-2 py-1 rounded-md shadow-sm">
-            ★ Featured
+          <div v-if="photo.isFeatured" class="absolute top-2 left-2 inline-flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-xs font-bold text-black shadow-sm">
+            <Icon name="ph:star-fill" class="h-3.5 w-3.5" aria-hidden="true" />
+            <span>Featured</span>
           </div>
         </div>
         <div class="mt-3 flex-1">
@@ -166,60 +171,68 @@ async function deletePhoto(photo: any) {
     </div>
 
     <!-- Upload Modal -->
-    <UiModal v-model="uploadModalOpen" title="Upload Foto Baru">
+    <UiModal v-model="uploadModalOpen" title="Upload Foto Baru" size="sm">
       <form @submit.prevent="submitUpload" class="space-y-4">
+        <UiMediaInput
+          v-model="selectedFile"
+          label="Pilih Foto"
+          accept="image/*"
+          preview-aspect="cover"
+          hint="JPG, PNG, atau WebP."
+          required
+        />
         <div>
-          <label class="block text-sm font-medium text-gray-700">Pilih Foto</label>
-          <input type="file" ref="fileInput" accept="image/*" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm" required>
+          <label class="admin-label">Judul (Opsional)</label>
+          <input v-model="uploadForm.title" type="text" class="admin-input">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Judul (Opsional)</label>
-          <input v-model="uploadForm.title" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          <label class="admin-label">Kategori</label>
+          <input v-model="uploadForm.category" type="text" class="admin-input">
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Kategori</label>
-          <input v-model="uploadForm.category" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-        </div>
-        <div v-if="can('gallery.manage_all')" class="flex items-center">
-          <input v-model="uploadForm.isFeatured" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-          <label class="ml-2 block text-sm text-gray-900">Jadikan Featured</label>
-        </div>
-        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse gap-2">
-          <button type="submit" :disabled="uploading" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:w-auto sm:text-sm disabled:opacity-50">
-            {{ uploading ? 'Mengunggah...' : 'Upload' }}
-          </button>
-          <button type="button" @click="uploadModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+        <UiAdvancedOptions v-if="can('gallery.manage_all')" label="Opsi Lanjutan" hint="Tampilkan di galeri unggulan beranda">
+          <div class="flex items-center gap-2">
+            <input id="upload-featured" v-model="uploadForm.isFeatured" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+            <label for="upload-featured" class="text-sm font-semibold text-black dark:text-white">Jadikan Featured</label>
+          </div>
+        </UiAdvancedOptions>
+        <div class="flex flex-col-reverse gap-2 border-t border-gray/10 pt-4 sm:flex-row sm:justify-end">
+          <button type="button" @click="uploadModalOpen = false" class="admin-btn-ghost justify-center">
             Batal
+          </button>
+          <button type="submit" :disabled="uploading" class="admin-btn-primary justify-center">
+            {{ uploading ? 'Mengunggah...' : 'Upload' }}
           </button>
         </div>
       </form>
     </UiModal>
 
     <!-- Edit Modal -->
-    <UiModal v-model="editModalOpen" title="Edit Info Foto">
+    <UiModal v-model="editModalOpen" title="Edit Info Foto" size="sm">
       <form @submit.prevent="submitEdit" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700">Judul</label>
-          <input v-model="editForm.title" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          <label class="admin-label">Judul</label>
+          <input v-model="editForm.title" type="text" class="admin-input">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Kategori</label>
-          <input v-model="editForm.category" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          <label class="admin-label">Kategori</label>
+          <input v-model="editForm.category" type="text" class="admin-input">
         </div>
-        <div v-if="can('gallery.manage_all')">
-          <label class="block text-sm font-medium text-gray-700">Urutan Tampil (Order)</label>
-          <input v-model="editForm.order" type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-        </div>
-        <div v-if="can('gallery.manage_all')" class="flex items-center">
-          <input v-model="editForm.isFeatured" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-          <label class="ml-2 block text-sm text-gray-900">Jadikan Featured</label>
-        </div>
-        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse gap-2">
-          <button type="submit" :disabled="saving" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:w-auto sm:text-sm disabled:opacity-50">
-            {{ saving ? 'Menyimpan...' : 'Simpan' }}
-          </button>
-          <button type="button" @click="editModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+        <UiAdvancedOptions v-if="can('gallery.manage_all')" label="Opsi Lanjutan" hint="Urutan tampil dan sorotan beranda">
+          <div>
+            <label class="admin-label">Urutan Tampil (Order)</label>
+            <input v-model="editForm.order" type="number" class="admin-input">
+          </div>
+          <div class="flex items-center gap-2">
+            <input id="edit-featured" v-model="editForm.isFeatured" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+            <label for="edit-featured" class="text-sm font-semibold text-black dark:text-white">Jadikan Featured</label>
+          </div>
+        </UiAdvancedOptions>
+        <div class="flex flex-col-reverse gap-2 border-t border-gray/10 pt-4 sm:flex-row sm:justify-end">
+          <button type="button" @click="editModalOpen = false" class="admin-btn-ghost justify-center">
             Batal
+          </button>
+          <button type="submit" :disabled="saving" class="admin-btn-primary justify-center">
+            {{ saving ? 'Menyimpan...' : 'Simpan' }}
           </button>
         </div>
       </form>

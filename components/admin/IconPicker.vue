@@ -47,8 +47,15 @@ onUnmounted(() => {
   }
 })
 
-// A curated list of popular icons for services
+// A curated list of popular icons for services (Phosphor primary, FA6 kept for legacy compatibility)
 const popularIcons = [
+  'ph:buildings-bold', 'ph:chart-line-up-bold', 'ph:presentation-chart-bold',
+  'ph:hard-hat-bold', 'ph:handshake-bold', 'ph:users-three-bold',
+  'ph:calculator-bold', 'ph:money-bold', 'ph:file-text-bold',
+  'ph:gavel-bold', 'ph:scales-bold', 'ph:briefcase-bold',
+  'ph:map-pin-line-bold', 'ph:house-line-bold', 'ph:factory-bold',
+  'ph:storefront-bold', 'ph:shield-check-bold', 'ph:compass-tool-bold',
+
   'fa6-solid:building', 'fa6-solid:chart-line', 'fa6-solid:diagram-project',
   'fa6-solid:helmet-safety', 'fa6-solid:file-contract', 'fa6-solid:magnifying-glass-dollar',
   'fa6-solid:handshake', 'fa6-solid:users', 'fa6-solid:house',
@@ -57,12 +64,6 @@ const popularIcons = [
   'fa6-solid:building-user', 'fa6-solid:industry', 'fa6-solid:shop',
   'fa6-solid:gavel', 'fa6-solid:coins', 'fa6-solid:money-bill-trend-up',
   'fa6-solid:chart-pie', 'fa6-solid:pen-ruler', 'fa6-solid:house-laptop',
-
-  // Alternative generic icons (Phosphor icons)
-  'ph:buildings-bold', 'ph:chart-line-up-bold', 'ph:presentation-chart-bold',
-  'ph:hard-hat-bold', 'ph:handshake-bold', 'ph:users-three-bold',
-  'ph:calculator-bold', 'ph:money-bold', 'ph:file-text-bold',
-  'ph:gavel-bold', 'ph:scales-bold'
 ]
 
 const filteredIcons = computed(() => {
@@ -91,10 +92,10 @@ const isCustomIcon = computed(() => {
     <div class="flex gap-2">
       <!-- Icon Preview Box -->
       <div
-        class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-lg border border-gray-300 bg-gray-50 text-2xl text-primary"
+        class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl border border-gray/20 bg-stone-50 text-2xl text-primary dark:border-white/15 dark:bg-gray-800"
       >
         <Icon v-if="internalValue" :name="getNuxtIconName(internalValue)" />
-        <span v-else class="text-gray-400 text-sm">?</span>
+        <Icon v-else name="ph:question-bold" class="h-5 w-5 text-gray-400" aria-hidden="true" />
       </div>
 
       <!-- Input Field -->
@@ -103,48 +104,48 @@ const isCustomIcon = computed(() => {
           :value="internalValue"
           @input="updateValue(($event.target as HTMLInputElement).value)"
           type="text"
-          class="block w-full h-12 rounded-lg border border-gray-300 bg-gray-50 p-2.5 pr-12 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
-          placeholder="Misal: fa6-solid:building"
+          class="admin-input h-12 !pr-28"
+          placeholder="Misal: ph:buildings-bold"
         >
         <button
           @click="togglePicker"
           type="button"
-          class="absolute inset-y-0 right-0 flex items-center px-3 bg-gray-200 border-l border-gray-300 rounded-r-lg hover:bg-gray-300 transition-colors text-sm font-medium"
+          class="absolute inset-y-0 right-0 flex items-center rounded-r-xl border-l border-gray/20 bg-stone-100 px-3 text-xs font-bold text-black transition-colors hover:bg-stone-200 dark:border-white/15 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
         >
           Pilih Icon
         </button>
       </div>
     </div>
-    <p class="mt-1 text-xs text-gray-500">
-      Anda dapat memilih dari daftar atau mengetikkan kode langsung dari <a href="https://icones.js.org/" target="_blank" class="text-blue-600 hover:underline">Icones.js.org</a>.
+    <p class="mt-1 text-xs text-gray">
+      Anda dapat memilih dari daftar atau mengetikkan kode langsung dari <a href="https://icones.js.org/" target="_blank" class="text-primary hover:underline">Icones.js.org</a>.
     </p>
 
     <!-- Picker Dropdown -->
     <div
       v-if="showPicker"
-      class="absolute z-10 mt-2 w-full max-w-sm rounded-lg border border-gray-200 bg-white shadow-xl max-h-80 flex flex-col"
+      class="absolute z-20 mt-2 flex max-h-80 w-full max-w-sm flex-col rounded-xl border border-gray/20 bg-white shadow-xl dark:border-white/15 dark:bg-gray-dark"
     >
-      <div class="p-3 border-b border-gray-100">
+      <div class="border-b border-gray/10 p-3">
         <input
           v-model="search"
           type="text"
-          class="block w-full rounded-md border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+          class="admin-input !py-2"
           placeholder="Cari ikon..."
         >
       </div>
-      <div class="p-3 overflow-y-auto grid grid-cols-5 gap-2">
+      <div class="grid grid-cols-5 gap-2 overflow-y-auto p-3">
         <button
           v-for="icon in filteredIcons"
           :key="icon"
           @click="selectIcon(icon)"
           type="button"
-          class="flex flex-col items-center justify-center p-2 rounded-lg border hover:bg-blue-50 hover:border-blue-300 transition-colors group"
-          :class="getNuxtIconName(internalValue) === icon ? 'bg-blue-100 border-blue-400' : 'border-transparent'"
+          class="group flex flex-col items-center justify-center rounded-lg border p-2 transition-colors hover:border-primary/40 hover:bg-primary/10"
+          :class="getNuxtIconName(internalValue) === icon ? 'border-primary bg-primary/15' : 'border-transparent'"
           :title="icon"
         >
-          <Icon :name="icon" class="text-2xl text-gray-700 group-hover:text-primary transition-colors" />
+          <Icon :name="icon" class="text-2xl text-gray-700 transition-colors group-hover:text-primary dark:text-gray-200" />
         </button>
-        <div v-if="filteredIcons.length === 0" class="col-span-5 py-4 text-center text-sm text-gray-500">
+        <div v-if="filteredIcons.length === 0" class="col-span-5 py-4 text-center text-sm text-gray">
           Ikon tidak ditemukan di daftar populer. Anda tetap bisa mengetik manual namanya.
         </div>
       </div>

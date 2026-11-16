@@ -41,10 +41,8 @@ const form = reactive({
   author: 'Admin',
 })
 
-const coverInput = ref<HTMLInputElement | null>(null)
 const contentEditor = ref<{ getSemanticHtml: () => string } | null>(null)
 const selectedCover = ref<File | null>(null)
-const coverPreview = ref('')
 const removeCover = ref(false)
 const hydratedKey = ref('')
 
@@ -85,10 +83,6 @@ watch(() => props.initialValue, (article) => {
   form.author = article.author || 'Admin'
 }, { immediate: true })
 
-onBeforeUnmount(() => {
-  if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
-})
-
 const suggestedSlug = computed(() => (form.slug || form.title)
   .toLocaleLowerCase('id-ID')
   .normalize('NFKD')
@@ -102,28 +96,21 @@ const readingTime = computed(() => {
 })
 
 const existingCover = computed(() => removeCover.value ? '' : props.initialValue?.coverImageUrl || '')
-const shownCover = computed(() => coverPreview.value || existingCover.value)
 
-function selectCover(event: Event) {
-  const input = event.target as HTMLInputElement
-  const file = input.files?.[0] || null
-  if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
-  selectedCover.value = file
-  coverPreview.value = file ? URL.createObjectURL(file) : ''
+function onCoverChange(file: File | null) {
   if (file) removeCover.value = false
 }
 
 function clearCover() {
-  if (coverPreview.value) URL.revokeObjectURL(coverPreview.value)
-  coverPreview.value = ''
   selectedCover.value = null
   removeCover.value = true
-  if (coverInput.value) coverInput.value.value = ''
 }
+
+const toast = useToast()
 
 function submitForm() {
   if (form.status === 'scheduled' && !form.publishedAt) {
-    alert('Pilih tanggal dan waktu terbit untuk artikel terjadwal.')
+    toast.error('Pilih tanggal dan waktu terbit untuk artikel terjadwal.')
     return
   }
 
@@ -287,20 +274,17 @@ function submitForm() {
 
       <section class="admin-card space-y-4" aria-labelledby="cover-heading">
         <h2 id="cover-heading" class="text-lg font-extrabold text-black dark:text-white">Cover artikel</h2>
-        <div v-if="shownCover" class="overflow-hidden rounded-xl bg-slate-100">
-          <img :src="shownCover" alt="Preview cover artikel" class="aspect-[16/10] w-full object-cover">
-        </div>
-        <input
-          ref="coverInput"
-          type="file"
+        <UiMediaInput
+          v-model="selectedCover"
+          :existing-url="existingCover"
           accept="image/jpeg,image/png,image/webp"
-          class="block w-full text-sm text-gray file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-2 file:font-semibold file:text-blue-800 hover:file:bg-blue-100"
-          @change="selectCover"
-        >
-        <p class="text-xs leading-5 text-gray">JPG, PNG, atau WebP. Maksimal 4 MB; server otomatis mengoptimalkan gambar.</p>
-        <button v-if="shownCover" type="button" class="text-sm font-semibold text-red-600 hover:text-red-800" @click="clearCover">
-          Hapus cover
-        </button>
+          preview-aspect="cover"
+          removable
+          :max-bytes="4 * 1024 * 1024"
+          hint="JPG, PNG, atau WebP. Maksimal 4 MB; server otomatis mengoptimalkan gambar."
+          @update:model-value="onCoverChange"
+          @remove-existing="clearCover"
+        />
       </section>
 
       <div class="flex gap-3">

@@ -14,14 +14,6 @@ const leaders = computed(() => leadersData.value || [])
 const { data: staffData } = await useFetch<PublicStaffGroup[]>('/api/staff')
 const staffGroups = computed(() => staffData.value || [])
 
-/** Inisial untuk avatar staff, tanpa gelar di belakang koma. */
-function initials(name: string) {
-  const words = name.split(',')[0].trim().split(/\s+/).filter(Boolean)
-  const first = words[0]?.[0] ?? ''
-  const last = words.length > 1 ? words[words.length - 1][0] : ''
-  return (first + last).toUpperCase()
-}
-
 const missions = [
   { id: '01', text: 'Menciptakan Brand Image dan Brand Loyalty bagi pengguna jasa.' },
   { id: '02', text: 'Peningkatan Profesionalisme Personil.' },
@@ -170,15 +162,22 @@ const missions = [
               <li
                 v-for="member in group.staff"
                 :key="member._id"
-                class="flex items-start gap-4 rounded-2xl border border-primary/20 p-5 transition hover:border-primary/50"
+                class="flex items-start gap-3.5 rounded-2xl border border-gray/15 bg-white p-5 transition hover:border-primary/50 dark:border-white/10 dark:bg-gray-dark/40"
               >
-                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-extrabold text-primary" aria-hidden="true">
-                  {{ initials(member.name) }}
+                <span
+                  class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
+                  :class="member.mappiNumber ? 'border-primary/25 bg-primary/10 text-primary' : 'border-gray/15 bg-stone-100 text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300'"
+                  aria-hidden="true"
+                >
+                  <Icon
+                    :name="member.mappiNumber ? 'ph:seal-check-bold' : 'ph:identification-badge-bold'"
+                    class="h-5 w-5"
+                  />
                 </span>
                 <div class="min-w-0">
                   <p class="font-extrabold leading-snug text-black dark:text-white">{{ member.name }}</p>
                   <p class="mt-0.5 text-sm text-gray">{{ member.position }}</p>
-                  <p v-if="member.mappiNumber" class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-gray-700 dark:text-gray-300">
+                  <p v-if="member.mappiNumber" class="mt-2 inline-flex items-center gap-1 rounded-md bg-stone-100 px-2 py-0.5 text-xs font-semibold text-gray-700 dark:bg-white/10 dark:text-gray-200">
                     <Icon name="ph:identification-card-bold" class="text-primary" aria-hidden="true" />
                     No. MAPPI {{ member.mappiNumber }}
                   </p>

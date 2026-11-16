@@ -17,6 +17,7 @@ interface UserRow {
 }
 
 const { session } = useAdminAuth()
+const toast = useToast()
 const { data: usersData, refresh, pending } = await useFetch<{ items: UserRow[] }>('/api/admin/users')
 const { data: rolesData } = await useFetch<{ items: Array<{ key: string; name: string }> }>('/api/admin/roles')
 const { data: leaders } = await useFetch<any[]>('/api/leaders')
@@ -120,7 +121,7 @@ async function submitReset() {
       body: { password: resetForm.password },
     })
     resetOpen.value = false
-    alert(res.message)
+    toast.success(res.message)
   } catch (err: any) {
     resetError.value = err?.data?.statusMessage || 'Gagal mereset password.'
   } finally {
@@ -129,6 +130,27 @@ async function submitReset() {
 }
 
 const { ask } = useConfirm()
+
+function userActions(user: UserRow) {
+  const actions: Array<{
+    label: string
+    icon?: string
+    to?: string
+    variant?: 'default' | 'danger'
+    onClick?: () => void
+  }> = [
+    { label: 'Edit Pengguna', icon: 'ph:pencil-simple-bold', onClick: () => openEdit(user) },
+  ]
+  if (user._id === session.value?.id) {
+    actions.push({ label: 'Ganti Password', icon: 'ph:key-bold', to: '/admin/profile' })
+  } else {
+    actions.push(
+      { label: 'Reset Password', icon: 'ph:password-bold', onClick: () => openReset(user) },
+      { label: 'Hapus', icon: 'ph:trash-bold', variant: 'danger', onClick: () => deleteUser(user) }
+    )
+  }
+  return actions
+}
 
 async function deleteUser(user: UserRow) {
   const confirmed = await ask({
@@ -140,9 +162,10 @@ async function deleteUser(user: UserRow) {
   if (!confirmed) return
   try {
     await $fetch(`/api/admin/users/${user._id}`, { method: 'DELETE' })
+    toast.success('Pengguna berhasil dihapus.')
     await refresh()
   } catch (err: any) {
-    alert(err?.data?.statusMessage || 'Gagal menghapus pengguna.')
+    toast.error(err?.data?.statusMessage || 'Gagal menghapus pengguna.')
   }
 }
 </script>
@@ -203,12 +226,7 @@ async function deleteUser(user: UserRow) {
               </td>
               <td class="whitespace-nowrap px-6 py-4 text-sm text-gray">{{ formatDate(user.lastLoginAt) }}</td>
               <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                <button class="mr-4 text-primary hover:text-blue-900" @click="openEdit(user)">Edit</button>
-                <template v-if="user._id !== session?.id">
-                  <button class="mr-4 text-amber-700 hover:text-amber-900" @click="openReset(user)">Reset Password</button>
-                  <button class="text-red-600 hover:text-red-900" @click="deleteUser(user)">Hapus</button>
-                </template>
-                <NuxtLink v-else to="/admin/profile" class="text-gray hover:text-black dark:hover:text-white">Ganti Password</NuxtLink>
+                <UiActionMenu :items="userActions(user)" :label="`Aksi untuk ${user.name}`" />
               </td>
             </tr>
           </tbody>
@@ -217,7 +235,7 @@ async function deleteUser(user: UserRow) {
     </div>
 
     <!-- Modal tambah / ubah -->
-    <UiModal v-model="modalOpen" :title="editing ? 'Edit Pengguna' : 'Tambah Pengguna'">
+    <UiModal v-model="modalOpen" :title="editing ? 'Edit Pengguna' : 'Tambah Pengguna'" size="md">
       <form class="space-y-4" @submit.prevent="submitForm">
         <div class="grid gap-4 md:grid-cols-2">
           <div>
@@ -299,10 +317,10 @@ async function deleteUser(user: UserRow) {
     </UiModal>
 
     <!-- Modal reset password -->
-    <UiModal v-model="resetOpen" :title="`Reset Password — ${resetTarget?.name || ''}`">
+    <UiModal v-model="resetOpen" :title="`Reset Password — ${resetTarget?.name || ''}`" size="sm">
       <form class="space-y-4" @submit.prevent="submitReset">
         <p class="text-sm text-gray">Semua sesi login pengguna ini akan langsung berakhir.</p>
-        <div class="grid gap-4 md:grid-cols-2">
+        <div class="space-y-4">
           <div>
             <label for="reset-password" class="admin-label">Password Baru</label>
             <input id="reset-password" v-model="resetForm.password" type="password" required :minlength="MIN_PASSWORD" autocomplete="new-password" class="admin-input" placeholder="Minimal 12 karakter">

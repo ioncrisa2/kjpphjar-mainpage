@@ -3,6 +3,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'branches.view
 useHead({ title: "Admin Cabang | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
+const toast = useToast()
 
 const { data: branches, refresh, pending } = await useFetch('/api/branches')
 
@@ -72,15 +73,27 @@ async function submitForm() {
     })
     
     modalOpen.value = false
+    toast.success(isEditing.value ? 'Cabang berhasil diperbarui.' : 'Cabang berhasil ditambahkan.')
     refresh()
   } catch (err: any) {
-    alert(err.data?.statusMessage || 'Gagal menyimpan data')
+    toast.error(err.data?.statusMessage || 'Gagal menyimpan data.')
   } finally {
     saving.value = false
   }
 }
 
 const { ask } = useConfirm()
+
+function branchActions(branch: any) {
+  const actions: Array<{ label: string; icon?: string; variant?: 'default' | 'danger'; onClick?: () => void }> = []
+  if (can('branches.update')) {
+    actions.push({ label: 'Edit Cabang', icon: 'ph:pencil-simple-bold', onClick: () => openEdit(branch) })
+  }
+  if (can('branches.delete')) {
+    actions.push({ label: 'Hapus', icon: 'ph:trash-bold', variant: 'danger', onClick: () => deleteItem(branch) })
+  }
+  return actions
+}
 
 async function deleteItem(branch: any) {
   const confirmed = await ask({
@@ -92,9 +105,10 @@ async function deleteItem(branch: any) {
   if (!confirmed) return
   try {
     await $fetch(`/api/branches/${branch._id}`, { method: 'DELETE' })
+    toast.success('Cabang berhasil dihapus.')
     refresh()
   } catch (err) {
-    alert('Gagal menghapus cabang')
+    toast.error('Gagal menghapus cabang.')
   }
 }
 </script>
@@ -127,7 +141,7 @@ async function deleteItem(branch: any) {
               <th class="px-6 py-3 text-right text-xs font-bold text-gray uppercase tracking-wider">Aksi</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray/10">
+          <tbody class="divide-y divide-gray/10 bg-white dark:bg-gray-dark">
             <tr v-for="branch in branches" :key="branch._id">
               <td class="px-6 py-4">
                 <div class="font-bold text-black dark:text-white">{{ branch.name }}</div>
@@ -138,12 +152,11 @@ async function deleteItem(branch: any) {
                 <div class="text-sm text-gray">{{ branch.phone }}</div>
               </td>
               <td class="px-6 py-4">
-                <span v-if="branch.isActive" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
-                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Nonaktif</span>
+                <span v-if="branch.isActive" class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
+                <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium">
-                <button v-if="can('branches.update')" @click="openEdit(branch)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
-                <button v-if="can('branches.delete')" @click="deleteItem(branch)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <UiActionMenu v-if="branchActions(branch).length" :items="branchActions(branch)" :label="`Aksi untuk ${branch.name}`" />
               </td>
             </tr>
           </tbody>
@@ -152,56 +165,60 @@ async function deleteItem(branch: any) {
     </div>
 
     <!-- Modal Form -->
-    <UiModal v-model="modalOpen" :title="isEditing ? 'Edit Cabang' : 'Tambah Cabang Baru'">
+    <UiModal v-model="modalOpen" :title="isEditing ? 'Edit Cabang' : 'Tambah Cabang Baru'" size="lg">
       <form @submit.prevent="submitForm" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700">Nama Cabang</label>
-            <input v-model="form.name" type="text" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+            <label class="admin-label">Nama Cabang</label>
+            <input v-model="form.name" type="text" required class="admin-input">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700">Kota</label>
-            <input v-model="form.city" type="text" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+            <label class="admin-label">Kota</label>
+            <input v-model="form.city" type="text" required class="admin-input">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700">Telepon</label>
-            <input v-model="form.phone" type="text" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+            <label class="admin-label">Telepon</label>
+            <input v-model="form.phone" type="text" required class="admin-input">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input v-model="form.email" type="email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+            <label class="admin-label">Email</label>
+            <input v-model="form.email" type="email" required class="admin-input">
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
-            <textarea v-model="form.address" rows="2" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm"></textarea>
+            <label class="admin-label">Alamat Lengkap</label>
+            <textarea v-model="form.address" rows="2" required class="admin-input resize-y"></textarea>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700">Latitude</label>
-            <input v-model="form.latitude" type="number" step="any" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+            <label class="admin-label">Latitude</label>
+            <input v-model="form.latitude" type="number" step="any" required class="admin-input">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700">Longitude</label>
-            <input v-model="form.longitude" type="number" step="any" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-          </div>
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700">URL Google Maps (Opsional)</label>
-            <input v-model="form.mapsUrl" type="url" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Urutan Tampil (Order)</label>
-            <input v-model="form.order" type="number" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-          </div>
-          <div class="flex items-center mt-6">
-            <input v-model="form.isActive" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-            <label class="ml-2 block text-sm text-gray-900">Aktif (Ditampilkan)</label>
+            <label class="admin-label">Longitude</label>
+            <input v-model="form.longitude" type="number" step="any" required class="admin-input">
           </div>
         </div>
-        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse gap-2">
-          <button type="submit" :disabled="saving" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:w-auto sm:text-sm disabled:opacity-50">
-            {{ saving ? 'Menyimpan...' : 'Simpan' }}
-          </button>
-          <button type="button" @click="modalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+        <UiAdvancedOptions label="Opsi Lanjutan" hint="URL Google Maps, urutan tampil, dan visibilitas cabang">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="md:col-span-2">
+              <label class="admin-label">URL Google Maps (Opsional)</label>
+              <input v-model="form.mapsUrl" type="url" class="admin-input">
+            </div>
+            <div>
+              <label class="admin-label">Urutan Tampil (Order)</label>
+              <input v-model="form.order" type="number" class="admin-input">
+            </div>
+            <div class="flex items-center gap-2 md:pt-7">
+              <input id="branch-active" v-model="form.isActive" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+              <label for="branch-active" class="text-sm font-semibold text-black dark:text-white">Aktif (Ditampilkan)</label>
+            </div>
+          </div>
+        </UiAdvancedOptions>
+        <div class="flex flex-col-reverse gap-2 border-t border-gray/10 pt-4 sm:flex-row sm:justify-end">
+          <button type="button" @click="modalOpen = false" class="admin-btn-ghost justify-center">
             Batal
+          </button>
+          <button type="submit" :disabled="saving" class="admin-btn-primary justify-center">
+            {{ saving ? 'Menyimpan...' : 'Simpan' }}
           </button>
         </div>
       </form>

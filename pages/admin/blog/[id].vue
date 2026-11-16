@@ -6,6 +6,7 @@ useHead({ title: "Edit Artikel | KJPP HJA'R" })
 
 const route = useRoute()
 const router = useRouter()
+const toast = useToast()
 const id = route.params.id as string
 const { data: article, pending, error } = await useFetch(`/api/admin/blog/${id}`)
 const saving = ref(false)
@@ -21,10 +22,10 @@ async function saveArticle(payload: FormData) {
   saving.value = true
   try {
     await $fetch(`/api/admin/blog/${id}`, { method: 'PUT', body: payload })
-    alert('Perubahan artikel berhasil disimpan.')
+    toast.success('Perubahan artikel berhasil disimpan.')
     await router.push('/admin/blog')
   } catch (fetchError: any) {
-    alert(fetchError?.data?.statusMessage || 'Perubahan artikel gagal disimpan.')
+    toast.error(fetchError?.data?.statusMessage || 'Perubahan artikel gagal disimpan.')
   } finally {
     saving.value = false
   }

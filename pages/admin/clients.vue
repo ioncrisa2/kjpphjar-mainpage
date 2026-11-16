@@ -3,6 +3,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'clients.view'
 useHead({ title: "Admin Klien | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
+const toast = useToast()
 // Mengurutkan menyentuh semua klien, jadi khusus clients.manage_all.
 const canReorder = computed(() => can('clients.manage_all'))
 
@@ -13,7 +14,8 @@ const modalOpen = ref(false)
 const saving = ref(false)
 const isEditing = ref(false)
 const editId = ref('')
-const fileInput = ref<HTMLInputElement | null>(null)
+const selectedLogo = ref<File | null>(null)
+const editingLogoUrl = ref('')
 
 const draggedIndex = ref<number | null>(null)
 const dragOverIndex = ref<number | null>(null)
@@ -30,7 +32,8 @@ function resetForm() {
   form.name = ''
   form.category = ''
   form.isActive = true
-  if (fileInput.value) fileInput.value.value = ''
+  selectedLogo.value = null
+  editingLogoUrl.value = ''
 }
 
 function openAdd() {
@@ -44,14 +47,15 @@ function openEdit(item: any) {
   form.name = item.name
   form.category = item.category || ''
   form.isActive = item.isActive !== false
-  if (fileInput.value) fileInput.value.value = ''
+  selectedLogo.value = null
+  editingLogoUrl.value = item.logoUrl || ''
   modalOpen.value = true
 }
 
 async function submitForm() {
-  const file = fileInput.value?.files?.[0]
+  const file = selectedLogo.value
   if (!isEditing.value && !file) {
-    alert('Logo wajib diunggah untuk klien baru')
+    toast.error('Logo wajib diunggah untuk klien baru.')
     return
   }
 
@@ -72,15 +76,32 @@ async function submitForm() {
     })
     
     modalOpen.value = false
+    toast.success(isEditing.value ? 'Data klien diperbarui.' : 'Klien berhasil ditambahkan.')
     refresh()
   } catch (err: any) {
-    alert(err.data?.statusMessage || 'Gagal menyimpan data')
+    toast.error(err.data?.statusMessage || 'Gagal menyimpan data.')
   } finally {
     saving.value = false
   }
 }
 
 const { ask } = useConfirm()
+
+function clientActions(client: any) {
+  const actions: Array<{
+    label: string
+    icon?: string
+    variant?: 'default' | 'danger'
+    onClick?: () => void
+  }> = []
+  if (can('clients.update')) {
+    actions.push({ label: 'Edit Klien', icon: 'ph:pencil-simple-bold', onClick: () => openEdit(client) })
+  }
+  if (can('clients.delete')) {
+    actions.push({ label: 'Hapus', icon: 'ph:trash-bold', variant: 'danger', onClick: () => deleteItem(client) })
+  }
+  return actions
+}
 
 async function deleteItem(client: any) {
   const confirmed = await ask({
@@ -92,9 +113,10 @@ async function deleteItem(client: any) {
   if (!confirmed) return
   try {
     await $fetch(`/api/clients/${client._id}`, { method: 'DELETE' })
+    toast.success('Klien berhasil dihapus.')
     refresh()
   } catch (err) {
-    alert('Gagal menghapus data')
+    toast.error('Gagal menghapus data.')
   }
 }
 
@@ -147,7 +169,7 @@ async function saveOrder() {
       body: { clientIds }
     })
   } catch (err) {
-    alert('Gagal menyimpan urutan baru')
+    toast.error('Gagal menyimpan urutan baru.')
     refresh()
   } finally {
     saving.value = false
@@ -187,60 +209,60 @@ async function saveOrder() {
           @dragleave="onDragLeave(index, $event)"
           @drop="onDrop(index, $event)"
           :class="[
-            'border rounded-lg p-4 flex flex-col items-center relative group bg-white transition-all duration-200',
+            'border border-gray/15 rounded-xl p-4 pt-10 flex flex-col items-center relative bg-white dark:border-white/10 dark:bg-gray-dark transition-all duration-200',
             canReorder ? 'cursor-move' : '',
-            draggedIndex === index ? 'opacity-50 ring-2 ring-blue-500 ring-offset-2' : '',
-            dragOverIndex === index && draggedIndex !== index ? 'ring-2 ring-blue-300 ring-offset-2 bg-blue-50 transform scale-[1.02]' : ''
+            draggedIndex === index ? 'opacity-50 ring-2 ring-primary ring-offset-2' : '',
+            dragOverIndex === index && draggedIndex !== index ? 'ring-2 ring-primary/60 ring-offset-2 bg-primary/5 transform scale-[1.02]' : ''
           ]"
         >
-          <div class="h-24 w-full flex items-center justify-center mb-4">
+          <div v-if="!client.isActive" class="absolute top-2.5 left-2.5">
+            <span class="inline-flex items-center justify-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-bold text-white">Hidden</span>
+          </div>
+          <div v-if="clientActions(client).length" class="absolute top-2 right-2">
+            <UiActionMenu :items="clientActions(client)" :label="`Aksi untuk ${client.name}`" />
+          </div>
+          <div class="h-24 w-full flex items-center justify-center mb-3">
             <img :src="client.logoUrl" :alt="client.name" class="max-h-full max-w-full object-contain">
           </div>
-          <h3 class="text-sm font-medium text-gray-900 text-center line-clamp-1 w-full" :title="client.name">{{ client.name }}</h3>
-          <p class="text-xs text-gray-500 mt-1">{{ client.category || 'Tanpa Kategori' }}</p>
-          
-          <div v-if="can('clients.update') || can('clients.delete')" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center space-x-4">
-            <button v-if="can('clients.update')" @click="openEdit(client)" class="text-white hover:text-blue-300">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-            </button>
-            <button v-if="can('clients.delete')" @click="deleteItem(client)" class="text-white hover:text-red-400">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-            </button>
-          </div>
-          <div v-if="!client.isActive" class="absolute top-2 left-2">
-            <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">Hidden</span>
-          </div>
+          <h3 class="text-sm font-bold text-black dark:text-white text-center line-clamp-1 w-full" :title="client.name">{{ client.name }}</h3>
+          <p class="text-xs text-gray mt-1">{{ client.category || 'Tanpa Kategori' }}</p>
         </div>
       </div>
     </div>
 
     <!-- Modal Form -->
-    <UiModal v-model="modalOpen" :title="isEditing ? 'Edit Klien' : 'Tambah Klien Baru'">
+    <UiModal v-model="modalOpen" :title="isEditing ? 'Edit Klien' : 'Tambah Klien Baru'" size="sm">
       <form @submit.prevent="submitForm" class="space-y-4">
+        <UiMediaInput
+          v-model="selectedLogo"
+          :existing-url="editingLogoUrl"
+          label="Logo"
+          accept="image/*"
+          preview-aspect="contain"
+          :required="!isEditing"
+          :hint="isEditing ? 'Biarkan jika tidak ingin mengubah logo.' : 'PNG transparan, JPG, atau WebP.'"
+        />
         <div>
-          <label class="block text-sm font-medium text-gray-700">Logo</label>
-          <input type="file" ref="fileInput" accept="image/*" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 text-sm" :required="!isEditing">
-          <p v-if="isEditing" class="mt-1 text-xs text-gray-500">Biarkan kosong jika tidak ingin mengubah logo.</p>
+          <label class="admin-label">Nama Klien</label>
+          <input v-model="form.name" type="text" required class="admin-input">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Nama Klien</label>
-          <input v-model="form.name" type="text" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          <label class="admin-label">Kategori (Opsional)</label>
+          <input v-model="form.category" type="text" class="admin-input" placeholder="Contoh: BUMN, Swasta, Perbankan">
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Kategori (Opsional)</label>
-          <input v-model="form.category" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm" placeholder="Contoh: BUMN, Swasta, Perbankan">
-        </div>
-        <div class="flex items-center mt-6">
-          <input v-model="form.isActive" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-          <label class="ml-2 block text-sm text-gray-900">Aktif (Ditampilkan)</label>
-        </div>
+        <UiAdvancedOptions label="Opsi Lanjutan" hint="Visibilitas di halaman publik">
+          <div class="flex items-center gap-2">
+            <input id="client-active" v-model="form.isActive" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+            <label for="client-active" class="text-sm font-semibold text-black dark:text-white">Aktif (Ditampilkan)</label>
+          </div>
+        </UiAdvancedOptions>
         
-        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse gap-2">
-          <button type="submit" :disabled="saving" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:w-auto sm:text-sm disabled:opacity-50">
-            {{ saving ? 'Menyimpan...' : 'Simpan' }}
-          </button>
-          <button type="button" @click="modalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+        <div class="flex flex-col-reverse gap-2 border-t border-gray/10 pt-4 sm:flex-row sm:justify-end">
+          <button type="button" @click="modalOpen = false" class="admin-btn-ghost justify-center">
             Batal
+          </button>
+          <button type="submit" :disabled="saving" class="admin-btn-primary justify-center">
+            {{ saving ? 'Menyimpan...' : 'Simpan' }}
           </button>
         </div>
       </form>

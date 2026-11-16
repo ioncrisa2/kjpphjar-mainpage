@@ -25,19 +25,18 @@ const store = useAppStore()
             <span class="font-bold text-black dark:text-white">KJPP Henricus Judi Adrianto dan Rekan</span>
             <span>— Panel Manajemen Konten & Analitik</span>
           </div>
-          <div class="flex items-center gap-4 text-xs font-semibold">
-            <span class="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-              <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Sistem Online
-            </span>
-            <span class="text-gray-400 dark:text-gray-500">v1.0</span>
+          <div class="flex items-center gap-3 text-xs font-medium text-gray-400 dark:text-gray-500">
+            <span>Zona waktu: WIB (Asia/Jakarta)</span>
+            <span aria-hidden="true">·</span>
+            <span>v1.0</span>
           </div>
         </footer>
       </main>
     </div>
 
-    <!-- Global Confirmation Modal for Admin Actions -->
+    <!-- Global Confirmation Modal & Toast Notifications for Admin Actions -->
     <UiConfirmModal />
+    <UiToastContainer />
   </div>
 </template>
 

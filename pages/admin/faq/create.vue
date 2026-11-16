@@ -38,8 +38,8 @@ async function save() {
 <template>
   <div class="space-y-6 max-w-4xl">
     <div class="flex items-center gap-4">
-      <NuxtLink to="/admin/faq" class="text-gray-500 hover:text-black dark:hover:text-white transition">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+      <NuxtLink to="/admin/faq" class="admin-btn-ghost !px-3" aria-label="Kembali ke daftar FAQ">
+        <Icon name="ph:arrow-left-bold" />
       </NuxtLink>
       <h1 class="text-2xl font-extrabold text-black dark:text-white">Tambah FAQ</h1>
     </div>
@@ -68,10 +68,10 @@ async function save() {
         </div>
 
         <div class="pt-4 border-t border-gray/10 flex justify-end gap-3">
-          <NuxtLink to="/admin/faq" class="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+          <NuxtLink to="/admin/faq" class="admin-btn-ghost">
             Batal
           </NuxtLink>
-          <button type="submit" :disabled="saving" class="admin-btn-primary disabled:opacity-50">
+          <button type="submit" :disabled="saving" class="admin-btn-primary">
             {{ saving ? 'Menyimpan...' : 'Simpan FAQ' }}
           </button>
         </div>

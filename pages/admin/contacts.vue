@@ -110,25 +110,25 @@ watch(showUnreadOnly, () => {
               <th class="px-6 py-3 text-right text-xs font-bold text-gray uppercase tracking-wider">Aksi</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray/10">
-            <tr v-for="contact in contacts" :key="contact._id" :class="{'bg-blue-50': !contact.isRead}">
+          <tbody class="divide-y divide-gray/10 bg-white dark:bg-gray-dark">
+            <tr v-for="contact in contacts" :key="contact._id" :class="{ 'bg-primary/5 dark:bg-primary/10': !contact.isRead }">
               <td class="px-6 py-4">
-                <div class="font-bold" :class="contact.isRead ? 'text-gray-900' : 'text-black'">{{ contact.fullname }}</div>
+                <div class="font-bold" :class="contact.isRead ? 'text-gray-700 dark:text-gray-200' : 'text-black dark:text-white'">{{ contact.fullname }}</div>
                 <div class="text-xs text-gray mt-1" v-if="contact.city">{{ contact.city }}</div>
               </td>
               <td class="px-6 py-4">
-                <div class="text-sm text-gray-900">{{ contact.email }}</div>
+                <div class="text-sm text-black dark:text-gray-200">{{ contact.email }}</div>
                 <div class="text-xs text-gray" v-if="contact.phone">{{ contact.phone }}</div>
               </td>
               <td class="px-6 py-4">
-                <div class="text-sm text-gray-900 truncate max-w-xs" :title="contact.message">{{ contact.message }}</div>
+                <div class="text-sm text-gray-700 dark:text-gray-300 truncate max-w-xs" :title="contact.message">{{ contact.message }}</div>
               </td>
               <td class="px-6 py-4 text-sm text-gray">
                 {{ new Date(contact.submittedAt).toLocaleDateString('id-ID') }}
                 <div class="text-xs">{{ new Date(contact.submittedAt).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) }}</div>
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium">
-                <button @click="openDetail(contact)" class="text-primary hover:text-blue-900 font-semibold">Buka</button>
+                <button @click="openDetail(contact)" class="font-semibold text-primary hover:underline">Buka</button>
               </td>
             </tr>
           </tbody>
@@ -152,7 +152,7 @@ watch(showUnreadOnly, () => {
     </div>
 
     <!-- Detail Modal -->
-    <UiModal v-model="detailModalOpen" title="Detail Pesan">
+    <UiModal v-model="detailModalOpen" title="Detail Pesan" size="md">
       <div v-if="selectedContact" class="space-y-4">
         <div class="grid grid-cols-2 gap-4">
           <div>

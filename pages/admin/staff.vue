@@ -3,6 +3,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'staff.view' }
 useHead({ title: "Admin Staff | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
+const toast = useToast()
 
 const { data: staffList, refresh, pending } = await useFetch<any[]>('/api/staff', { query: { admin: 'true' } })
 const { data: branches } = await useFetch<any[]>('/api/branches')
@@ -86,15 +87,27 @@ async function submitForm() {
     })
 
     modalOpen.value = false
+    toast.success(isEditing.value ? 'Data staff diperbarui.' : 'Staff berhasil ditambahkan.')
     refresh()
   } catch (err: any) {
-    alert(err.data?.statusMessage || 'Gagal menyimpan data')
+    toast.error(err.data?.statusMessage || 'Gagal menyimpan data.')
   } finally {
     saving.value = false
   }
 }
 
 const { ask } = useConfirm()
+
+function staffActions(staff: any) {
+  const actions: Array<{ label: string; icon?: string; variant?: 'default' | 'danger'; onClick?: () => void }> = []
+  if (can('staff.update')) {
+    actions.push({ label: 'Edit Staff', icon: 'ph:pencil-simple-bold', onClick: () => openEdit(staff) })
+  }
+  if (can('staff.delete')) {
+    actions.push({ label: 'Hapus', icon: 'ph:trash-bold', variant: 'danger', onClick: () => deleteItem(staff) })
+  }
+  return actions
+}
 
 async function deleteItem(staff: any) {
   const confirmed = await ask({
@@ -106,9 +119,10 @@ async function deleteItem(staff: any) {
   if (!confirmed) return
   try {
     await $fetch(`/api/staff/${staff._id}`, { method: 'DELETE' })
+    toast.success('Data staff berhasil dihapus.')
     refresh()
   } catch (err) {
-    alert('Gagal menghapus data')
+    toast.error('Gagal menghapus data.')
   }
 }
 </script>
@@ -166,23 +180,22 @@ async function deleteItem(staff: any) {
               <th class="px-6 py-3 text-right text-xs font-bold text-gray uppercase tracking-wider">Aksi</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray/10">
+          <tbody class="divide-y divide-gray/10 bg-white dark:bg-gray-dark">
             <tr v-for="staff in filteredStaff" :key="staff._id">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ staff.name }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ staff.position }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-black dark:text-white">{{ staff.name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-200">{{ staff.position }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span v-if="staff.branchId" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{{ staff.branchId.name }}</span>
-                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Kantor terhapus</span>
+                <span v-if="staff.branchId" class="inline-flex rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-200">{{ staff.branchId.name }}</span>
+                <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Kantor terhapus</span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ staff.mappiNumber || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ staff.order || 0 }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray">{{ staff.mappiNumber || '-' }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm tabular-nums text-gray">{{ staff.order || 0 }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span v-if="staff.isActive !== false" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
-                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Nonaktif</span>
+                <span v-if="staff.isActive !== false" class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
+                <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button v-if="can('staff.update')" @click="openEdit(staff)" class="text-primary hover:text-blue-900 mr-4">Edit</button>
-                <button v-if="can('staff.delete')" @click="deleteItem(staff)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <UiActionMenu v-if="staffActions(staff).length" :items="staffActions(staff)" :label="`Aksi untuk ${staff.name}`" />
               </td>
             </tr>
           </tbody>
@@ -191,48 +204,50 @@ async function deleteItem(staff: any) {
     </div>
 
     <!-- Modal Form -->
-    <UiModal v-model="modalOpen" :title="isEditing ? 'Edit Staff' : 'Tambah Staff Baru'">
+    <UiModal v-model="modalOpen" :title="isEditing ? 'Edit Staff' : 'Tambah Staff Baru'" size="md">
       <form @submit.prevent="submitForm" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700">Nama</label>
-          <input v-model="form.name" type="text" required maxlength="200" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          <label class="admin-label">Nama</label>
+          <input v-model="form.name" type="text" required maxlength="200" class="admin-input">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Jabatan</label>
-          <input v-model="form.position" type="text" required maxlength="200" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          <label class="admin-label">Jabatan</label>
+          <input v-model="form.position" type="text" required maxlength="200" class="admin-input">
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700">Kantor Penempatan (Pusat / Cabang)</label>
-          <select v-model="form.branchId" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
+          <label class="admin-label">Kantor Penempatan (Pusat / Cabang)</label>
+          <select v-model="form.branchId" required class="admin-input">
             <option value="" disabled>Pilih kantor</option>
             <option v-for="branch in branchOptions" :key="branch._id" :value="branch._id">
               {{ branch.name }}{{ branch.city ? ` (${branch.city})` : '' }}
             </option>
           </select>
-          <p v-if="isEditing && !form.branchId" class="mt-1 text-xs text-red-600">Kantor sebelumnya sudah dihapus. Pilih kantor yang baru.</p>
-          <p v-else class="mt-1 text-xs text-gray-500">Daftar kantor diambil dari menu Cabang.</p>
+          <p v-if="isEditing && !form.branchId" class="mt-1 text-xs text-red-600 dark:text-red-400">Kantor sebelumnya sudah dihapus. Pilih kantor yang baru.</p>
+          <p v-else class="mt-1 text-xs text-gray">Daftar kantor diambil dari menu Cabang.</p>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Nomor MAPPI <span class="font-normal text-gray-500">(opsional)</span></label>
-          <input v-model="form.mappiNumber" type="text" maxlength="100" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-          <p class="mt-1 text-xs text-gray-500">Jika diisi, nomor MAPPI ikut tampil di website.</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Urutan Tampil</label>
-          <input v-model.number="form.order" type="number" min="0" max="9999" step="1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 sm:text-sm">
-          <p class="mt-1 text-xs text-gray-500">Angka kecil tampil lebih dulu dalam kantor yang sama.</p>
-        </div>
-        <div class="flex items-center">
-          <input id="staff-active" v-model="form.isActive" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-          <label for="staff-active" class="ml-2 block text-sm text-gray-900">Aktif (ditampilkan di website)</label>
-        </div>
+        <UiAdvancedOptions label="Opsi Lanjutan" hint="Nomor MAPPI, urutan tampil, dan status aktif">
+          <div>
+            <label class="admin-label">Nomor MAPPI <span class="font-normal text-gray">(opsional)</span></label>
+            <input v-model="form.mappiNumber" type="text" maxlength="100" class="admin-input">
+            <p class="mt-1 text-xs text-gray">Jika diisi, nomor MAPPI ikut tampil di website.</p>
+          </div>
+          <div>
+            <label class="admin-label">Urutan Tampil</label>
+            <input v-model.number="form.order" type="number" min="0" max="9999" step="1" class="admin-input">
+            <p class="mt-1 text-xs text-gray">Angka kecil tampil lebih dulu dalam kantor yang sama.</p>
+          </div>
+          <div class="flex items-center gap-2 pt-1">
+            <input id="staff-active" v-model="form.isActive" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+            <label for="staff-active" class="text-sm font-semibold text-black dark:text-white">Aktif (ditampilkan di website)</label>
+          </div>
+        </UiAdvancedOptions>
 
-        <div class="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse gap-2">
-          <button type="submit" :disabled="saving" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:w-auto sm:text-sm disabled:opacity-50">
-            {{ saving ? 'Menyimpan...' : 'Simpan' }}
-          </button>
-          <button type="button" @click="modalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+        <div class="flex flex-col-reverse gap-2 border-t border-gray/10 pt-4 sm:flex-row sm:justify-end">
+          <button type="button" @click="modalOpen = false" class="admin-btn-ghost justify-center">
             Batal
+          </button>
+          <button type="submit" :disabled="saving" class="admin-btn-primary justify-center">
+            {{ saving ? 'Menyimpan...' : 'Simpan' }}
           </button>
         </div>
       </form>

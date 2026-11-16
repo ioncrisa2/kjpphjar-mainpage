@@ -95,6 +95,7 @@ async function submitForm() {
 }
 
 const { ask } = useConfirm()
+const toast = useToast()
 
 async function deleteRole(role: RoleRow) {
   const confirmed = await ask({
@@ -106,9 +107,10 @@ async function deleteRole(role: RoleRow) {
   if (!confirmed) return
   try {
     await $fetch(`/api/admin/roles/${role._id}`, { method: 'DELETE' })
+    toast.success('Role berhasil dihapus.')
     await refresh()
   } catch (err: any) {
-    alert(err?.data?.statusMessage || 'Gagal menghapus role.')
+    toast.error(err?.data?.statusMessage || 'Gagal menghapus role.')
   }
 }
 </script>
@@ -171,7 +173,7 @@ async function deleteRole(role: RoleRow) {
       </article>
     </div>
 
-    <UiModal v-model="modalOpen" :title="editing ? `Edit Role — ${editing.name}` : 'Tambah Role'">
+    <UiModal v-model="modalOpen" :title="editing ? `Edit Role — ${editing.name}` : 'Tambah Role'" size="xl">
       <form class="space-y-5" @submit.prevent="submitForm">
         <div class="grid gap-4 md:grid-cols-2">
           <div>

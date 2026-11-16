@@ -47,20 +47,14 @@ if (import.meta.server) {
       
       <div class="container relative z-10 px-4 sm:px-6 lg:px-8 mx-auto py-20 flex flex-col items-center text-center">
         
-        <div class="mb-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl inline-block transform hover:scale-105 transition-transform duration-300">
-          <img src="/assets/images/h-logo.png" :alt="settings.siteName" width="220" height="55" class="h-14 w-auto mx-auto drop-shadow-md" />
+        <div class="mb-10 inline-block rounded-2xl border border-white/15 bg-black/40 p-6 shadow-xl">
+          <img src="/assets/images/h-logo.png" :alt="settings.siteName" width="220" height="55" class="mx-auto h-14 w-auto" />
         </div>
 
-        <div class="max-w-2xl bg-black/50 backdrop-blur-md p-8 sm:p-12 rounded-[2rem] border border-white/10 shadow-2xl relative overflow-hidden">
-          <!-- Glassmorphism glare effect -->
-          <div class="absolute -top-24 -left-24 w-48 h-48 bg-primary/30 rounded-full blur-3xl opacity-50"></div>
-          
+        <div class="relative max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-[#0b131e]/90 p-8 shadow-2xl sm:p-12">
           <div class="relative z-10">
-            <div class="mb-6 inline-flex items-center justify-center gap-2 rounded-full bg-primary/20 px-4 py-2 text-sm font-bold text-white border border-primary/30">
-              <span class="relative flex h-3 w-3">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
-              </span>
+            <div class="mb-6 inline-flex items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/15 px-4 py-2 text-sm font-bold text-white">
+              <span class="h-2.5 w-2.5 rounded-full bg-primary" aria-hidden="true"></span>
               Mode Pemeliharaan
             </div>
             

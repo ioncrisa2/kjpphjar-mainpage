@@ -54,6 +54,7 @@ function statusPresentation(article: Record<string, any>) {
 }
 
 const { ask } = useConfirm()
+const toast = useToast()
 
 async function deleteItem(article: Record<string, any>) {
   const confirmed = await ask({
@@ -65,10 +66,11 @@ async function deleteItem(article: Record<string, any>) {
   if (!confirmed) return
   try {
     await $fetch(`/api/admin/blog/${article._id}`, { method: 'DELETE' })
+    toast.success('Artikel berhasil dihapus.')
     if (articles.value.length === 1 && page.value > 1) page.value--
     else await refresh()
   } catch (error: any) {
-    alert(error?.data?.statusMessage || 'Artikel gagal dihapus.')
+    toast.error(error?.data?.statusMessage || 'Artikel gagal dihapus.')
   }
 }
 </script>

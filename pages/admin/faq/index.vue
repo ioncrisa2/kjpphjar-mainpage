@@ -12,6 +12,7 @@ const draggedIndex = ref<number | null>(null)
 const dragOverIndex = ref<number | null>(null)
 
 const { ask } = useConfirm()
+const toast = useToast()
 
 async function deleteItem(faq: any) {
   const confirmed = await ask({
@@ -23,9 +24,10 @@ async function deleteItem(faq: any) {
   if (!confirmed) return
   try {
     await $fetch(`/api/faq/${faq._id}`, { method: 'DELETE' })
+    toast.success('FAQ berhasil dihapus.')
     refresh()
   } catch (err) {
-    alert('Gagal menghapus FAQ')
+    toast.error('Gagal menghapus FAQ.')
   }
 }
 
@@ -77,7 +79,7 @@ async function saveOrder(items: any[]) {
     })
     await refresh()
   } catch (err) {
-    alert('Gagal menyimpan urutan baru')
+    toast.error('Gagal menyimpan urutan baru.')
     refresh()
   } finally {
     saving.value = false
@@ -113,7 +115,7 @@ async function saveOrder(items: any[]) {
               <th class="px-6 py-3 text-right text-xs font-bold text-gray uppercase tracking-wider">Aksi</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray/10">
+          <tbody class="divide-y divide-gray/10 bg-white dark:bg-gray-dark">
             <tr v-for="(faq, index) in faqs" :key="faq._id"
                 :draggable="can('faq.update')"
                 @dragstart="onDragStart(index, $event)"
@@ -122,27 +124,27 @@ async function saveOrder(items: any[]) {
                 @drop="onDrop(index, $event)"
                 :class="[
                   'cursor-move transition-all duration-200',
-                  draggedIndex === index ? 'opacity-50 bg-gray-50' : 'hover:bg-gray/5',
-                  dragOverIndex === index && draggedIndex !== index ? 'border-t-2 border-t-blue-500 bg-blue-50' : ''
+                  draggedIndex === index ? 'opacity-50 bg-stone-50 dark:bg-white/5' : 'hover:bg-gray/5',
+                  dragOverIndex === index && draggedIndex !== index ? 'border-t-2 border-t-primary bg-primary/5' : ''
                 ]">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-gray-400 cursor-move shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+                  <Icon name="ph:dots-six-vertical-bold" class="h-5 w-5 shrink-0 cursor-move text-gray-400" aria-hidden="true" />
                   <div>
                     <div class="font-bold text-black dark:text-white line-clamp-2">{{ faq.question }}</div>
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 text-sm text-gray">
+              <td class="px-6 py-4 text-sm tabular-nums text-gray">
                 {{ index + 1 }}
               </td>
               <td class="px-6 py-4">
-                <span v-if="faq.isActive" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Aktif</span>
-                <span v-else class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Nonaktif</span>
+                <span v-if="faq.isActive" class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
+                <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
               </td>
               <td class="px-6 py-4 text-right text-sm font-medium">
-                <NuxtLink v-if="can('faq.update')" :to="`/admin/faq/${faq._id}`" class="text-primary hover:text-blue-900 mr-4">Edit</NuxtLink>
-                <button v-if="can('faq.delete')" @click="deleteItem(faq)" class="text-red-600 hover:text-red-900">Hapus</button>
+                <NuxtLink v-if="can('faq.update')" :to="`/admin/faq/${faq._id}`" class="mr-4 font-semibold text-primary hover:underline">Edit</NuxtLink>
+                <button v-if="can('faq.delete')" @click="deleteItem(faq)" class="font-semibold text-red-600 hover:underline dark:text-red-400">Hapus</button>
               </td>
             </tr>
           </tbody>

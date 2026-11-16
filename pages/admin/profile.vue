@@ -95,7 +95,11 @@ async function updateProfile() {
           : 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300'
       "
     >
-      <span aria-hidden="true">{{ feedback.type === 'success' ? '✓' : '!' }}</span>
+      <Icon
+        :name="feedback.type === 'success' ? 'ph:check-circle-bold' : 'ph:warning-circle-bold'"
+        class="mt-0.5 h-4 w-4 shrink-0"
+        aria-hidden="true"
+      />
       <span>{{ feedback.message }}</span>
     </div>
 
