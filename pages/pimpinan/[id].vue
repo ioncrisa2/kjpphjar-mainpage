@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { COMPANY_DATA, sanitizeJsonLd } from '~/shared/company-data'
+
 const route = useRoute()
 const id = route.params.id as string
 const { data: leader, error } = await useFetch<any>(`/api/leaders/${id}`)
@@ -68,21 +70,23 @@ useHead({
           name: item.label,
           value: item.value,
         }))
-        return JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Person',
-          name: leader.value.name,
-          jobTitle: leader.value.position,
-          description: leader.value.bio || undefined,
-          image: absolutePhoto.value || undefined,
-          url: canonicalUrl.value,
-          identifier: identifiers.length ? identifiers : undefined,
-          worksFor: {
-            '@type': 'Organization',
-            name: 'KJPP Henricus Judi Adrianto dan Rekan',
-            url: baseUrl,
-          },
-        }).replace(/</g, '\\u003c')
+        return JSON.stringify(
+          sanitizeJsonLd({
+            '@context': 'https://schema.org',
+            '@type': 'Person',
+            name: leader.value.name,
+            jobTitle: leader.value.position,
+            description: seoDescription.value,
+            image: absolutePhoto.value || undefined,
+            url: canonicalUrl.value,
+            identifier: identifiers.length ? identifiers : undefined,
+            worksFor: {
+              '@type': 'Organization',
+              name: COMPANY_DATA.name,
+              url: baseUrl,
+            },
+          })
+        ).replace(/</g, '\\u003c')
       }),
     },
   ],

@@ -10,6 +10,7 @@ if (error.value) {
 
 import lightGallery from 'lightgallery'
 import lgZoom from 'lightgallery/plugins/zoom'
+import { sanitizeJsonLd } from '~/shared/company-data'
 
 const serviceRef = ref<HTMLElement | null>(null)
 
@@ -68,35 +69,37 @@ useHead({
       type: 'application/ld+json',
       children: computed(() =>
         service.value
-          ? JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'Service',
-              name: service.value.title,
-              serviceType: service.value.title,
-              description: service.value.description,
-              url: `${baseUrl}/layanan/${service.value.slug || slug}`,
-              provider: {
-                '@type': 'ProfessionalService',
-                '@id': `${baseUrl}/#organization`,
-                name: company.name,
-                url: baseUrl,
-                telephone: company.headOffice.phone,
-                address: {
-                  '@type': 'PostalAddress',
-                  streetAddress: company.headOffice.streetAddress,
-                  addressLocality: company.headOffice.locality,
-                  addressRegion: company.headOffice.region,
-                  postalCode: company.headOffice.postalCode,
-                  addressCountry: company.headOffice.country,
+          ? JSON.stringify(
+              sanitizeJsonLd({
+                '@context': 'https://schema.org',
+                '@type': 'Service',
+                name: service.value.title,
+                serviceType: service.value.title,
+                description: service.value.description,
+                url: `${baseUrl}/layanan/${service.value.slug || slug}`,
+                provider: {
+                  '@type': 'ProfessionalService',
+                  '@id': `${baseUrl}/#organization`,
+                  name: company.name,
+                  url: baseUrl,
+                  telephone: company.headOffice.phone,
+                  address: {
+                    '@type': 'PostalAddress',
+                    streetAddress: company.headOffice.streetAddress,
+                    addressLocality: company.headOffice.locality,
+                    addressRegion: company.headOffice.region,
+                    postalCode: company.headOffice.postalCode,
+                    addressCountry: company.headOffice.country,
+                  },
                 },
-              },
-              areaServed: [
-                { '@type': 'City', name: 'Palembang' },
-                { '@type': 'AdministrativeArea', name: 'Sumatera Selatan' },
-                { '@type': 'Place', name: 'Sumatera' },
-                { '@type': 'Country', name: 'Indonesia' },
-              ],
-            })
+                areaServed: [
+                  { '@type': 'City', name: 'Palembang' },
+                  { '@type': 'AdministrativeArea', name: 'Sumatera Selatan' },
+                  { '@type': 'Place', name: 'Sumatera' },
+                  { '@type': 'Country', name: 'Indonesia' },
+                ],
+              })
+            ).replace(/</g, '\\u003c')
           : ''
       ),
     },

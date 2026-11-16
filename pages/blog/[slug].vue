@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import lightGallery from 'lightgallery'
 import lgZoom from 'lightgallery/plugins/zoom'
+import { COMPANY_DATA, sanitizeJsonLd } from '~/shared/company-data'
 
 const route = useRoute()
 const slug = route.params.slug as string
@@ -66,6 +67,8 @@ useHead({
       children: computed(() => {
         if (!article.value) return ''
         const leader = article.value.leader
+        const publishedIso = new Date(article.value.publishedAt || article.value.createdAt).toISOString()
+        const modifiedIso = new Date(article.value.updatedAt || article.value.publishedAt || article.value.createdAt).toISOString()
         const authorObj = leader
           ? {
               '@type': 'Person',
@@ -76,7 +79,7 @@ useHead({
               url: `${baseUrl}/pimpinan/${leader.slug || leader._id}`,
               worksFor: {
                 '@type': 'Organization',
-                name: 'KJPP Henricus Judi Adrianto dan Rekan',
+                name: COMPANY_DATA.name,
                 url: baseUrl,
               },
             }
@@ -85,30 +88,32 @@ useHead({
               name: article.value.author || 'Admin',
               worksFor: {
                 '@type': 'Organization',
-                name: 'KJPP Henricus Judi Adrianto dan Rekan',
+                name: COMPANY_DATA.name,
                 url: baseUrl,
               },
             }
 
-        return JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'BlogPosting',
-          headline: article.value.title,
-          image: absoluteCover.value ? [absoluteCover.value] : [],
-          datePublished: article.value.publishedAt || article.value.createdAt,
-          dateModified: article.value.updatedAt || article.value.createdAt,
-          author: [authorObj],
-          publisher: {
-            '@type': 'Organization',
-            name: 'KJPP Henricus Judi Adrianto dan Rekan',
-            logo: { '@type': 'ImageObject', url: `${baseUrl}/assets/images/h-logo.png` },
-          },
-          description: seoDescription.value,
-          mainEntityOfPage: canonicalUrl.value,
-          articleSection: article.value.category?.name || undefined,
-          keywords: article.value.tags.join(', '),
-          wordCount: articleWordCount.value,
-        }).replace(/</g, '\\u003c')
+        return JSON.stringify(
+          sanitizeJsonLd({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: article.value.title,
+            image: [absoluteCover.value || defaultOgImage],
+            datePublished: publishedIso,
+            dateModified: modifiedIso,
+            author: [authorObj],
+            publisher: {
+              '@type': 'Organization',
+              name: COMPANY_DATA.name,
+              logo: { '@type': 'ImageObject', url: `${baseUrl}/assets/images/h-logo.png` },
+            },
+            description: seoDescription.value || article.value.title,
+            mainEntityOfPage: canonicalUrl.value,
+            articleSection: article.value.category?.name || undefined,
+            keywords: article.value.tags?.length ? article.value.tags.join(', ') : undefined,
+            wordCount: articleWordCount.value > 0 ? articleWordCount.value : undefined,
+          })
+        ).replace(/</g, '\\u003c')
       }),
     },
   ],

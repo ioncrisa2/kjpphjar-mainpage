@@ -214,9 +214,34 @@ export function normalizeBranchDisplay(rawBranch: Record<string, any>): OfficeBr
   }
 }
 
+export function sanitizeJsonLd<T>(input: T): T {
+  if (Array.isArray(input)) {
+    return input
+      .map((item) => sanitizeJsonLd(item))
+      .filter((item) => {
+        if (item === undefined || item === null || item === '') return false
+        if (Array.isArray(item) && item.length === 0) return false
+        if (typeof item === 'object' && Object.keys(item as object).length === 0) return false
+        return true
+      }) as unknown as T
+  }
+  if (input && typeof input === 'object') {
+    const out: Record<string, unknown> = {}
+    for (const [k, v] of Object.entries(input as Record<string, unknown>)) {
+      const cleaned = sanitizeJsonLd(v)
+      if (cleaned === undefined || cleaned === null || cleaned === '') continue
+      if (Array.isArray(cleaned) && cleaned.length === 0) continue
+      if (typeof cleaned === 'object' && !Array.isArray(cleaned) && Object.keys(cleaned as object).length === 0) continue
+      out[k] = cleaned
+    }
+    return out as T
+  }
+  return input
+}
+
 export function buildProfessionalServiceJsonLd(baseUrl = 'https://kjpp-hjar.co.id') {
   const cleanBase = baseUrl.replace('://www.', '://').replace(/\/$/, '')
-  return {
+  return sanitizeJsonLd({
     '@context': 'https://schema.org',
     '@type': 'ProfessionalService',
     '@id': `${cleanBase}/#organization`,
@@ -251,5 +276,5 @@ export function buildProfessionalServiceJsonLd(baseUrl = 'https://kjpp-hjar.co.i
       { '@type': 'Country', name: 'Indonesia' },
     ],
     sameAs: [COMPANY_DATA.socialMedia.instagram],
-  }
+  })
 }

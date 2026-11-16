@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { sanitizeJsonLd } from '~/shared/company-data'
+
 const faqTitle = "Tanya Jawab (FAQ) Jasa Penilai Publik | KJPP HJA'R Palembang"
 const faqDescription =
   "Jawaban atas pertanyaan umum seputar prosedur, dokumen, waktu kerja, biaya, dan legalitas jasa penilaian publik di KJPP HJA'R Palembang."
@@ -21,15 +23,17 @@ useHead({
       type: 'application/ld+json',
       children: computed(() => {
         if (!faqs.value?.length) return ''
-        return JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'FAQPage',
-          mainEntity: faqs.value.map((f: any) => ({
-            '@type': 'Question',
-            name: f.question,
-            acceptedAnswer: { '@type': 'Answer', text: f.answer },
-          })),
-        }).replace(/</g, '\\u003c')
+        return JSON.stringify(
+          sanitizeJsonLd({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqs.value.map((f: any) => ({
+              '@type': 'Question',
+              name: f.question,
+              acceptedAnswer: { '@type': 'Answer', text: f.answer },
+            })),
+          })
+        ).replace(/</g, '\\u003c')
       }),
     },
   ],
