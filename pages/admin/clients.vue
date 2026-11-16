@@ -4,10 +4,20 @@ useHead({ title: "Admin Klien | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
 const toast = useToast()
+const viewMode = useAdminViewMode('clients', 'grid')
 // Mengurutkan menyentuh semua klien, jadi khusus clients.manage_all.
 const canReorder = computed(() => can('clients.manage_all'))
 
-const { data: clientsResponse, refresh, pending } = await useFetch('/api/clients?all=true')
+interface ClientItem {
+  _id: string
+  name: string
+  logoUrl: string
+  category?: string
+  order?: number
+  isActive?: boolean
+}
+
+const { data: clientsResponse, refresh, pending } = await useFetch<{ items: ClientItem[]; categories?: string[] }>('/api/clients?all=true')
 const clients = computed(() => clientsResponse.value?.items || [])
 
 const modalOpen = ref(false)
@@ -112,7 +122,7 @@ async function deleteItem(client: any) {
   })
   if (!confirmed) return
   try {
-    await $fetch(`/api/clients/${client._id}`, { method: 'DELETE' })
+    await $fetch(`/api/clients/${client._id}` as string, { method: 'DELETE' })
     toast.success('Klien berhasil dihapus.')
     refresh()
   } catch (err) {
@@ -179,27 +189,30 @@ async function saveOrder() {
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Rekan & Klien</h1>
         <p class="mt-1 text-sm text-gray">
           Kelola logo klien yang tampil di website.
-          <template v-if="canReorder">Anda bisa drag &amp; drop (geser) kartu klien di bawah untuk mengatur urutannya.</template>
+          <template v-if="canReorder">Anda bisa drag &amp; drop (geser) {{ viewMode === 'grid' ? 'kartu' : 'baris' }} klien di bawah untuk mengatur urutannya.</template>
           <template v-else>Daftar ini hanya menampilkan klien yang Anda tambahkan.</template>
         </p>
       </div>
-      <button v-if="can('clients.create')" @click="openAdd" class="admin-btn-primary">
-        + Tambah Klien
-      </button>
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
+        <button v-if="can('clients.create')" @click="openAdd" class="admin-btn-primary">
+          + Tambah Klien
+        </button>
+      </div>
     </div>
 
-    <!-- Grid -->
-    <div class="admin-card">
+    <!-- Content -->
+    <div class="admin-card" :class="viewMode === 'table' && clients.length ? '!p-0 overflow-hidden' : ''">
       <div v-if="pending" class="p-6 text-center text-gray-500">Memuat data...</div>
       <div v-else-if="!clients.length" class="p-6 text-center text-gray-500">
         Belum ada data klien.
       </div>
-      <div v-else class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 p-4">
+      <div v-else-if="viewMode === 'grid'" class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 p-4">
         <div
           v-for="(client, index) in clients"
           :key="client._id"
@@ -227,6 +240,59 @@ async function saveOrder() {
           <h3 class="text-sm font-bold text-black dark:text-white text-center line-clamp-1 w-full" :title="client.name">{{ client.name }}</h3>
           <p class="text-xs text-gray mt-1">{{ client.category || 'Tanpa Kategori' }}</p>
         </div>
+      </div>
+      <div v-else class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray/10">
+          <thead class="bg-gray/5">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Klien</th>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Kategori</th>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Urutan</th>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Status</th>
+              <th class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray/10 bg-white dark:bg-gray-dark">
+            <tr
+              v-for="(client, index) in clients"
+              :key="client._id"
+              :draggable="canReorder"
+              @dragstart="onDragStart(index, $event)"
+              @dragover="onDragOver(index, $event)"
+              @dragleave="onDragLeave(index, $event)"
+              @drop="onDrop(index, $event)"
+              :class="[
+                'transition-all duration-200',
+                canReorder ? 'cursor-move' : '',
+                draggedIndex === index ? 'opacity-50 bg-stone-50 dark:bg-white/5' : 'hover:bg-gray/5',
+                dragOverIndex === index && draggedIndex !== index ? 'border-t-2 border-t-primary bg-primary/5' : ''
+              ]"
+            >
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <Icon v-if="canReorder" name="ph:dots-six-vertical-bold" class="h-5 w-5 shrink-0 cursor-move text-gray-400" aria-hidden="true" />
+                  <div class="flex h-10 w-16 shrink-0 items-center justify-center rounded-lg border border-gray/10 bg-stone-50 p-1 dark:bg-white/5">
+                    <img :src="client.logoUrl" :alt="client.name" class="max-h-full max-w-full object-contain">
+                  </div>
+                  <div class="text-sm font-bold text-black dark:text-white">{{ client.name }}</div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray">
+                {{ client.category || 'Tanpa Kategori' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm tabular-nums text-gray">
+                {{ index + 1 }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span v-if="client.isActive !== false" class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
+                <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Hidden</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <UiActionMenu v-if="clientActions(client).length" :items="clientActions(client)" :label="`Aksi untuk ${client.name}`" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 

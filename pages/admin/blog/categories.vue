@@ -4,6 +4,7 @@ useHead({ title: "Kategori Blog | KJPP HJA'R" })
 
 const { data, pending, refresh } = await useFetch('/api/admin/categories')
 const toast = useToast()
+const viewMode = useAdminViewMode('blog-categories', 'grid')
 const categories = computed(() => data.value?.items || [])
 const saving = ref(false)
 const editingId = ref('')
@@ -66,12 +67,15 @@ async function deleteCategory(category: Record<string, any>) {
 
 <template>
   <div class="space-y-6">
-    <header class="flex flex-wrap items-center gap-4">
-      <NuxtLink to="/admin/blog" class="admin-btn-ghost !px-3" aria-label="Kembali ke blog"><Icon name="ph:arrow-left-bold" /></NuxtLink>
-      <div>
-        <h1 class="text-2xl font-extrabold text-black dark:text-white">Kategori artikel</h1>
-        <p class="mt-1 text-sm text-gray">Atur pengelompokan artikel yang tersedia di halaman publik.</p>
+    <header class="flex flex-wrap items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-4">
+        <NuxtLink to="/admin/blog" class="admin-btn-ghost !px-3" aria-label="Kembali ke blog"><Icon name="ph:arrow-left-bold" /></NuxtLink>
+        <div>
+          <h1 class="text-2xl font-extrabold text-black dark:text-white">Kategori artikel</h1>
+          <p class="mt-1 text-sm text-gray">Atur pengelompokan artikel yang tersedia di halaman publik.</p>
+        </div>
       </div>
+      <AdminViewSwitcher v-model="viewMode" grid-label="Daftar" />
     </header>
 
     <div class="grid items-start gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
@@ -109,7 +113,7 @@ async function deleteCategory(category: Record<string, any>) {
           <h2 class="mt-4 text-lg font-bold text-black dark:text-white">Belum ada kategori</h2>
           <p class="mt-2 text-sm text-gray">Tambahkan kategori pertama menggunakan form di samping.</p>
         </div>
-        <div v-else class="divide-y divide-gray/10">
+        <div v-else-if="viewMode === 'grid'" class="divide-y divide-gray/10">
           <article v-for="category in categories" :key="category._id" class="flex flex-wrap items-center justify-between gap-4 p-5 transition hover:bg-slate-50 dark:hover:bg-white/5">
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-center gap-2">
@@ -125,6 +129,43 @@ async function deleteCategory(category: Record<string, any>) {
               <button type="button" class="rounded-lg p-2 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40" :disabled="category.articleCount > 0" :title="category.articleCount > 0 ? 'Kategori yang masih dipakai tidak dapat dihapus' : 'Hapus kategori'" :aria-label="`Hapus ${category.name}`" @click="deleteCategory(category)"><Icon name="ph:trash-bold" class="text-lg" /></button>
             </div>
           </article>
+        </div>
+        <div v-else class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray/10">
+            <thead class="bg-gray/5">
+              <tr>
+                <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Kategori</th>
+                <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Artikel</th>
+                <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Status</th>
+                <th class="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray">Aksi</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray/10 bg-white dark:bg-gray-dark">
+              <tr v-for="category in categories" :key="category._id" class="transition hover:bg-slate-50 dark:hover:bg-white/5">
+                <td class="px-5 py-4">
+                  <p class="font-bold text-black dark:text-white">{{ category.name }}</p>
+                  <p class="mt-0.5 text-xs font-semibold text-primary">/kategori/{{ category.slug }}</p>
+                  <p v-if="category.description" class="mt-1 line-clamp-1 max-w-md text-xs text-gray">{{ category.description }}</p>
+                </td>
+                <td class="px-5 py-4 whitespace-nowrap text-sm tabular-nums text-gray">
+                  {{ category.articleCount }} artikel
+                </td>
+                <td class="px-5 py-4 whitespace-nowrap">
+                  <span class="rounded-full px-2.5 py-0.5 text-xs font-bold" :class="category.isActive ? 'bg-green-100 text-green-800' : 'bg-slate-200 text-slate-700'">
+                    {{ category.isActive ? 'Aktif' : 'Nonaktif' }}
+                  </span>
+                </td>
+                <td class="px-5 py-4 whitespace-nowrap text-right">
+                  <button type="button" class="rounded-lg p-2 text-primary transition hover:bg-blue-50" :aria-label="`Edit ${category.name}`" @click="editCategory(category)">
+                    <Icon name="ph:pencil-simple-bold" class="text-lg" />
+                  </button>
+                  <button type="button" class="rounded-lg p-2 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40" :disabled="category.articleCount > 0" :title="category.articleCount > 0 ? 'Kategori yang masih dipakai tidak dapat dihapus' : 'Hapus kategori'" :aria-label="`Hapus ${category.name}`" @click="deleteCategory(category)">
+                    <Icon name="ph:trash-bold" class="text-lg" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </div>

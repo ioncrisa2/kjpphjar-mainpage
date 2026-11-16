@@ -4,9 +4,31 @@ useHead({ title: "Admin Galeri | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
 const toast = useToast()
+const viewMode = useAdminViewMode('gallery', 'grid')
+
+interface GalleryItem {
+  _id: string
+  filename: string
+  imageUrl: string
+  thumbnailUrl: string
+  uploadedAt?: string
+  createdAt?: string
+  title?: string
+  category?: string
+  isFeatured: boolean
+  order: number
+}
+
+interface GalleryResponse {
+  items: GalleryItem[]
+  total: number
+  page: number
+  totalPages: number
+  categories: string[]
+}
 
 const page = ref(1)
-const { data, refresh, pending } = await useFetch('/api/gallery', {
+const { data, refresh, pending } = await useFetch<GalleryResponse>('/api/gallery', {
   // admin=true: tanpa gallery.manage_all hanya foto milik sendiri yang dikembalikan.
   query: computed(() => ({ page: page.value, limit: 12, admin: 'true' }))
 })
@@ -93,6 +115,39 @@ async function submitEdit() {
 }
 
 const { ask } = useConfirm()
+const downloadingId = ref<string | null>(null)
+
+async function downloadPhoto(photo: any) {
+  const sourceUrl = photo.imageUrl || photo.thumbnailUrl
+  if (!sourceUrl) {
+    toast.error('URL gambar tidak tersedia.')
+    return
+  }
+
+  downloadingId.value = photo._id
+  try {
+    const filename = buildDownloadFilename({
+      title: photo.title,
+      filename: photo.filename,
+      url: sourceUrl,
+      fallbackBase: `galeri-${photo._id}`,
+    })
+    await downloadAssetUrl(sourceUrl, filename)
+  } catch {
+    toast.error('Gagal mengunduh gambar.')
+  } finally {
+    downloadingId.value = null
+  }
+}
+
+function formatUploadedDate(value?: string) {
+  if (!value) return '—'
+  return new Date(value).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
 
 async function deletePhoto(photo: any) {
   const confirmed = await ask({
@@ -114,24 +169,28 @@ async function deletePhoto(photo: any) {
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Galeri Foto</h1>
         <p class="mt-1 text-sm text-gray">Kelola foto kegiatan dan momen yang tampil di website.</p>
       </div>
-      <button v-if="can('gallery.create')" @click="uploadModalOpen = true" class="admin-btn-primary">
-        <Icon name="ph:upload-simple-bold" class="h-4 w-4" aria-hidden="true" />
-        <span>Upload Foto</span>
-      </button>
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
+        <button v-if="can('gallery.create')" @click="uploadModalOpen = true" class="admin-btn-primary">
+          <Icon name="ph:upload-simple-bold" class="h-4 w-4" aria-hidden="true" />
+          <span>Upload Foto</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Grid -->
+    <!-- Content -->
     <div v-if="pending" class="text-center py-10">Memuat...</div>
     <div v-else-if="!photos?.length" class="admin-card text-center py-16 text-gray">
       Belum ada foto di galeri. Klik "Upload Foto" untuk mulai menambahkan.
     </div>
 
-    <div v-else class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:gap-6">
+    <!-- Grid View -->
+    <div v-else-if="viewMode === 'grid'" class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:gap-6">
       <div v-for="photo in photos" :key="photo._id" class="admin-card !p-3 group flex flex-col">
         <div class="relative overflow-hidden rounded-xl bg-gray/5 pb-[75%]">
           <img
@@ -148,10 +207,112 @@ async function deletePhoto(photo: any) {
           <p class="font-bold text-black dark:text-white truncate" :title="photo.title">{{ photo.title || 'Tanpa Judul' }}</p>
           <p class="text-xs text-gray mt-1">{{ photo.category || 'Tanpa Kategori' }}</p>
         </div>
-        <div class="mt-3 flex items-center justify-between border-t border-gray/10 pt-3">
-          <button v-if="can('gallery.update')" class="text-xs font-bold text-primary hover:underline" @click="openEdit(photo)">Edit</button>
-          <button v-if="can('gallery.delete')" class="text-xs font-bold text-red-500 hover:underline" @click="deletePhoto(photo)">Hapus</button>
+        <div class="mt-3 flex items-center justify-between gap-2 border-t border-gray/10 pt-3">
+          <button
+            type="button"
+            class="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 hover:underline disabled:opacity-50 dark:text-emerald-400"
+            :disabled="downloadingId === photo._id"
+            :title="`Download ${photo.title || photo.filename || 'foto'}`"
+            @click="downloadPhoto(photo)"
+          >
+            <Icon name="ph:download-simple-bold" class="h-3.5 w-3.5" aria-hidden="true" />
+            <span>{{ downloadingId === photo._id ? 'Mengunduh...' : 'Download' }}</span>
+          </button>
+          <div class="flex items-center gap-3">
+            <button v-if="can('gallery.update')" type="button" class="text-xs font-bold text-primary hover:underline" @click="openEdit(photo)">Edit</button>
+            <button v-if="can('gallery.delete')" type="button" class="text-xs font-bold text-red-500 hover:underline" @click="deletePhoto(photo)">Hapus</button>
+          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Table View -->
+    <div v-else class="admin-card !p-0 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray/10">
+          <thead class="bg-gray/5">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Foto</th>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Kategori</th>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Sorotan</th>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Urutan</th>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Diunggah</th>
+              <th class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray/10 bg-white dark:bg-gray-dark">
+            <tr v-for="photo in photos" :key="photo._id" class="transition hover:bg-gray/5">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-gray/10">
+                    <img
+                      :src="photo.thumbnailUrl"
+                      :alt="photo.title || 'Foto'"
+                      class="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div class="min-w-0">
+                    <p class="max-w-xs truncate text-sm font-bold text-black dark:text-white" :title="photo.title">
+                      {{ photo.title || 'Tanpa Judul' }}
+                    </p>
+                    <p class="mt-0.5 max-w-xs truncate text-xs text-gray" :title="photo.filename">
+                      {{ photo.filename }}
+                    </p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-200">
+                {{ photo.category || 'Tanpa Kategori' }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  v-if="photo.isFeatured"
+                  class="inline-flex items-center gap-1 rounded-full bg-primary/20 px-2.5 py-0.5 text-xs font-bold text-black dark:text-primary"
+                >
+                  <Icon name="ph:star-fill" class="h-3 w-3" aria-hidden="true" />
+                  <span>Featured</span>
+                </span>
+                <span v-else class="text-xs text-gray">Reguler</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm tabular-nums text-gray">
+                {{ photo.order ?? 0 }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray">
+                {{ formatUploadedDate(photo.uploadedAt || photo.createdAt) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="inline-flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-1 font-semibold text-emerald-600 hover:underline disabled:opacity-50 dark:text-emerald-400"
+                    :disabled="downloadingId === photo._id"
+                    :title="`Download ${photo.title || photo.filename || 'foto'}`"
+                    @click="downloadPhoto(photo)"
+                  >
+                    <Icon name="ph:download-simple-bold" class="h-4 w-4" aria-hidden="true" />
+                    <span>Download</span>
+                  </button>
+                  <button
+                    v-if="can('gallery.update')"
+                    type="button"
+                    class="font-semibold text-primary hover:underline"
+                    @click="openEdit(photo)"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    v-if="can('gallery.delete')"
+                    type="button"
+                    class="font-semibold text-red-600 hover:underline dark:text-red-400"
+                    @click="deletePhoto(photo)"
+                  >
+                    Hapus
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 

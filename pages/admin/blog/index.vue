@@ -3,6 +3,7 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'blog.view' })
 useHead({ title: "Admin Blog | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
+const viewMode = useAdminViewMode('blog', 'table')
 // Tanpa blog.publish, artikel terbit/terjadwal dikunci (hanya editor yang bisa mengubah).
 function isLocked(article: Record<string, any>) {
   return !can('blog.publish') && article.status !== 'draft'
@@ -82,7 +83,8 @@ async function deleteItem(article: Record<string, any>) {
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Blog & artikel</h1>
         <p class="mt-1 text-sm text-gray">{{ can('blog.manage_all') ? 'Kelola publikasi, kategori, SEO, dan performa artikel.' : 'Artikel yang Anda tulis. Artikel baru disimpan sebagai draft sampai diterbitkan editor.' }}</p>
       </div>
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <AdminViewSwitcher v-model="viewMode" />
         <NuxtLink v-if="can('blog.categories')" to="/admin/blog/categories" class="admin-btn-ghost">
           <Icon name="ph:folders-bold" /> Kategori
         </NuxtLink>
@@ -135,7 +137,7 @@ async function deleteItem(article: Record<string, any>) {
         <button v-if="search || status || categoryId" type="button" class="admin-btn-ghost mt-5" @click="resetFilters">Reset filter</button>
         <NuxtLink v-else-if="can('blog.create')" to="/admin/blog/create" class="admin-btn-primary mt-5">Tulis artikel pertama</NuxtLink>
       </div>
-      <div v-else class="overflow-x-auto">
+      <div v-else-if="viewMode === 'table'" class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray/10">
           <thead class="bg-slate-50">
             <tr>
@@ -186,6 +188,51 @@ async function deleteItem(article: Record<string, any>) {
             </tr>
           </tbody>
         </table>
+      </div>
+      <div v-else class="grid gap-4 p-5 sm:grid-cols-2 xl:grid-cols-3">
+        <article
+          v-for="article in articles"
+          :key="article._id"
+          class="flex flex-col overflow-hidden rounded-xl border border-gray/15 bg-white transition hover:border-primary/40 dark:border-white/10 dark:bg-gray-dark"
+        >
+          <div class="relative aspect-[16/9] w-full overflow-hidden bg-slate-100 dark:bg-white/5">
+            <img v-if="article.coverImageUrl" :src="article.coverImageUrl" :alt="article.title" class="h-full w-full object-cover">
+            <div v-else class="flex h-full items-center justify-center text-slate-300">
+              <Icon name="ph:image-bold" class="text-3xl" />
+            </div>
+            <div class="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5">
+              <span class="inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-bold shadow-xs" :class="statusPresentation(article).class">
+                {{ statusPresentation(article).label }}
+              </span>
+              <span v-if="article.isFeatured" class="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-bold text-violet-800 shadow-xs">
+                Unggulan
+              </span>
+            </div>
+          </div>
+          <div class="flex flex-1 flex-col p-4">
+            <p class="text-xs font-semibold text-primary">{{ article.category?.name || 'Tanpa kategori' }}</p>
+            <h2 class="mt-1 line-clamp-2 text-base font-bold text-black dark:text-white" :title="article.title">{{ article.title }}</h2>
+            <p class="mt-1 truncate text-xs text-gray">/blog/{{ article.slug }}</p>
+            <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-gray">
+              <span>{{ article.views.toLocaleString('id-ID') }} views · {{ article.readingTime }} mnt</span>
+              <span v-if="article.publishedAt">{{ new Date(article.publishedAt).toLocaleDateString('id-ID', { dateStyle: 'medium' }) }}</span>
+            </div>
+            <div class="mt-4 flex items-center justify-end gap-1 border-t border-gray/10 pt-3">
+              <span v-if="isLocked(article)" class="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-gray" title="Artikel sudah terbit atau terjadwal; hanya editor yang bisa mengubahnya." :aria-label="`${article.title} terkunci`">
+                <Icon name="ph:lock-simple-bold" class="text-base" />
+                <span>Terkunci</span>
+              </span>
+              <NuxtLink v-else-if="can('blog.update')" :to="`/admin/blog/${article._id}`" class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold text-primary transition hover:bg-blue-50 dark:hover:bg-primary/10" :aria-label="`Edit ${article.title}`">
+                <Icon name="ph:pencil-simple-bold" class="text-base" />
+                <span>Edit</span>
+              </NuxtLink>
+              <button v-if="can('blog.delete') && !isLocked(article)" type="button" class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-bold text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10" :aria-label="`Hapus ${article.title}`" @click="deleteItem(article)">
+                <Icon name="ph:trash-bold" class="text-base" />
+                <span>Hapus</span>
+              </button>
+            </div>
+          </div>
+        </article>
       </div>
 
       <footer v-if="data?.totalPages && data.totalPages > 1" class="flex items-center justify-between border-t border-gray/10 px-6 py-4">

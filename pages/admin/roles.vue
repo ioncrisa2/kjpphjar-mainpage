@@ -16,6 +16,7 @@ interface RoleRow {
 
 const { data: rolesData, refresh, pending } = await useFetch<{ items: RoleRow[] }>('/api/admin/roles')
 const { data: catalog } = await useFetch<{ groups: PermissionGroup[] }>('/api/admin/permissions')
+const viewMode = useAdminViewMode('roles', 'grid')
 
 const roles = computed(() => rolesData.value?.items || [])
 const groups = computed(() => catalog.value?.groups || [])
@@ -125,11 +126,14 @@ async function deleteRole(role: RoleRow) {
           Kelola pengguna dan role selalu khusus Super Admin.
         </p>
       </div>
-      <button class="admin-btn-primary" @click="openAdd">+ Tambah Role</button>
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
+        <button class="admin-btn-primary" @click="openAdd">+ Tambah Role</button>
+      </div>
     </div>
 
     <div v-if="pending" class="admin-card text-center text-gray-500">Memuat data...</div>
-    <div v-else class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div v-else-if="viewMode === 'grid'" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       <article v-for="role in roles" :key="role._id" class="admin-card flex flex-col gap-3">
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0">
@@ -171,6 +175,62 @@ async function deleteRole(role: RoleRow) {
           </button>
         </div>
       </article>
+    </div>
+    <div v-else class="admin-card !p-0 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray/10">
+          <thead class="bg-gray/5">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Role</th>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Deskripsi</th>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Izin Akses</th>
+              <th class="px-6 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Pengguna</th>
+              <th class="px-6 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray/10 bg-white dark:bg-gray-dark">
+            <tr v-for="role in roles" :key="role._id" class="hover:bg-gray/5">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-bold text-black dark:text-white">{{ role.name }}</div>
+                <div class="text-xs text-gray">{{ role.key }}</div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray max-w-xs">
+                <span class="line-clamp-2">{{ role.description || '—' }}</span>
+              </td>
+              <td class="px-6 py-4">
+                <span v-if="role.isSystem" class="inline-flex rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-bold text-violet-800 dark:bg-violet-500/20 dark:text-violet-200">
+                  Akses Penuh (Sistem)
+                </span>
+                <span v-else class="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                  {{ role.permissions.length }} izin dipilih
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold"
+                  :class="role.isSystem ? 'bg-violet-100 text-violet-800' : 'bg-stone-100 text-stone-700'"
+                >
+                  {{ role.userCount }} pengguna
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <template v-if="!role.isSystem">
+                  <button class="mr-4 font-semibold text-primary hover:underline" @click="openEdit(role)">Edit</button>
+                  <button
+                    class="font-semibold text-red-600 hover:underline disabled:cursor-not-allowed disabled:opacity-40 dark:text-red-400"
+                    :disabled="role.userCount > 0"
+                    :title="role.userCount > 0 ? 'Masih dipakai pengguna' : ''"
+                    @click="deleteRole(role)"
+                  >
+                    Hapus
+                  </button>
+                </template>
+                <span v-else class="text-xs text-gray">Terkunci</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <UiModal v-model="modalOpen" :title="editing ? `Edit Role — ${editing.name}` : 'Tambah Role'" size="xl">

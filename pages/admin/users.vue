@@ -18,6 +18,7 @@ interface UserRow {
 
 const { session } = useAdminAuth()
 const toast = useToast()
+const viewMode = useAdminViewMode('users', 'table')
 const { data: usersData, refresh, pending } = await useFetch<{ items: UserRow[] }>('/api/admin/users')
 const { data: rolesData } = await useFetch<{ items: Array<{ key: string; name: string }> }>('/api/admin/roles')
 const { data: leaders } = await useFetch<any[]>('/api/leaders')
@@ -180,13 +181,16 @@ async function deleteUser(user: UserRow) {
           <NuxtLink to="/admin/roles" class="font-semibold text-primary hover:underline">Role & Hak Akses</NuxtLink>.
         </p>
       </div>
-      <button class="admin-btn-primary" @click="openAdd">+ Tambah Pengguna</button>
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
+        <button class="admin-btn-primary" @click="openAdd">+ Tambah Pengguna</button>
+      </div>
     </div>
 
-    <div class="admin-card overflow-hidden !p-0">
-      <div v-if="pending" class="p-6 text-center text-gray-500">Memuat data...</div>
-      <div v-else-if="!users.length" class="p-6 text-center text-gray-500">Belum ada pengguna.</div>
-      <div v-else class="overflow-x-auto">
+    <div v-if="pending" class="admin-card p-6 text-center text-gray-500">Memuat data...</div>
+    <div v-else-if="!users.length" class="admin-card p-6 text-center text-gray-500">Belum ada pengguna.</div>
+    <div v-else-if="viewMode === 'table'" class="admin-card overflow-hidden !p-0">
+      <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray/10">
           <thead class="bg-gray/5">
             <tr>
@@ -232,6 +236,44 @@ async function deleteUser(user: UserRow) {
           </tbody>
         </table>
       </div>
+    </div>
+    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <article v-for="user in users" :key="user._id" class="admin-card flex flex-col gap-3">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h2 class="truncate text-base font-extrabold text-black dark:text-white" :title="user.name">
+              {{ user.name }}
+              <span v-if="user._id === session?.id" class="ml-1 text-xs font-semibold text-primary">(Anda)</span>
+            </h2>
+            <p class="truncate text-xs text-gray">{{ user.username }}</p>
+          </div>
+          <UiActionMenu :items="userActions(user)" :label="`Aksi untuk ${user.name}`" />
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span
+            class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold"
+            :class="user.isSuperAdmin ? 'bg-violet-100 text-violet-800' : 'bg-stone-100 text-stone-700'"
+          >
+            {{ user.roleName }}
+          </span>
+          <span
+            class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold"
+            :class="user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+          >
+            {{ user.isActive ? 'Aktif' : 'Nonaktif' }}
+          </span>
+        </div>
+        <div class="space-y-1 rounded-xl bg-gray/5 p-3 text-xs">
+          <div class="flex justify-between gap-2">
+            <span class="text-gray">Penulis Artikel</span>
+            <span class="truncate font-semibold text-black dark:text-white">{{ user.leader?.name || '—' }}</span>
+          </div>
+          <div class="flex justify-between gap-2">
+            <span class="text-gray">Login Terakhir</span>
+            <span class="font-semibold text-black dark:text-white">{{ formatDate(user.lastLoginAt) }}</span>
+          </div>
+        </div>
+      </article>
     </div>
 
     <!-- Modal tambah / ubah -->

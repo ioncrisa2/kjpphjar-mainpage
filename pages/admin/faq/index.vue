@@ -3,8 +3,17 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'faq.view' })
 useHead({ title: "Admin FAQ | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
+const viewMode = useAdminViewMode('faq', 'table')
 
-const { data: faqsResponse, refresh, pending } = await useFetch('/api/faq', { query: { admin: 'true' } })
+interface FaqItem {
+  _id: string
+  question: string
+  answer?: string
+  order: number
+  isActive: boolean
+}
+
+const { data: faqsResponse, refresh, pending } = await useFetch<FaqItem[]>('/api/faq', { query: { admin: 'true' } })
 const faqs = computed(() => faqsResponse.value || [])
 
 const saving = ref(false)
@@ -23,7 +32,7 @@ async function deleteItem(faq: any) {
   })
   if (!confirmed) return
   try {
-    await $fetch(`/api/faq/${faq._id}`, { method: 'DELETE' })
+    await $fetch(`/api/faq/${faq._id}` as string, { method: 'DELETE' })
     toast.success('FAQ berhasil dihapus.')
     refresh()
   } catch (err) {
@@ -89,23 +98,28 @@ async function saveOrder(items: any[]) {
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Q&A (FAQ)</h1>
-        <p class="mt-1 text-sm text-gray">Kelola pertanyaan yang sering diajukan. Anda bisa drag & drop (geser) baris di bawah untuk mengatur urutannya.</p>
+        <p class="mt-1 text-sm text-gray">Kelola pertanyaan yang sering diajukan. Anda bisa drag & drop (geser) {{ viewMode === 'table' ? 'baris' : 'kartu' }} di bawah untuk mengatur urutannya.</p>
       </div>
-      <NuxtLink v-if="can('faq.create')" to="/admin/faq/create" class="admin-btn-primary">
-        + Tambah Pertanyaan
-      </NuxtLink>
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
+        <NuxtLink v-if="can('faq.create')" to="/admin/faq/create" class="admin-btn-primary">
+          + Tambah Pertanyaan
+        </NuxtLink>
+      </div>
     </div>
 
-    <!-- Table -->
-    <div class="admin-card overflow-hidden">
-      <div v-if="pending" class="p-6 text-center text-gray-500">Memuat data...</div>
-      <div v-else-if="!faqs?.length" class="p-6 text-center text-gray-500">
-        Belum ada data FAQ.
-      </div>
-      <div v-else class="overflow-x-auto">
+    <!-- Content -->
+    <div v-if="pending" class="admin-card p-6 text-center text-gray-500">Memuat data...</div>
+    <div v-else-if="!faqs?.length" class="admin-card p-6 text-center text-gray-500">
+      Belum ada data FAQ.
+    </div>
+
+    <!-- Table View -->
+    <div v-else-if="viewMode === 'table'" class="admin-card !p-0 overflow-hidden">
+      <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray/10">
           <thead class="bg-gray/5">
             <tr>
@@ -123,13 +137,14 @@ async function saveOrder(items: any[]) {
                 @dragleave="onDragLeave(index, $event)"
                 @drop="onDrop(index, $event)"
                 :class="[
-                  'cursor-move transition-all duration-200',
+                  'transition-all duration-200',
+                  can('faq.update') ? 'cursor-move' : '',
                   draggedIndex === index ? 'opacity-50 bg-stone-50 dark:bg-white/5' : 'hover:bg-gray/5',
                   dragOverIndex === index && draggedIndex !== index ? 'border-t-2 border-t-primary bg-primary/5' : ''
                 ]">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                  <Icon name="ph:dots-six-vertical-bold" class="h-5 w-5 shrink-0 cursor-move text-gray-400" aria-hidden="true" />
+                  <Icon v-if="can('faq.update')" name="ph:dots-six-vertical-bold" class="h-5 w-5 shrink-0 cursor-move text-gray-400" aria-hidden="true" />
                   <div>
                     <div class="font-bold text-black dark:text-white line-clamp-2">{{ faq.question }}</div>
                   </div>
@@ -150,6 +165,39 @@ async function saveOrder(items: any[]) {
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- Grid View -->
+    <div v-else class="grid gap-4 sm:grid-cols-2">
+      <article
+        v-for="(faq, index) in faqs"
+        :key="faq._id"
+        :draggable="can('faq.update')"
+        @dragstart="onDragStart(index, $event)"
+        @dragover="onDragOver(index, $event)"
+        @dragleave="onDragLeave(index, $event)"
+        @drop="onDrop(index, $event)"
+        :class="[
+          'admin-card flex flex-col gap-3 transition-all duration-200',
+          can('faq.update') ? 'cursor-move' : '',
+          draggedIndex === index ? 'opacity-50 ring-2 ring-primary ring-offset-2' : '',
+          dragOverIndex === index && draggedIndex !== index ? 'ring-2 ring-primary/60 ring-offset-2 bg-primary/5' : ''
+        ]"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <Icon v-if="can('faq.update')" name="ph:dots-six-vertical-bold" class="h-5 w-5 shrink-0 text-gray-400" aria-hidden="true" />
+            <span class="rounded-md bg-gray/10 px-2 py-0.5 text-xs font-bold tabular-nums text-gray">#{{ index + 1 }}</span>
+          </div>
+          <span v-if="faq.isActive" class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
+          <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
+        </div>
+        <h2 class="line-clamp-3 text-base font-bold text-black dark:text-white">{{ faq.question }}</h2>
+        <div class="mt-auto flex items-center justify-end gap-4 border-t border-gray/10 pt-3 text-sm font-medium">
+          <NuxtLink v-if="can('faq.update')" :to="`/admin/faq/${faq._id}`" class="font-semibold text-primary hover:underline">Edit</NuxtLink>
+          <button v-if="can('faq.delete')" type="button" class="font-semibold text-red-600 hover:underline dark:text-red-400" @click="deleteItem(faq)">Hapus</button>
+        </div>
+      </article>
     </div>
   </div>
 </template>

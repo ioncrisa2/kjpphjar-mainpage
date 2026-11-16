@@ -4,8 +4,21 @@ useHead({ title: "Admin Karir | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
 const toast = useToast()
+const viewMode = useAdminViewMode('careers', 'table')
 
-const { data: careers, refresh, pending } = await useFetch('/api/careers?admin=true')
+interface CareerItem {
+  _id: string
+  title: string
+  location: string
+  type: string
+  description?: string
+  requirements?: string[]
+  postedAt: string
+  closingDate?: string | null
+  isActive: boolean
+}
+
+const { data: careers, refresh, pending } = await useFetch<CareerItem[]>('/api/careers?admin=true')
 
 const modalOpen = ref(false)
 const saving = ref(false)
@@ -108,23 +121,28 @@ async function deleteItem(career: any) {
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Karir / Lowongan</h1>
         <p class="mt-1 text-sm text-gray">Kelola informasi lowongan pekerjaan.</p>
       </div>
-      <button v-if="can('careers.create')" @click="openAdd" class="admin-btn-primary">
-        + Tambah Lowongan
-      </button>
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
+        <button v-if="can('careers.create')" @click="openAdd" class="admin-btn-primary">
+          + Tambah Lowongan
+        </button>
+      </div>
     </div>
 
-    <!-- Table -->
-    <div class="admin-card overflow-hidden">
-      <div v-if="pending" class="p-6 text-center text-gray-500">Memuat data...</div>
-      <div v-else-if="!careers?.length" class="p-6 text-center text-gray-500">
-        Belum ada lowongan pekerjaan.
-      </div>
-      <div v-else class="overflow-x-auto">
+    <!-- Content -->
+    <div v-if="pending" class="admin-card p-6 text-center text-gray-500">Memuat data...</div>
+    <div v-else-if="!careers?.length" class="admin-card p-6 text-center text-gray-500">
+      Belum ada lowongan pekerjaan.
+    </div>
+
+    <!-- Table View -->
+    <div v-else-if="viewMode === 'table'" class="admin-card !p-0 overflow-hidden">
+      <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray/10">
           <thead class="bg-gray/5">
             <tr>
@@ -159,6 +177,31 @@ async function deleteItem(career: any) {
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- Grid View -->
+    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <article v-for="career in careers" :key="career._id" class="admin-card flex flex-col gap-3">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h2 class="line-clamp-2 text-base font-extrabold text-black dark:text-white" :title="career.title">{{ career.title }}</h2>
+            <p class="mt-1 text-xs text-gray">Dibuat: {{ new Date(career.postedAt).toLocaleDateString('id-ID') }}</p>
+          </div>
+          <UiActionMenu v-if="careerActions(career).length" :items="careerActions(career)" :label="`Aksi untuk ${career.title}`" />
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="rounded-full bg-primary/15 px-2.5 py-0.5 font-bold text-black dark:text-primary">{{ career.type }}</span>
+          <span class="inline-flex items-center gap-1 text-gray">
+            <Icon name="ph:map-pin-bold" class="h-3.5 w-3.5" aria-hidden="true" />
+            {{ career.location }}
+          </span>
+        </div>
+        <div class="mt-auto flex items-center justify-between border-t border-gray/10 pt-3 text-xs">
+          <span class="text-gray">Tutup: {{ career.closingDate ? new Date(career.closingDate).toLocaleDateString('id-ID') : 'Tidak Ada Batas' }}</span>
+          <span v-if="career.isActive" class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
+          <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
+        </div>
+      </article>
     </div>
 
     <!-- Modal Form -->

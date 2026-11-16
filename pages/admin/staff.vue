@@ -4,6 +4,7 @@ useHead({ title: "Admin Staff | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
 const toast = useToast()
+const viewMode = useAdminViewMode('staff', 'table')
 
 const { data: staffList, refresh, pending } = await useFetch<any[]>('/api/staff', { query: { admin: 'true' } })
 const { data: branches } = await useFetch<any[]>('/api/branches')
@@ -129,14 +130,17 @@ async function deleteItem(staff: any) {
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Staff</h1>
         <p class="mt-1 text-sm text-gray">Daftar staff kantor pusat maupun cabang. Staff aktif ditampilkan di halaman Tentang Kami dan Kontak.</p>
       </div>
-      <button v-if="can('staff.create')" @click="openAdd" class="admin-btn-primary">
-        + Tambah Staff
-      </button>
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
+        <button v-if="can('staff.create')" @click="openAdd" class="admin-btn-primary">
+          + Tambah Staff
+        </button>
+      </div>
     </div>
 
     <!-- Filter -->
@@ -157,16 +161,16 @@ async function deleteItem(staff: any) {
       </div>
     </section>
 
-    <!-- Table -->
-    <div class="admin-card overflow-hidden">
-      <div v-if="pending" class="p-6 text-center text-gray-500">Memuat data...</div>
-      <div v-else-if="!staffList?.length" class="p-6 text-center text-gray-500">
-        Belum ada data staff.
-      </div>
-      <div v-else-if="!filteredStaff.length" class="p-6 text-center text-gray-500">
-        Tidak ada staff yang cocok dengan filter.
-      </div>
-      <div v-else class="overflow-x-auto">
+    <!-- Content -->
+    <div v-if="pending" class="admin-card p-6 text-center text-gray-500">Memuat data...</div>
+    <div v-else-if="!staffList?.length" class="admin-card p-6 text-center text-gray-500">
+      Belum ada data staff.
+    </div>
+    <div v-else-if="!filteredStaff.length" class="admin-card p-6 text-center text-gray-500">
+      Tidak ada staff yang cocok dengan filter.
+    </div>
+    <div v-else-if="viewMode === 'table'" class="admin-card overflow-hidden">
+      <div class="overflow-x-auto">
         <p class="pb-3 text-xs text-gray">{{ filteredStaff.length }} dari {{ staffList?.length }} staff</p>
         <table class="min-w-full divide-y divide-gray/10">
           <thead class="bg-gray/5">
@@ -200,6 +204,30 @@ async function deleteItem(staff: any) {
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+    <div v-else class="space-y-3">
+      <p class="text-xs text-gray">{{ filteredStaff.length }} dari {{ staffList?.length }} staff</p>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <article v-for="staff in filteredStaff" :key="staff._id" class="admin-card flex flex-col gap-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <h2 class="truncate text-base font-extrabold text-black dark:text-white" :title="staff.name">{{ staff.name }}</h2>
+              <p class="truncate text-xs font-semibold text-gray" :title="staff.position">{{ staff.position }}</p>
+            </div>
+            <UiActionMenu v-if="staffActions(staff).length" :items="staffActions(staff)" :label="`Aksi untuk ${staff.name}`" />
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span v-if="staff.branchId" class="inline-flex rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-200">{{ staff.branchId.name }}</span>
+            <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Kantor terhapus</span>
+            <span v-if="staff.mappiNumber" class="text-xs text-gray">MAPPI: {{ staff.mappiNumber }}</span>
+          </div>
+          <div class="mt-auto flex items-center justify-between border-t border-gray/10 pt-3">
+            <span class="text-xs tabular-nums text-gray">Urutan: {{ staff.order || 0 }}</span>
+            <span v-if="staff.isActive !== false" class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
+            <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
+          </div>
+        </article>
       </div>
     </div>
 

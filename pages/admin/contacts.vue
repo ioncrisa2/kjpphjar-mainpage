@@ -3,17 +3,38 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'contacts.view
 useHead({ title: "Inbox Pesan | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
+const viewMode = useAdminViewMode('contacts', 'table')
+
+interface ContactRow {
+  _id: string
+  fullname: string
+  email: string
+  message: string
+  submittedAt: string
+  phone?: string
+  city?: string
+  isRead: boolean
+  branch?: string
+}
+
+interface ContactsResponse {
+  items: ContactRow[]
+  total: number
+  unread: number
+  page: number
+  totalPages: number
+}
 
 const page = ref(1)
 const showUnreadOnly = ref(false)
 
 const query = computed(() => {
-  const q: any = { page: page.value, limit: 10 }
+  const q: Record<string, string | number> = { page: page.value, limit: 10 }
   if (showUnreadOnly.value) q.isRead = 'false'
   return q
 })
 
-const { data, refresh, pending } = await useFetch('/api/contacts', { query })
+const { data, refresh, pending } = await useFetch<ContactsResponse>('/api/contacts', { query })
 
 const { unreadCount, setUnreadCount, decrementUnread } = useUnreadContacts()
 
@@ -29,10 +50,10 @@ watch(
 
 const contacts = computed(() => data.value?.items || [])
 
-const selectedContact = ref<any>(null)
+const selectedContact = ref<ContactRow | null>(null)
 const detailModalOpen = ref(false)
 
-async function openDetail(contact: any) {
+async function openDetail(contact: ContactRow) {
   selectedContact.value = contact
   detailModalOpen.value = true
   
@@ -65,9 +86,11 @@ watch(showUnreadOnly, () => {
         <p class="mt-1 text-sm text-gray">Pesan dari pengunjung website via form Contact Us.</p>
       </div>
 
-      <!-- Export to Excel Button -->
-      <div v-if="can('contacts.export')">
+      <!-- Actions & View Switcher -->
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
         <a
+          v-if="can('contacts.export')"
           href="/api/contacts/export"
           download
           class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700"
@@ -93,13 +116,13 @@ watch(showUnreadOnly, () => {
       </div>
     </div>
 
-    <!-- Table -->
-    <div class="admin-card overflow-hidden">
+    <!-- Content -->
+    <div class="admin-card !p-0 overflow-hidden">
       <div v-if="pending" class="p-6 text-center text-gray-500">Memuat data...</div>
       <div v-else-if="!contacts?.length" class="p-6 text-center text-gray-500">
         Belum ada pesan.
       </div>
-      <div v-else class="overflow-x-auto">
+      <div v-else-if="viewMode === 'table'" class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray/10">
           <thead class="bg-gray/5">
             <tr>
@@ -133,6 +156,36 @@ watch(showUnreadOnly, () => {
             </tr>
           </tbody>
         </table>
+      </div>
+      <div v-else class="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3">
+        <article
+          v-for="contact in contacts"
+          :key="contact._id"
+          class="flex flex-col gap-3 rounded-xl border p-4 transition"
+          :class="contact.isRead ? 'border-gray/15 bg-white dark:border-white/10 dark:bg-gray-dark' : 'border-primary/40 bg-primary/5 dark:bg-primary/10'"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span v-if="!contact.isRead" class="h-2 w-2 shrink-0 rounded-full bg-primary" title="Belum dibaca"></span>
+                <h2 class="truncate text-sm font-extrabold text-black dark:text-white" :title="contact.fullname">{{ contact.fullname }}</h2>
+              </div>
+              <p v-if="contact.city" class="mt-0.5 text-xs text-gray">{{ contact.city }}</p>
+            </div>
+            <span class="shrink-0 text-[11px] tabular-nums text-gray">
+              {{ new Date(contact.submittedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }}
+            </span>
+          </div>
+          <div class="space-y-0.5 text-xs">
+            <p class="truncate text-black dark:text-gray-200">{{ contact.email }}</p>
+            <p v-if="contact.phone" class="text-gray">{{ contact.phone }}</p>
+          </div>
+          <p class="line-clamp-3 flex-1 text-xs leading-relaxed text-gray-700 dark:text-gray-300">{{ contact.message }}</p>
+          <div class="mt-auto flex items-center justify-between border-t border-gray/10 pt-3">
+            <span class="text-[11px] text-gray">{{ new Date(contact.submittedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }}</span>
+            <button type="button" class="text-xs font-bold text-primary hover:underline" @click="openDetail(contact)">Buka Pesan</button>
+          </div>
+        </article>
       </div>
       
       <!-- Pagination -->

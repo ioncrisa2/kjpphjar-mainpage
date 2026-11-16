@@ -3,8 +3,17 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'contact_perso
 
 const { can } = useAdminAuth()
 const toast = useToast()
+const viewMode = useAdminViewMode('contact-persons', 'table')
 
-const { data: contacts, refresh } = await useFetch('/api/contact-persons')
+interface ContactPersonItem {
+  _id: string
+  name: string
+  phone: string
+  order?: number
+  isActive: boolean
+}
+
+const { data: contacts, refresh } = await useFetch<ContactPersonItem[]>('/api/contact-persons')
 
 const isModalOpen = ref(false)
 const isSubmitting = ref(false)
@@ -123,22 +132,25 @@ const onDrop = async (dropIndex: number) => {
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Manajemen Kontak Footer</h1>
         <p class="mt-1 text-sm text-gray">Kelola daftar contact person yang tampil di footer website publik.</p>
       </div>
-      <button v-if="can('contact_persons.create')" @click="openAddModal" class="admin-btn-primary">
-        <Icon name="ph:plus-bold" class="h-4 w-4" aria-hidden="true" />
-        <span>Tambah Kontak</span>
-      </button>
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
+        <button v-if="can('contact_persons.create')" @click="openAddModal" class="admin-btn-primary">
+          <Icon name="ph:plus-bold" class="h-4 w-4" aria-hidden="true" />
+          <span>Tambah Kontak</span>
+        </button>
+      </div>
     </div>
 
     <!-- Instructions -->
     <div class="flex items-start gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4 text-black dark:bg-primary/10 dark:text-gray-200">
       <Icon name="ph:info-bold" class="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
       <p class="text-sm leading-relaxed">
-        Kontak yang ditambahkan di sini akan ditampilkan secara otomatis pada bagian footer (bawah) dari setiap halaman website publik. Anda bisa mengurutkan daftar kontak dengan cara menarik dan melepas baris (Drag &amp; Drop).
+        Kontak yang ditambahkan di sini akan ditampilkan secara otomatis pada bagian footer (bawah) dari setiap halaman website publik. Anda bisa mengurutkan daftar kontak dengan cara menarik dan melepas {{ viewMode === 'table' ? 'baris' : 'kartu' }} (Drag &amp; Drop).
       </p>
     </div>
 
     <!-- Contacts Table -->
-    <div class="admin-card !p-0 overflow-hidden">
+    <div v-if="viewMode === 'table'" class="admin-card !p-0 overflow-hidden">
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray/10">
           <thead class="bg-gray/5">
@@ -162,11 +174,11 @@ const onDrop = async (dropIndex: number) => {
               @dragstart="onDragStart(index)"
               @dragover.prevent
               @drop="onDrop(index)"
-              class="cursor-move transition-colors hover:bg-gray/5"
-              :class="{ 'opacity-50': draggedIndex === index }"
+              class="transition-colors hover:bg-gray/5"
+              :class="{ 'cursor-move': can('contact_persons.update'), 'opacity-50': draggedIndex === index }"
             >
               <td class="px-6 py-4 whitespace-nowrap text-gray-400">
-                <Icon name="ph:dots-six-vertical-bold" class="h-5 w-5 cursor-move" aria-hidden="true" />
+                <Icon v-if="can('contact_persons.update')" name="ph:dots-six-vertical-bold" class="h-5 w-5 cursor-move" aria-hidden="true" />
               </td>
               <td class="px-6 py-4">
                 <div class="font-bold text-black dark:text-white">{{ item.name }}</div>
@@ -187,6 +199,46 @@ const onDrop = async (dropIndex: number) => {
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Contacts Grid -->
+    <div v-else>
+      <div v-if="!items || items.length === 0" class="admin-card px-6 py-12 text-center text-sm text-gray">
+        Belum ada data kontak. Silakan tambah baru.
+      </div>
+      <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <article
+          v-for="(item, index) in items"
+          :key="item._id"
+          :draggable="can('contact_persons.update')"
+          @dragstart="onDragStart(index)"
+          @dragover.prevent
+          @drop="onDrop(index)"
+          class="admin-card flex flex-col gap-3 transition-all"
+          :class="{ 'cursor-move': can('contact_persons.update'), 'opacity-50 ring-2 ring-primary': draggedIndex === index }"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-2 min-w-0">
+              <Icon v-if="can('contact_persons.update')" name="ph:dots-six-vertical-bold" class="h-5 w-5 shrink-0 text-gray-400" aria-hidden="true" />
+              <h2 class="truncate text-base font-bold text-black dark:text-white" :title="item.name">{{ item.name }}</h2>
+            </div>
+            <span
+              class="shrink-0 inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold"
+              :class="item.isActive ? 'bg-green-100 text-green-800 dark:bg-green-500/20 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-300'"
+            >
+              {{ item.isActive ? 'Aktif' : 'Tidak Aktif' }}
+            </span>
+          </div>
+          <p class="inline-flex items-center gap-2 text-sm text-gray">
+            <Icon name="ph:phone-bold" class="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <span>{{ item.phone }}</span>
+          </p>
+          <div class="mt-auto flex items-center justify-end gap-4 border-t border-gray/10 pt-3 text-sm font-medium">
+            <button v-if="can('contact_persons.update')" type="button" class="font-semibold text-primary hover:underline" @click="openEditModal(item)">Edit</button>
+            <button v-if="can('contact_persons.delete')" type="button" class="font-semibold text-red-600 hover:underline dark:text-red-400" @click="deleteContact(item)">Hapus</button>
+          </div>
+        </article>
       </div>
     </div>
 

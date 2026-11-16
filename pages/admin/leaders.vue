@@ -4,8 +4,21 @@ useHead({ title: "Admin Pimpinan | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
 const toast = useToast()
+const viewMode = useAdminViewMode('leaders', 'table')
 
-const { data: leaders, refresh, pending } = await useFetch('/api/leaders')
+interface LeaderItem {
+  _id: string
+  name: string
+  position: string
+  bio?: string
+  photoUrl: string
+  mappiNumber?: string
+  publicValuerLicense?: string
+  order: number
+  isActive: boolean
+}
+
+const { data: leaders, refresh, pending } = await useFetch<LeaderItem[]>('/api/leaders')
 
 const modalOpen = ref(false)
 const saving = ref(false)
@@ -128,23 +141,28 @@ async function deleteItem(leader: any) {
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Pimpinan</h1>
         <p class="mt-1 text-sm text-gray">Kelola profil pimpinan KJPP HJA'R.</p>
       </div>
-      <button v-if="can('leaders.create')" @click="openAdd" class="admin-btn-primary">
-        + Tambah Pimpinan
-      </button>
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
+        <button v-if="can('leaders.create')" @click="openAdd" class="admin-btn-primary">
+          + Tambah Pimpinan
+        </button>
+      </div>
     </div>
 
-    <!-- Table -->
-    <div class="admin-card overflow-hidden">
-      <div v-if="pending" class="p-6 text-center text-gray-500">Memuat data...</div>
-      <div v-else-if="!leaders?.length" class="p-6 text-center text-gray-500">
-        Belum ada data pimpinan.
-      </div>
-      <div v-else class="overflow-x-auto">
+    <!-- Content -->
+    <div v-if="pending" class="admin-card p-6 text-center text-gray-500">Memuat data...</div>
+    <div v-else-if="!leaders?.length" class="admin-card p-6 text-center text-gray-500">
+      Belum ada data pimpinan.
+    </div>
+
+    <!-- Table View -->
+    <div v-else-if="viewMode === 'table'" class="admin-card !p-0 overflow-hidden">
+      <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray/10">
           <thead class="bg-gray/5">
             <tr>
@@ -189,6 +207,37 @@ async function deleteItem(leader: any) {
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- Grid View -->
+    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <article v-for="leader in leaders" :key="leader._id" class="admin-card flex flex-col gap-4">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <img class="h-14 w-14 shrink-0 rounded-full object-cover ring-2 ring-primary/20" :src="leader.photoUrl" :alt="leader.name">
+            <div class="min-w-0">
+              <h2 class="truncate text-base font-extrabold text-black dark:text-white" :title="leader.name">{{ leader.name }}</h2>
+              <p class="truncate text-xs font-semibold text-gray" :title="leader.position">{{ leader.position }}</p>
+            </div>
+          </div>
+          <UiActionMenu v-if="leaderActions(leader).length" :items="leaderActions(leader)" :label="`Aksi untuk ${leader.name}`" />
+        </div>
+        <div class="space-y-1 rounded-xl bg-gray/5 p-3 text-xs">
+          <div class="flex justify-between gap-2">
+            <span class="text-gray">No. MAPPI</span>
+            <span class="font-semibold text-black dark:text-white">{{ leader.mappiNumber || '-' }}</span>
+          </div>
+          <div class="flex justify-between gap-2">
+            <span class="text-gray">Ijin PP</span>
+            <span class="font-semibold text-black dark:text-white">{{ leader.publicValuerLicense || '-' }}</span>
+          </div>
+        </div>
+        <div class="mt-auto flex items-center justify-between border-t border-gray/10 pt-3">
+          <span class="text-xs tabular-nums text-gray">Urutan: {{ leader.order }}</span>
+          <span v-if="leader.isActive" class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
+          <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
+        </div>
+      </article>
     </div>
 
     <!-- Modal Form -->

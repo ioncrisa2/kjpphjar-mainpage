@@ -3,8 +3,18 @@ definePageMeta({ layout: 'admin', middleware: 'auth', permission: 'services.view
 useHead({ title: "Admin Layanan | KJPP HJA'R" })
 
 const { can } = useAdminAuth()
+const viewMode = useAdminViewMode('services', 'table')
 
-const { data: servicesResponse, refresh, pending } = await useFetch('/api/services')
+interface ServiceItem {
+  _id: string
+  title: string
+  slug: string
+  icon?: string
+  order?: number
+  isActive: boolean
+}
+
+const { data: servicesResponse, refresh, pending } = await useFetch<ServiceItem[]>('/api/services')
 const services = computed(() => servicesResponse.value || [])
 
 const saving = ref(false)
@@ -23,7 +33,7 @@ async function deleteItem(service: any) {
   })
   if (!confirmed) return
   try {
-    await $fetch(`/api/services/${service._id}`, { method: 'DELETE' })
+    await $fetch(`/api/services/${service._id}` as string, { method: 'DELETE' })
     toast.success('Layanan berhasil dihapus.')
     refresh()
   } catch (err) {
@@ -90,23 +100,28 @@ async function saveOrder(items: any[]) {
 
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Layanan Kami</h1>
-        <p class="mt-1 text-sm text-gray">Kelola informasi layanan. Anda bisa drag & drop (geser) baris di bawah untuk mengatur urutannya.</p>
+        <p class="mt-1 text-sm text-gray">Kelola informasi layanan. Anda bisa drag & drop (geser) {{ viewMode === 'table' ? 'baris' : 'kartu' }} di bawah untuk mengatur urutannya.</p>
       </div>
-      <NuxtLink v-if="can('services.create')" to="/admin/services/create" class="admin-btn-primary">
-        + Tambah Layanan
-      </NuxtLink>
+      <div class="flex flex-wrap items-center gap-3">
+        <AdminViewSwitcher v-model="viewMode" />
+        <NuxtLink v-if="can('services.create')" to="/admin/services/create" class="admin-btn-primary">
+          + Tambah Layanan
+        </NuxtLink>
+      </div>
     </div>
 
-    <!-- Table -->
-    <div class="admin-card overflow-hidden">
-      <div v-if="pending" class="p-6 text-center text-gray-500">Memuat data...</div>
-      <div v-else-if="!services?.length" class="p-6 text-center text-gray-500">
-        Belum ada data layanan.
-      </div>
-      <div v-else class="overflow-x-auto">
+    <!-- Content -->
+    <div v-if="pending" class="admin-card p-6 text-center text-gray-500">Memuat data...</div>
+    <div v-else-if="!services?.length" class="admin-card p-6 text-center text-gray-500">
+      Belum ada data layanan.
+    </div>
+
+    <!-- Table View -->
+    <div v-else-if="viewMode === 'table'" class="admin-card !p-0 overflow-hidden">
+      <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray/10">
           <thead class="bg-gray/5">
             <tr>
@@ -125,13 +140,14 @@ async function saveOrder(items: any[]) {
                 @dragleave="onDragLeave(index, $event)"
                 @drop="onDrop(index, $event)"
                 :class="[
-                  'cursor-move transition-all duration-200',
+                  'transition-all duration-200',
+                  can('services.update') ? 'cursor-move' : '',
                   draggedIndex === index ? 'opacity-50 bg-stone-50 dark:bg-white/5' : 'hover:bg-gray/5',
                   dragOverIndex === index && draggedIndex !== index ? 'border-t-2 border-t-primary bg-primary/5' : ''
                 ]">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                  <Icon name="ph:dots-six-vertical-bold" class="h-5 w-5 shrink-0 cursor-move text-gray-400" aria-hidden="true" />
+                  <Icon v-if="can('services.update')" name="ph:dots-six-vertical-bold" class="h-5 w-5 shrink-0 cursor-move text-gray-400" aria-hidden="true" />
                   <div>
                     <div class="font-bold text-black dark:text-white">{{ service.title }}</div>
                     <div class="text-xs text-gray mt-1">{{ service.slug }}</div>
@@ -160,6 +176,48 @@ async function saveOrder(items: any[]) {
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- Grid View -->
+    <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <article
+        v-for="(service, index) in services"
+        :key="service._id"
+        :draggable="can('services.update')"
+        @dragstart="onDragStart(index, $event)"
+        @dragover="onDragOver(index, $event)"
+        @dragleave="onDragLeave(index, $event)"
+        @drop="onDrop(index, $event)"
+        :class="[
+          'admin-card flex flex-col gap-3 transition-all duration-200',
+          can('services.update') ? 'cursor-move' : '',
+          draggedIndex === index ? 'opacity-50 ring-2 ring-primary ring-offset-2' : '',
+          dragOverIndex === index && draggedIndex !== index ? 'ring-2 ring-primary/60 ring-offset-2 bg-primary/5' : ''
+        ]"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Icon v-if="service.icon" :name="getNuxtIconName(service.icon)" class="h-5 w-5" aria-hidden="true" />
+              <Icon v-else name="ph:briefcase-bold" class="h-5 w-5" aria-hidden="true" />
+            </div>
+            <div class="min-w-0">
+              <h2 class="truncate text-base font-bold text-black dark:text-white" :title="service.title">{{ service.title }}</h2>
+              <p class="truncate text-xs text-gray">{{ service.slug }}</p>
+            </div>
+          </div>
+          <Icon v-if="can('services.update')" name="ph:dots-six-vertical-bold" class="h-5 w-5 shrink-0 text-gray-400" aria-hidden="true" />
+        </div>
+        <div class="flex items-center justify-between gap-2 text-xs">
+          <span class="tabular-nums text-gray">Urutan #{{ index + 1 }}</span>
+          <span v-if="service.isActive" class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
+          <span v-else class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
+        </div>
+        <div class="mt-auto flex items-center justify-end gap-4 border-t border-gray/10 pt-3 text-sm font-medium">
+          <NuxtLink v-if="can('services.update')" :to="`/admin/services/${service._id}`" class="font-semibold text-primary hover:underline">Edit</NuxtLink>
+          <button v-if="can('services.delete')" type="button" class="font-semibold text-red-600 hover:underline dark:text-red-400" @click="deleteItem(service)">Hapus</button>
+        </div>
+      </article>
     </div>
   </div>
 </template>
