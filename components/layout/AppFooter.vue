@@ -25,6 +25,11 @@ const socialLinks = computed(() =>
 function telephoneHref(phone: string) {
   return formatPhoneHref(phone)
 }
+
+const hasConfirmedOjk = computed(() => {
+  const val = String(company.value.licenses.ojkRegistration || '').trim()
+  return Boolean(val && !val.includes('[PERLU KONFIRMASI]'))
+})
 </script>
 
 <template>
@@ -48,7 +53,7 @@ function telephoneHref(phone: string) {
               <li><strong>Izin Usaha KJPP (Kemenkeu):</strong> No. {{ company.licenses.kjppLicenseNumber }} ({{ company.licenses.kjppDecreeNumber }})</li>
               <li><strong>Izin Penilai Publik:</strong> {{ company.licenses.managingPartnerValuerLicense }}</li>
               <li><strong>Keanggotaan:</strong> {{ company.licenses.mappiMembership }}</li>
-              <li><strong>Terdaftar OJK:</strong> {{ company.licenses.ojkRegistration }}</li>
+              <li v-if="hasConfirmedOjk"><strong>Terdaftar OJK:</strong> {{ company.licenses.ojkRegistration }}</li>
             </ul>
           </div>
           <div v-if="socialLinks.length" class="mt-6">
