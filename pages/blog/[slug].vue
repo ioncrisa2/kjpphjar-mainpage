@@ -165,10 +165,10 @@ const shareLinks = computed(() => {
   const url = encodeURIComponent(canonicalUrl.value)
   const title = encodeURIComponent(article.value?.title || '')
   return [
-    { label: 'WhatsApp', icon: 'ph:whatsapp-logo-bold', href: `https://wa.me/?text=${title}%20${url}`, class: 'hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-400/15 dark:hover:text-green-300' },
-    { label: 'LinkedIn', icon: 'ph:linkedin-logo-bold', href: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`, class: 'hover:bg-blue-50 hover:text-blue-800 dark:hover:bg-blue-400/15 dark:hover:text-blue-200' },
-    { label: 'X', icon: 'ph:x-logo-bold', href: `https://twitter.com/intent/tweet?url=${url}&text=${title}`, class: 'hover:bg-slate-100 hover:text-black dark:hover:bg-white/10 dark:hover:text-white' },
-    { label: 'Facebook', icon: 'ph:facebook-logo-bold', href: `https://www.facebook.com/sharer/sharer.php?u=${url}`, class: 'hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-400/15 dark:hover:text-blue-200' },
+    { label: 'WhatsApp', icon: 'ph:whatsapp-logo-bold', href: `https://wa.me/?text=${title}%20${url}`, class: '' },
+    { label: 'LinkedIn', icon: 'ph:linkedin-logo-bold', href: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`, class: '' },
+    { label: 'X', icon: 'ph:x-logo-bold', href: `https://twitter.com/intent/tweet?url=${url}&text=${title}`, class: '' },
+    { label: 'Facebook', icon: 'ph:facebook-logo-bold', href: `https://www.facebook.com/sharer/sharer.php?u=${url}`, class: '' },
   ]
 })
 
@@ -178,58 +178,54 @@ function formatDate(value: string) {
 </script>
 
 <template>
-  <div v-if="pending" class="min-h-screen bg-white pt-[106px] dark:bg-black" aria-label="Memuat artikel">
-    <div class="bg-black px-4 py-20 sm:py-24">
-      <div class="mx-auto max-w-4xl space-y-5 text-center">
-        <div class="mx-auto h-7 w-32 animate-pulse rounded-full bg-white/10"></div>
-        <div class="mx-auto h-10 max-w-2xl animate-pulse rounded-lg bg-white/10 sm:h-14"></div>
-        <div class="mx-auto h-6 max-w-xl animate-pulse rounded bg-white/10"></div>
-        <div class="mx-auto h-5 w-80 max-w-full animate-pulse rounded bg-white/10"></div>
+  <div v-if="pending" class="min-h-screen bg-[var(--paper)]" aria-label="Memuat artikel">
+    <div class="pub-page-banner">
+      <div class="mx-auto max-w-4xl space-y-5 px-4 sm:px-6 lg:px-8">
+        <div class="h-5 w-32 animate-pulse bg-white/10"></div>
+        <div class="h-10 max-w-2xl animate-pulse bg-white/10 sm:h-14"></div>
+        <div class="h-6 max-w-xl animate-pulse bg-white/10"></div>
       </div>
     </div>
     <div class="mx-auto max-w-4xl space-y-5 px-4 py-14 sm:px-6">
-      <div class="h-5 w-40 animate-pulse rounded bg-slate-100 dark:bg-white/10"></div>
-      <div v-for="width in ['100%', '94%', '98%', '78%', '96%', '88%']" :key="width" class="h-5 animate-pulse rounded bg-slate-100 dark:bg-white/10" :style="{ width }"></div>
-      <div class="h-56 animate-pulse rounded-xl bg-slate-100 dark:bg-white/10"></div>
+      <div v-for="width in ['100%', '94%', '98%', '78%', '96%', '88%']" :key="width" class="h-5 animate-pulse bg-[var(--rule)]/50" :style="{ width }"></div>
     </div>
   </div>
-  <div v-else-if="article" class="bg-white dark:bg-black">
-    <header class="relative overflow-hidden bg-black pt-[110px] sm:pt-[130px]">
-      <div v-if="article.coverImageUrl" class="absolute inset-0">
-        <img :src="article.coverImageUrl" alt="" class="h-full w-full object-cover opacity-25">
-        <div class="absolute inset-0 bg-black/45"></div>
-      </div>
-      <div class="relative mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-24 lg:px-8">
-        <NuxtLink v-if="article.category" :to="{ path: '/blog', query: { category: article.category.slug } }" class="inline-flex rounded-full bg-primary/15 px-3 py-1.5 text-sm font-bold text-primary transition hover:bg-primary/25">{{ article.category.name }}</NuxtLink>
-        <h1 class="mx-auto mt-5 max-w-4xl text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-5xl">{{ article.title }}</h1>
-        <p v-if="article.excerpt" class="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/70 sm:text-lg">{{ article.excerpt }}</p>
-        <div class="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-white/65">
-          <span class="inline-flex items-center gap-1.5"><Icon name="ph:calendar-blank-bold" /> {{ formatDate(article.publishedAt || article.createdAt) }}</span>
-          <span class="inline-flex items-center gap-1.5"><Icon name="ph:clock-bold" /> {{ article.readingTime }} menit baca</span>
-          <span class="inline-flex items-center gap-1.5"><Icon name="ph:eye-bold" /> {{ article.views.toLocaleString('id-ID') }} views</span>
-          <span v-if="article.author" class="inline-flex items-center gap-1.5"><Icon name="ph:user-circle-bold" /> {{ article.author }}</span>
+  <div v-else-if="article" class="bg-[var(--paper)]">
+    <header class="pub-page-banner">
+      <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <NuxtLink v-if="article.category" :to="{ path: '/blog', query: { category: article.category.slug } }" class="pub-eyebrow hover:underline">{{ article.category.name }}</NuxtLink>
+        <h1 class="pub-h1">{{ article.title }}</h1>
+        <p v-if="article.excerpt" class="pub-lead">{{ article.excerpt }}</p>
+        <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[#1E3A6E] pt-4 text-[14px] tabular-nums text-[#CBD5E1]">
+          <span>{{ formatDate(article.publishedAt || article.createdAt) }}</span>
+          <span aria-hidden="true">·</span>
+          <span>{{ article.readingTime }} menit baca</span>
+          <span aria-hidden="true">·</span>
+          <span>{{ article.views.toLocaleString('id-ID') }} views</span>
+          <template v-if="article.author">
+            <span aria-hidden="true">·</span>
+            <span>{{ article.author }}</span>
+          </template>
         </div>
       </div>
     </header>
 
-    <main class="py-14 sm:py-20">
+    <main class="pub-section">
       <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-        <UiBreadcrumbs 
+        <UiBreadcrumbs
           :items="[
             { label: 'Blog', to: '/blog' },
             { label: article.title }
-          ]" 
+          ]"
         />
 
         <nav
           v-if="articleToc.length >= 2"
           aria-label="Daftar isi artikel"
-          class="mt-6 rounded-2xl border border-gray/15 bg-slate-50 p-5 dark:border-white/10 dark:bg-slate-900/70"
+          class="mt-8 border-y border-[var(--rule)] py-6"
         >
-          <p class="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-primary">
-            <Icon name="ph:list-bullets-bold" class="text-sm" /> Daftar Isi
-          </p>
-          <ol class="mt-3 space-y-1.5 text-sm">
+          <p class="text-[14px] font-bold text-[var(--brand-navy)]">Daftar isi</p>
+          <ol class="mt-3 space-y-2 text-[16px]">
             <li
               v-for="item in articleToc"
               :key="item.id"
@@ -237,8 +233,8 @@ function formatDate(value: string) {
             >
               <a
                 :href="`#${item.id}`"
-                class="inline-block transition hover:text-primary"
-                :class="item.level === 3 ? 'text-gray-600 dark:text-slate-400' : 'font-semibold text-black dark:text-white'"
+                class="inline-block transition-colors duration-150 hover:text-[var(--brand-navy)]"
+                :class="item.level === 3 ? 'text-[var(--muted)]' : 'font-bold text-[var(--ink)]'"
               >
                 {{ item.text }}
               </a>
@@ -246,48 +242,56 @@ function formatDate(value: string) {
           </ol>
         </nav>
 
-        <article ref="articleRef" class="blog-article prose prose-lg prose-blue mx-auto mt-10 max-w-none text-gray-900 prose-headings:font-extrabold prose-headings:text-black prose-a:text-primary prose-img:rounded-xl dark:prose-invert dark:text-slate-200 dark:prose-headings:text-white" v-html="articleHtml"></article>
+        <article ref="articleRef" class="blog-article prose prose-lg mx-auto mt-10 max-w-none text-[var(--ink)] prose-img:rounded-[2px] dark:prose-invert" v-html="articleHtml"></article>
 
-        <div v-if="article.tags.length" class="mt-12 flex flex-wrap items-center gap-2 border-t border-gray/10 pt-8 dark:border-white/10">
-          <span class="mr-1 text-sm font-bold text-black dark:text-white">Topik:</span>
-          <NuxtLink v-for="tag in article.tags" :key="tag" :to="{ path: '/blog', query: { tag } }" class="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-800 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-blue-400/15 dark:hover:text-blue-200">#{{ tag }}</NuxtLink>
+        <div v-if="article.tags.length" class="mt-12 flex flex-wrap items-center gap-2 border-t border-[var(--rule)] pt-8">
+          <span class="mr-1 text-[14px] font-bold text-[var(--ink)]">Topik:</span>
+          <NuxtLink v-for="tag in article.tags" :key="tag" :to="{ path: '/blog', query: { tag } }" class="pub-chip pub-chip-idle">#{{ tag }}</NuxtLink>
         </div>
 
         <!-- Tautan Internal ke Layanan Terkait -->
-        <section class="mt-10 rounded-2xl border border-primary/25 bg-stone-50 p-6 dark:border-white/10 dark:bg-slate-900/60" aria-labelledby="related-services-heading">
-          <h2 id="related-services-heading" class="text-lg font-extrabold text-black dark:text-white">
+        <section class="pub-box mt-10 p-6 sm:p-8" aria-labelledby="related-services-heading">
+          <h2 id="related-services-heading" class="pub-serif text-[20px] leading-[1.3] text-[var(--ink)]">
             Layanan Penilaian &amp; Konsultasi Terkait di KJPP HJA'R
           </h2>
-          <p class="mt-1.5 text-sm text-gray-700 dark:text-slate-300">
-            Butuh bantuan profesional terkait topik artikel ini? Pelajari ruang lingkup layanan kami atau <NuxtLink to="/contact-us" class="font-bold text-primary hover:underline">hubungi Kantor Pusat Palembang</NuxtLink>:
+          <p class="mt-2 text-[16px] leading-[1.6] text-[var(--muted)]">
+            Butuh bantuan profesional terkait topik artikel ini? Pelajari ruang lingkup layanan kami atau <NuxtLink to="/contact-us" class="pub-link font-bold underline underline-offset-[3px]">hubungi Kantor Pusat Palembang</NuxtLink>:
           </p>
-          <div class="mt-4 grid gap-3 sm:grid-cols-2">
-            <NuxtLink to="/layanan/penilaian-properti" class="flex items-center justify-between rounded-xl border border-gray/15 bg-white px-4 py-3 text-sm font-bold text-black transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-slate-800 dark:text-white">
-              <span>Penilaian Properti (Tanah, Bangunan &amp; Mesin)</span>
-              <Icon name="ph:arrow-right-bold" class="shrink-0 text-primary" aria-hidden="true" />
-            </NuxtLink>
-            <NuxtLink to="/layanan/penilaian-bisnis" class="flex items-center justify-between rounded-xl border border-gray/15 bg-white px-4 py-3 text-sm font-bold text-black transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-slate-800 dark:text-white">
-              <span>Penilaian Bisnis &amp; Saham</span>
-              <Icon name="ph:arrow-right-bold" class="shrink-0 text-primary" aria-hidden="true" />
-            </NuxtLink>
-            <NuxtLink to="/layanan/studi-kelayakan" class="flex items-center justify-between rounded-xl border border-gray/15 bg-white px-4 py-3 text-sm font-bold text-black transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-slate-800 dark:text-white">
-              <span>Studi Kelayakan Proyek (Feasibility Study)</span>
-              <Icon name="ph:arrow-right-bold" class="shrink-0 text-primary" aria-hidden="true" />
-            </NuxtLink>
-            <NuxtLink to="/layanan/pengawasan-proyek" class="flex items-center justify-between rounded-xl border border-gray/15 bg-white px-4 py-3 text-sm font-bold text-black transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-slate-800 dark:text-white">
-              <span>Pengawasan Proyek (Project Monitoring)</span>
-              <Icon name="ph:arrow-right-bold" class="shrink-0 text-primary" aria-hidden="true" />
-            </NuxtLink>
-          </div>
+          <ul class="mt-4 border-t border-[var(--rule)]">
+            <li class="border-b border-[var(--rule)]">
+              <NuxtLink to="/layanan/penilaian-properti" class="flex items-center justify-between gap-4 py-3 text-[16px] font-bold text-[var(--ink)] transition-colors duration-150 hover:text-[var(--brand-navy)]">
+                <span>Penilaian Properti (Tanah, Bangunan &amp; Mesin)</span>
+                <span aria-hidden="true" class="text-[var(--brand-navy)]">→</span>
+              </NuxtLink>
+            </li>
+            <li class="border-b border-[var(--rule)]">
+              <NuxtLink to="/layanan/penilaian-bisnis" class="flex items-center justify-between gap-4 py-3 text-[16px] font-bold text-[var(--ink)] transition-colors duration-150 hover:text-[var(--brand-navy)]">
+                <span>Penilaian Bisnis &amp; Saham</span>
+                <span aria-hidden="true" class="text-[var(--brand-navy)]">→</span>
+              </NuxtLink>
+            </li>
+            <li class="border-b border-[var(--rule)]">
+              <NuxtLink to="/layanan/studi-kelayakan" class="flex items-center justify-between gap-4 py-3 text-[16px] font-bold text-[var(--ink)] transition-colors duration-150 hover:text-[var(--brand-navy)]">
+                <span>Studi Kelayakan Proyek (Feasibility Study)</span>
+                <span aria-hidden="true" class="text-[var(--brand-navy)]">→</span>
+              </NuxtLink>
+            </li>
+            <li class="border-b border-[var(--rule)]">
+              <NuxtLink to="/layanan/pengawasan-proyek" class="flex items-center justify-between gap-4 py-3 text-[16px] font-bold text-[var(--ink)] transition-colors duration-150 hover:text-[var(--brand-navy)]">
+                <span>Pengawasan Proyek (Project Monitoring)</span>
+                <span aria-hidden="true" class="text-[var(--brand-navy)]">→</span>
+              </NuxtLink>
+            </li>
+          </ul>
         </section>
 
-        <section class="mt-10 flex flex-col gap-4 border-y border-gray/10 py-6 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between" aria-labelledby="share-heading">
+        <section class="mt-10 flex flex-col gap-4 border-y border-[var(--rule)] py-6 sm:flex-row sm:items-center sm:justify-between" aria-labelledby="share-heading">
           <div>
-            <h2 id="share-heading" class="font-extrabold text-black dark:text-white">Bagikan artikel</h2>
-            <p class="mt-1 text-sm text-gray dark:text-slate-300">Kirim wawasan ini kepada rekan Anda.</p>
+            <h2 id="share-heading" class="font-bold text-[var(--ink)]">Bagikan artikel</h2>
+            <p class="mt-1 text-[14px] text-[var(--muted)]">Kirim wawasan ini kepada rekan Anda.</p>
           </div>
           <div class="flex gap-2">
-            <a v-for="item in shareLinks" :key="item.label" :href="item.href" target="_blank" rel="noopener noreferrer" class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-600 transition dark:bg-white/5 dark:text-slate-300" :class="item.class" :aria-label="`Bagikan ke ${item.label}`">
+            <a v-for="item in shareLinks" :key="item.label" :href="item.href" target="_blank" rel="noopener noreferrer" class="inline-flex h-10 w-10 items-center justify-center rounded-[2px] border border-[var(--rule)] text-[var(--muted)] transition-colors duration-150 hover:border-[var(--brand-navy)] hover:text-[var(--brand-navy)]" :aria-label="`Bagikan ke ${item.label}`">
               <Icon :name="item.icon" />
             </a>
           </div>
@@ -296,10 +300,10 @@ function formatDate(value: string) {
         <!-- Author Bio Card (Pimpinan Rekan Penulis / Google E-E-A-T) -->
         <section
           v-if="article.leader"
-          class="mt-12 overflow-hidden rounded-2xl border border-primary/20 bg-slate-50 p-6 dark:border-white/10 dark:bg-slate-900/60 sm:p-8"
+          class="pub-box mt-12 p-6 sm:p-8"
           aria-labelledby="author-heading"
         >
-          <div class="flex flex-col gap-6 sm:flex-row sm:items-center">
+          <div class="flex flex-col gap-6 sm:flex-row sm:items-start">
             <div class="shrink-0">
               <img
                 v-if="article.leader.photoUrl"
@@ -307,35 +311,35 @@ function formatDate(value: string) {
                 :alt="`Foto ${article.leader.name}, ${article.leader.position} KJPP HJA'R`"
                 width="96"
                 height="96"
-                class="h-24 w-24 rounded-full border-2 border-primary object-cover shadow-md"
+                class="h-24 w-24 rounded-[2px] object-cover"
                 loading="lazy"
                 decoding="async"
               />
-              <div v-else class="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-3xl font-extrabold text-primary">
+              <div v-else class="pub-serif flex h-24 w-24 items-center justify-center rounded-[2px] bg-[#0B1640] text-[32px] text-white">
                 {{ article.leader.name.charAt(0) }}
               </div>
             </div>
             <div class="flex-1">
-              <div class="flex flex-wrap items-center justify-between gap-3">
+              <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p class="text-xs font-extrabold uppercase tracking-wider text-primary">Penulis Artikel</p>
-                  <h3 id="author-heading" class="mt-0.5 text-xl font-extrabold text-black dark:text-white sm:text-2xl">
-                    <NuxtLink :to="`/pimpinan/${article.leader.slug || article.leader._id}`" class="transition hover:text-primary">
+                  <p class="text-[14px] font-bold text-[var(--brand-navy)]">Penulis artikel</p>
+                  <h3 id="author-heading" class="pub-serif mt-1 text-[24px] leading-[1.25] text-[var(--ink)]">
+                    <NuxtLink :to="`/pimpinan/${article.leader.slug || article.leader._id}`" class="transition-colors duration-150 hover:text-[var(--brand-navy)]">
                       {{ article.leader.name }}
                     </NuxtLink>
                   </h3>
-                  <p class="text-sm font-semibold text-gray-700 dark:text-slate-300">
+                  <p class="mt-1 text-[14px] text-[var(--muted)]">
                     {{ article.leader.position }} · KJPP HJA'R
                   </p>
                 </div>
                 <NuxtLink
                   :to="{ path: '/blog', query: { author: article.leader._id } }"
-                  class="inline-flex items-center gap-1.5 rounded-xl border border-primary/30 bg-white px-4 py-2 text-xs font-bold text-primary transition hover:bg-primary hover:text-black dark:bg-slate-800"
+                  class="pub-link text-[14px] font-bold"
                 >
-                  Artikel lain dari penulis <Icon name="ph:arrow-right-bold" />
+                  Artikel lain dari penulis →
                 </NuxtLink>
               </div>
-              <p v-if="article.leader.bio" class="mt-3 text-sm leading-6 text-gray-600 dark:text-slate-300">
+              <p v-if="article.leader.bio" class="mt-3 text-[16px] leading-[1.6] text-[var(--muted)]">
                 {{ article.leader.bio }}
               </p>
             </div>
@@ -343,15 +347,15 @@ function formatDate(value: string) {
         </section>
       </div>
 
-      <section v-if="relatedArticles.length" class="mx-auto mt-16 max-w-7xl border-t border-gray/10 px-4 pt-14 dark:border-white/10 sm:px-6 lg:px-8" aria-labelledby="related-heading">
+      <section v-if="relatedArticles.length" class="container mt-16 border-t border-[var(--rule)] pt-14" aria-labelledby="related-heading">
         <div class="flex items-end justify-between gap-4">
           <div>
-            <h2 id="related-heading" class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl">Artikel terkait</h2>
-            <p class="mt-2 text-sm text-gray dark:text-slate-300">Bacaan lanjutan berdasarkan kategori dan topik serupa.</p>
+            <h2 id="related-heading" class="pub-h2">Artikel terkait</h2>
+            <p class="mt-2 text-[16px] text-[var(--muted)]">Bacaan lanjutan berdasarkan kategori dan topik serupa.</p>
           </div>
-          <NuxtLink to="/blog" class="hidden text-sm font-bold text-primary hover:underline sm:inline">Lihat semua</NuxtLink>
+          <NuxtLink to="/blog" class="pub-link hidden text-[14px] font-bold sm:inline">Lihat semua →</NuxtLink>
         </div>
-        <div class="mt-8 grid gap-7 md:grid-cols-3">
+        <div class="mt-8 grid gap-8 md:grid-cols-3">
           <BlogArticleCard v-for="related in relatedArticles" :key="related._id" :article="related" />
         </div>
       </section>

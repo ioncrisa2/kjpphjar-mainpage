@@ -36,33 +36,27 @@ const filteredPhotos = computed(() => {
 <template>
   <div>
     <!-- Banner -->
-    <div class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
+    <div class="pub-page-banner">
       <div class="container">
-        <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
-          <div class="heading mb-0 text-center md:text-left">
-            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Galeri</h1>
-          </div>
-        </div>
+        <span class="pub-eyebrow">Momen &amp; Kegiatan</span>
+        <h1 class="pub-h1">Galeri</h1>
       </div>
     </div>
 
-    <section class="py-14 lg:py-[100px]">
+    <section class="pub-section bg-[var(--paper)]">
       <div class="container">
-        <UiBreadcrumbs :items="[{ label: 'Galeri' }]" class="mb-6" />
-        <div class="heading text-center">
-          <p class="subtitle">Momen & Kegiatan</p>
-          <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Valuing What Matters</h2>
-        </div>
+        <UiBreadcrumbs :items="[{ label: 'Galeri' }]" class="mb-10" />
+        <h2 class="pub-h2 mb-10">Valuing What Matters</h2>
 
         <!-- Category filter -->
-        <div v-if="categories.length > 1" class="mb-8 flex flex-wrap justify-center gap-2">
+        <div v-if="categories.length > 1" class="mb-10 flex flex-wrap gap-2">
           <button
             v-for="cat in categories"
             :key="cat"
-            class="rounded-full border px-5 py-2 text-sm font-semibold transition"
-            :class="activeCategory === cat
-              ? 'border-primary bg-primary text-black'
-              : 'border-gray/30 text-gray hover:border-primary hover:text-primary'"
+            type="button"
+            class="pub-chip"
+            :class="activeCategory === cat ? 'pub-chip-active' : 'pub-chip-idle'"
+            :aria-pressed="activeCategory === cat"
             @click="activeCategory = cat"
           >
             {{ cat === 'all' ? 'Semua' : cat }}
@@ -70,7 +64,7 @@ const filteredPhotos = computed(() => {
         </div>
 
         <!-- Grid -->
-        <div v-if="filteredPhotos.length === 0" class="text-center py-16 text-gray">
+        <div v-if="filteredPhotos.length === 0" class="py-16 text-[var(--muted)]">
           Belum ada foto di galeri.
         </div>
 
@@ -78,7 +72,7 @@ const filteredPhotos = computed(() => {
           <ClientOnly>
             <lightgallery
               :settings="{ speed: 500, plugins: plugins, download: false }"
-              class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6"
+              class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:gap-x-8"
             >
               <a
                 v-for="photo in filteredPhotos"
@@ -86,14 +80,15 @@ const filteredPhotos = computed(() => {
                 :href="photo.imageUrl"
                 :data-src="photo.imageUrl"
                 :data-sub-html="photo.title"
-                class="block cursor-pointer overflow-hidden rounded-[24px] bg-gray-100 dark:bg-white/5"
+                class="group block cursor-zoom-in"
               >
                 <img
                   :src="photo.thumbnailUrl"
                   :alt="photo.title ? `${photo.title} – dokumentasi kegiatan KJPP HJA'R` : 'Dokumentasi kegiatan survei penilaian lapangan KJPP HJA\'R'"
-                  class="h-56 w-full object-cover transition duration-500 hover:scale-110"
+                  class="aspect-[4/3] w-full rounded-[2px] bg-[var(--surface)] object-cover"
                   loading="lazy"
                 />
+                <span v-if="photo.title" class="mt-2 block text-[14px] leading-[1.4] text-[var(--muted)] transition-colors duration-150 group-hover:text-[var(--ink)]">{{ photo.title }}</span>
               </a>
             </lightgallery>
           </ClientOnly>

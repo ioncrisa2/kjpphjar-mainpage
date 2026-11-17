@@ -61,25 +61,25 @@ useHead({
 </script>
 
 <template>
-  <nav aria-label="Breadcrumb" class="py-3">
-    <ol class="flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+  <nav aria-label="Breadcrumb" class="border-b border-[var(--rule)] pb-3">
+    <ol class="flex flex-wrap items-center gap-2 text-[14px] text-[var(--muted)]">
       <li>
-        <NuxtLink to="/" class="hover:text-primary transition-colors">
+        <NuxtLink to="/" class="pub-link">
           Beranda
         </NuxtLink>
       </li>
       <li v-for="(item, index) in items" :key="index" class="flex items-center gap-2">
-        <Icon name="ph:caret-right-bold" class="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+        <Icon name="ph:caret-right-bold" class="h-3.5 w-3.5 shrink-0 text-[var(--muted)]" aria-hidden="true" />
         <NuxtLink 
           v-if="item.to" 
           :to="item.to" 
-          class="hover:text-primary transition-colors"
+          class="pub-link"
         >
           {{ cleanLabel(item.label) }}
         </NuxtLink>
         <span 
           v-else 
-          class="text-gray-900 dark:text-gray-200 font-semibold" 
+          class="font-bold text-[var(--ink)]" 
           aria-current="page"
         >
           {{ cleanLabel(item.label) }}

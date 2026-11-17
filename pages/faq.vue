@@ -56,49 +56,51 @@ function isOpen(index: number) {
 <template>
   <div>
     <!-- Banner -->
-    <section class="bg-black py-20 lg:py-[100px] bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-center bg-no-repeat relative">
-      <div class="absolute inset-0 bg-black/60"></div>
-      <div class="container relative z-10 text-center">
-        <h1 class="text-3xl font-black uppercase text-white sm:text-4xl lg:text-5xl">Q&A (FAQ)</h1>
-        <p class="mt-4 text-lg font-medium text-white max-w-2xl mx-auto">
+    <section class="pub-page-banner">
+      <div class="container">
+        <span class="pub-eyebrow">Tanya Jawab</span>
+        <h1 class="pub-h1">Q&amp;A (FAQ)</h1>
+        <p class="pub-lead">
           Temukan jawaban atas pertanyaan yang sering diajukan mengenai layanan kami.
         </p>
       </div>
     </section>
 
     <!-- FAQ Content -->
-    <section class="py-14 lg:py-24">
+    <section class="pub-section bg-[var(--paper)]">
       <div class="container max-w-4xl">
-        <UiBreadcrumbs :items="[{ label: 'FAQ' }]" class="mb-6" />
-        
-        <div v-if="!faqs || faqs.length === 0" class="text-center text-gray-500 py-10 dark:text-gray-400">
+        <UiBreadcrumbs :items="[{ label: 'FAQ' }]" class="mb-10" />
+
+        <div v-if="!faqs || faqs.length === 0" class="py-10 text-[var(--muted)]">
           Belum ada pertanyaan yang tersedia.
         </div>
-        
-        <div v-else class="space-y-4">
-          <div 
-            v-for="(faq, index) in faqs" 
-            :key="faq._id" 
-            class="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden bg-white dark:bg-gray-dark shadow-sm"
+
+        <div v-else class="border-t border-[var(--rule)]">
+          <div
+            v-for="(faq, index) in faqs"
+            :key="faq._id"
+            class="border-b border-[var(--rule)]"
           >
-            <button 
+            <button
+              type="button"
+              class="flex w-full items-start justify-between gap-6 py-6 text-left transition-colors duration-150 hover:text-[var(--brand-navy)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#47BDFF]"
+              :aria-expanded="isOpen(index)"
               @click="toggleFaq(index)"
-              class="w-full flex items-center justify-between p-5 text-left focus:outline-none hover:bg-gray-50 dark:hover:bg-white/5 transition"
             >
-              <h3 class="text-lg font-bold text-black dark:text-white">
+              <h3 class="pub-serif text-[20px] leading-[1.35] text-[var(--ink)]">
                 {{ faq.question }}
               </h3>
-              <div class="shrink-0 ml-4 text-primary">
+              <span class="mt-1 shrink-0 text-[var(--brand-navy)]">
                 <Icon :name="isOpen(index) ? 'ph:minus-bold' : 'ph:plus-bold'" class="h-5 w-5" aria-hidden="true" />
-              </div>
+              </span>
             </button>
-            <div 
-              v-show="isOpen(index)" 
-              class="p-5 border-t border-gray-100 dark:border-gray-800"
+            <div
+              v-show="isOpen(index)"
+              class="pb-6"
             >
               <!-- Jawaban sudah disanitasi di server (server/utils/faq.ts) -->
               <div
-                class="prose prose-blue max-w-none text-gray-700 prose-a:text-primary dark:prose-invert dark:text-gray-300 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
+                class="prose max-w-[68ch] text-[var(--ink)] dark:prose-invert [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
                 v-html="faq.answer"
               />
             </div>
@@ -108,7 +110,7 @@ function isOpen(index: number) {
     </section>
 
     <BlogRecentArticles
-      class="border-t border-gray-100 py-14 dark:border-gray-800 lg:py-20"
+      class="border-t border-[var(--rule)] bg-[var(--surface)] py-16 lg:py-20"
       title="Ingin Tahu Lebih Dalam?"
       description="Baca panduan dan artikel dari tim penilai kami."
     />

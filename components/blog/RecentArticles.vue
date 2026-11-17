@@ -43,11 +43,11 @@ const headingId = `recent-articles-${props.category || 'all'}`
       </div>
       <div v-else class="mb-8 flex items-end justify-between gap-4">
         <div>
-          <p v-if="eyebrow" class="mb-2 text-sm font-extrabold text-primary">{{ eyebrow }}</p>
-          <h2 :id="headingId" class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl">{{ heading }}</h2>
-          <p v-if="description" class="mt-2 text-sm text-gray dark:text-slate-300">{{ description }}</p>
+          <p v-if="eyebrow" class="mb-2 text-sm font-bold text-[var(--brand-navy)]">{{ eyebrow }}</p>
+          <h2 :id="headingId" class="pub-serif text-2xl text-[var(--ink)] sm:text-[32px]">{{ heading }}</h2>
+          <p v-if="description" class="mt-2 text-[16px] text-[var(--muted)]">{{ description }}</p>
         </div>
-        <NuxtLink :to="moreLink" class="hidden shrink-0 text-sm font-bold text-primary hover:underline sm:inline">Lihat semua</NuxtLink>
+        <NuxtLink :to="moreLink" class="pub-link hidden shrink-0 text-sm font-bold sm:inline">Lihat semua →</NuxtLink>
       </div>
 
       <div class="grid gap-7 md:grid-cols-3">
@@ -57,7 +57,7 @@ const headingId = `recent-articles-${props.category || 'all'}`
       <div v-if="centered" class="mt-10 text-center">
         <NuxtLink :to="moreLink" class="btn">Lihat Semua Artikel</NuxtLink>
       </div>
-      <NuxtLink v-else :to="moreLink" class="mt-6 inline-block text-sm font-bold text-primary hover:underline sm:hidden">Lihat semua artikel</NuxtLink>
+      <NuxtLink v-else :to="moreLink" class="pub-link mt-6 inline-block text-sm font-bold sm:hidden">Lihat semua artikel →</NuxtLink>
     </div>
   </section>
 </template>

@@ -33,38 +33,38 @@ const hasConfirmedOjk = computed(() => {
 </script>
 
 <template>
-  <footer class="mt-auto bg-white dark:bg-transparent dark:bg-gradient-to-b dark:from-white/[0.03] dark:to-transparent">
+  <footer class="mt-auto border-t border-[var(--rule)] bg-[var(--paper)] text-[var(--ink)]">
     <div class="container">
-      <div class="grid gap-y-10 gap-x-8 py-14 sm:grid-cols-2 lg:grid-cols-4 lg:py-[90px]">
+      <div class="grid gap-y-10 gap-x-8 py-16 sm:grid-cols-2 lg:grid-cols-4 lg:py-20">
         <!-- Brand & Legalitas -->
         <div class="relative">
           <div class="flex flex-row gap-3 items-center">
-            <img src="/assets/images/h-logo.png" :alt="`Logo ${company.name}`" width="60" height="60" class="h-[60px] w-auto" />
-            <span class="max-w-[230px] text-base font-extrabold leading-tight text-black dark:text-white">
+            <img src="/assets/images/h-logo.png" :alt="`Logo ${company.name}`" width="56" height="56" class="h-[56px] w-auto rounded-[2px]" />
+            <span class="pub-serif max-w-[230px] text-[18px] leading-snug text-[var(--ink)]">
               {{ company.name }}
             </span>
           </div>
-          <p class="mt-4 text-xs leading-relaxed text-gray-700 dark:text-gray-300">
+          <p class="mt-4 text-[14px] leading-[1.6] tabular-nums text-[var(--muted)]">
             Kantor Jasa Penilai Publik (KJPP) independen berkantor pusat di Palembang sejak {{ company.foundedYear }}.
           </p>
-          <div class="mt-4 rounded-xl border border-gray/15 bg-stone-50 p-3.5 text-xs leading-relaxed text-gray-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-            <p class="font-extrabold text-black dark:text-white">Izin &amp; Keanggotaan Resmi:</p>
+          <div class="mt-4 border-t border-[var(--rule)] pt-4 text-[13px] leading-[1.6] tabular-nums text-[var(--muted)]">
+            <p class="font-bold text-[var(--ink)]">Izin &amp; Keanggotaan Resmi:</p>
             <ul class="mt-1.5 space-y-1">
-              <li><strong>Izin Usaha KJPP (Kemenkeu):</strong> No. {{ company.licenses.kjppLicenseNumber }} ({{ company.licenses.kjppDecreeNumber }})</li>
-              <li><strong>Izin Penilai Publik:</strong> {{ company.licenses.managingPartnerValuerLicense }}</li>
-              <li><strong>Keanggotaan:</strong> {{ company.licenses.mappiMembership }}</li>
-              <li v-if="hasConfirmedOjk"><strong>Terdaftar OJK:</strong> {{ company.licenses.ojkRegistration }}</li>
+              <li><strong class="text-[var(--ink)]">Izin Usaha KJPP (Kemenkeu):</strong> No. {{ company.licenses.kjppLicenseNumber }} ({{ company.licenses.kjppDecreeNumber }})</li>
+              <li><strong class="text-[var(--ink)]">Izin Penilai Publik:</strong> {{ company.licenses.managingPartnerValuerLicense }}</li>
+              <li><strong class="text-[var(--ink)]">Keanggotaan:</strong> {{ company.licenses.mappiMembership }}</li>
+              <li v-if="hasConfirmedOjk"><strong class="text-[var(--ink)]">Terdaftar OJK:</strong> {{ company.licenses.ojkRegistration }}</li>
             </ul>
           </div>
           <div v-if="socialLinks.length" class="mt-6">
-            <p class="mb-2.5 text-sm font-medium text-gray-700 dark:text-gray-300">Ikuti kami di media sosial:</p>
+            <p class="mb-2.5 text-[14px] font-normal text-[var(--muted)]">Ikuti kami di media sosial:</p>
             <ul class="flex flex-wrap items-center gap-2">
               <li v-for="social in socialLinks" :key="social.network">
                 <a
                   :href="social.href"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-gray/25 px-2 text-xs font-extrabold text-gray-700 transition hover:border-secondary hover:text-secondary dark:text-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary/40"
+                  class="inline-flex h-9 min-w-9 items-center justify-center rounded-[2px] border border-[var(--rule)] px-2 text-xs font-bold text-[var(--ink)] transition-colors duration-150 hover:border-[var(--brand-navy)] hover:text-[var(--brand-navy)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-navy)]"
                   :aria-label="social.label"
                 >
                   <Icon :name="social.icon" class="h-5 w-5" aria-hidden="true" />
@@ -76,14 +76,14 @@ const hasConfirmedOjk = computed(() => {
 
         <!-- Kantor Pusat & Jam Operasional -->
         <div>
-          <ul class="flex flex-col gap-3 font-bold">
-            <li class="mb-1 text-lg font-extrabold text-black dark:text-white">Kantor Pusat</li>
-            <li class="whitespace-pre-line text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-              <strong class="text-black dark:text-white">{{ headOffice.name }}:</strong><br />
+          <p class="pub-serif mb-4 text-[20px] text-[var(--ink)]">Kantor Pusat</p>
+          <ul class="flex flex-col gap-3 text-[14px] leading-[1.6] text-[var(--muted)]">
+            <li class="whitespace-pre-line">
+              <strong class="text-[var(--ink)]">{{ headOffice.name }}:</strong><br />
               {{ headOffice.fullAddress }}
             </li>
-            <li class="text-xs font-semibold text-gray-700 dark:text-gray-300">
-              <strong class="text-black dark:text-white">Jam Operasional:</strong><br />
+            <li class="tabular-nums">
+              <strong class="text-[var(--ink)]">Jam Operasional:</strong><br />
               {{ company.operatingHours.display }}
             </li>
             <li v-if="headOffice.googleMapsUrl">
@@ -91,7 +91,7 @@ const hasConfirmedOjk = computed(() => {
                 :href="headOffice.googleMapsUrl"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm font-bold text-sky-600 transition hover:text-secondary dark:text-primary"
+                class="pub-link text-[14px] font-bold"
               >
                 Buka Kantor Pusat di Google Maps →
               </a>
@@ -101,12 +101,12 @@ const hasConfirmedOjk = computed(() => {
 
         <!-- Kantor Cabang -->
         <div>
-          <p class="mb-4 text-lg font-extrabold text-black dark:text-white">Kantor Cabang</p>
-          <ul class="space-y-3 text-xs leading-relaxed text-gray-700 dark:text-gray-300">
-            <li v-for="branch in otherBranches" :key="branch.id">
-              <strong class="block text-sm font-bold text-black dark:text-white">{{ branch.name }} ({{ branch.city }})</strong>
+          <p class="pub-serif mb-4 text-[20px] text-[var(--ink)]">Kantor Cabang</p>
+          <ul class="space-y-3 text-[14px] leading-[1.6] tabular-nums text-[var(--muted)]">
+            <li v-for="branch in otherBranches" :key="branch.id" class="border-b border-[var(--rule)] pb-3 last:border-b-0 last:pb-0">
+              <strong class="block font-bold text-[var(--ink)]">{{ branch.name }} ({{ branch.city }})</strong>
               <span>{{ branch.address }}</span><br />
-              <a :href="branch.phoneHref" class="font-semibold text-sky-700 hover:underline dark:text-primary">
+              <a :href="branch.phoneHref" class="pub-link font-bold">
                 Telp: {{ branch.phone }}
               </a>
             </li>
@@ -115,40 +115,40 @@ const hasConfirmedOjk = computed(() => {
 
         <!-- Kontak & Navigasi Wilayah -->
         <div>
-          <ul class="flex flex-col gap-2 font-bold">
-            <li class="mb-1 text-lg font-extrabold text-black dark:text-white">Kontak Resmi</li>
+          <p class="pub-serif mb-4 text-[20px] text-[var(--ink)]">Kontak Resmi</p>
+          <ul class="flex flex-col gap-2 text-[14px] leading-[1.6] tabular-nums text-[var(--muted)]">
             <li v-if="headOffice.phone">
-              <a :href="telephoneHref(headOffice.phone)" class="inline-block text-sm font-medium text-gray-700 transition hover:text-secondary dark:text-gray-300">
+              <a :href="telephoneHref(headOffice.phone)" class="pub-link font-bold">
                 Telp Kantor Pusat: {{ headOffice.phone }}
               </a>
             </li>
             <li v-if="headOffice.email">
-              <a :href="`mailto:${headOffice.email}`" class="inline-block text-sm font-medium text-gray-700 transition hover:text-secondary dark:text-gray-300">
+              <a :href="`mailto:${headOffice.email}`" class="pub-link">
                 Email: {{ headOffice.email }}
               </a>
             </li>
             <li v-for="contact in contacts" :key="contact._id">
-              <a :href="telephoneHref(contact.phone)" class="inline-block text-sm font-medium text-gray-700 transition hover:text-secondary dark:text-gray-300">
+              <a :href="telephoneHref(contact.phone)" class="pub-link">
                 {{ contact.phone }} ({{ contact.name }})
               </a>
             </li>
           </ul>
 
-          <div class="mt-6 border-t border-gray/15 pt-4 dark:border-white/10">
-            <p class="mb-2 text-sm font-extrabold text-black dark:text-white">Wilayah Layanan Utama</p>
-            <ul class="space-y-1.5 text-sm font-semibold">
+          <div class="mt-6 border-t border-[var(--rule)] pt-4">
+            <p class="mb-2 text-[14px] font-bold text-[var(--ink)]">Wilayah Layanan Utama</p>
+            <ul class="space-y-1.5 text-[14px]">
               <li>
-                <NuxtLink to="/kjpp-palembang" class="text-gray-700 transition hover:text-primary dark:text-gray-300">
+                <NuxtLink to="/kjpp-palembang" class="pub-link">
                   KJPP Palembang
                 </NuxtLink>
               </li>
               <li>
-                <NuxtLink to="/kjpp-sumatera-selatan" class="text-gray-700 transition hover:text-primary dark:text-gray-300">
+                <NuxtLink to="/kjpp-sumatera-selatan" class="pub-link">
                   KJPP Sumatera Selatan (Sumsel)
                 </NuxtLink>
               </li>
               <li>
-                <NuxtLink to="/kjpp-sumatera" class="text-gray-700 transition hover:text-primary dark:text-gray-300">
+                <NuxtLink to="/kjpp-sumatera" class="pub-link">
                   KJPP Sumatera
                 </NuxtLink>
               </li>
@@ -159,23 +159,23 @@ const hasConfirmedOjk = computed(() => {
     </div>
 
     <!-- Bottom bar -->
-    <div class="bg-gradient-to-r from-[#FCF1F4] to-[#EDFBF9] py-5 dark:border-t-2 dark:border-white/5 dark:bg-none">
+    <div class="border-t border-[var(--rule)] py-5">
       <div class="container">
-        <div class="flex flex-col items-center justify-between gap-2 text-center font-bold text-gray-800 dark:text-white md:flex-row">
-          <div class="text-sm">
+        <div class="flex flex-col items-center justify-between gap-2 text-center text-[14px] tabular-nums text-[var(--muted)] md:flex-row">
+          <div>
             Copyright &copy; {{ new Date().getFullYear() }}
-            <NuxtLink to="/" class="text-sky-700 transition hover:text-secondary dark:text-primary">{{ company.name }}</NuxtLink>
+            <NuxtLink to="/" class="pub-link font-bold">{{ company.name }}</NuxtLink>
           </div>
-          <div class="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm">
-            <NuxtLink to="/kjpp-palembang" class="text-purple-700 font-bold transition hover:text-primary dark:text-primary">Palembang</NuxtLink>
-            <span class="text-gray-400" aria-hidden="true">·</span>
-            <NuxtLink to="/kjpp-sumatera-selatan" class="text-purple-700 font-bold transition hover:text-primary dark:text-primary">Sumsel</NuxtLink>
-            <span class="text-gray-400" aria-hidden="true">·</span>
-            <NuxtLink to="/kjpp-sumatera" class="text-purple-700 font-bold transition hover:text-primary dark:text-primary">Sumatera</NuxtLink>
-            <span class="text-gray-400" aria-hidden="true">·</span>
-            <NuxtLink to="/faq" class="text-purple-700 font-bold transition hover:text-primary dark:text-primary">FAQ</NuxtLink>
-            <span class="text-gray-400" aria-hidden="true">·</span>
-            <NuxtLink to="/contact-us" class="text-purple-700 font-bold transition hover:text-primary dark:text-primary">Contact Us</NuxtLink>
+          <div class="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+            <NuxtLink to="/kjpp-palembang" class="pub-link font-bold">Palembang</NuxtLink>
+            <span class="text-[var(--muted)]" aria-hidden="true">·</span>
+            <NuxtLink to="/kjpp-sumatera-selatan" class="pub-link font-bold">Sumsel</NuxtLink>
+            <span class="text-[var(--muted)]" aria-hidden="true">·</span>
+            <NuxtLink to="/kjpp-sumatera" class="pub-link font-bold">Sumatera</NuxtLink>
+            <span class="text-[var(--muted)]" aria-hidden="true">·</span>
+            <NuxtLink to="/faq" class="pub-link font-bold">FAQ</NuxtLink>
+            <span class="text-[var(--muted)]" aria-hidden="true">·</span>
+            <NuxtLink to="/contact-us" class="pub-link font-bold">Contact Us</NuxtLink>
           </div>
         </div>
       </div>

@@ -11,20 +11,154 @@
 @tailwind utilities;
 
 @layer components {
+    /* Public editorial tokens (blue theme) */
+    .public-site {
+        --paper: #F8FAFC;
+        --surface: #FFFFFF;
+        --ink: #08111F;
+        --muted: #475569;
+        --rule: #CBD5E1;
+        --brand-navy: #011987;
+        --brand-navy-hover: #0369A1;
+        --brand-sky: #47BDFF;
+        --navy-deep: #0B1640;
+        background-color: var(--paper);
+        color: var(--ink);
+    }
+
+    body.dark .public-site,
+    html.dark .public-site,
+    .public-site.is-dark {
+        --paper: #08111F;
+        --surface: #0D162B;
+        --ink: #F1F5F9;
+        --muted: #94A3B8;
+        --rule: #1E293B;
+        --brand-navy: #47BDFF;
+        --brand-navy-hover: #74CEFF;
+        --brand-sky: #47BDFF;
+        --navy-deep: #0B1640;
+    }
+
+    .pub-serif {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-weight: 600;
+        text-transform: none;
+    }
+
+    .pub-banner {
+        background-color: #0B1640;
+        color: #F8FAFC;
+        border-bottom: 1px solid #1E3A6E;
+    }
+
+    .pub-link {
+        color: var(--brand-navy);
+        transition: color 150ms ease;
+    }
+
+    .pub-link:hover {
+        color: var(--brand-navy-hover);
+        text-decoration: underline;
+    }
+
+    /* Inner-page banner (navy, no decorative image) */
+    .pub-page-banner {
+        @apply bg-[#0B1640] pt-[112px] pb-12 lg:pt-[144px] lg:pb-16;
+        border-bottom: 1px solid #1E3A6E;
+    }
+    .pub-eyebrow {
+        @apply mb-3 block text-[14px] font-bold text-[#47BDFF];
+    }
+    .pub-h1 {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-weight: 600;
+        text-transform: none;
+        @apply max-w-4xl text-[32px] leading-[1.2] text-white lg:text-[48px] lg:leading-[1.15];
+    }
+    .pub-lead {
+        @apply mt-4 max-w-[68ch] text-[17px] leading-[1.6] text-[#CBD5E1];
+    }
+    .pub-h2 {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-weight: 600;
+        text-transform: none;
+        @apply text-[24px] leading-[1.25] text-[var(--ink)] lg:text-[32px];
+    }
+    .pub-section {
+        @apply py-16 lg:py-24;
+    }
+    .pub-box {
+        @apply rounded-[2px] border border-[var(--rule)] bg-[var(--surface)];
+    }
+    .pub-btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-[2px] bg-[#011987] px-6 py-3 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[#0B1640] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#47BDFF] focus-visible:ring-offset-2;
+    }
+    body.dark .public-site .pub-btn,
+    .public-site.is-dark .pub-btn {
+        @apply bg-[#47BDFF] text-[#08111F] hover:bg-[#74CEFF];
+    }
+    .pub-btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 rounded-[2px] border border-[var(--rule)] bg-transparent px-6 py-3 text-[16px] font-bold text-[var(--ink)] transition-colors duration-150 hover:border-[var(--brand-navy)] hover:text-[var(--brand-navy)];
+    }
+    .pub-chip {
+        @apply rounded-[2px] border px-4 py-2 text-[14px] font-bold transition-colors duration-150;
+    }
+    .pub-chip-idle {
+        @apply border-[var(--rule)] text-[var(--muted)] hover:border-[var(--brand-navy)] hover:text-[var(--brand-navy)];
+    }
+    .pub-chip-active {
+        @apply border-[#011987] bg-[#011987] text-white;
+    }
+    body.dark .public-site .pub-chip-active,
+    .public-site.is-dark .pub-chip-active {
+        @apply border-[#47BDFF] bg-[#47BDFF] text-[#08111F];
+    }
+    .pub-navy {
+        @apply bg-[#0B1640] text-white;
+    }
+
+    .public-site .prose h1,
+    .public-site .prose h2,
+    .public-site .prose h3,
+    .public-site .prose h4 {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-weight: 600;
+        color: var(--ink);
+        text-transform: none;
+    }
+
+    .public-site .prose p,
+    .public-site .prose li {
+        color: var(--ink);
+        font-size: 17px;
+        line-height: 1.65;
+    }
+
+    .public-site .prose a {
+        color: var(--brand-navy);
+        font-weight: 700;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
     .btn {
-        @apply inline-block rounded-2xl bg-primary py-4 px-7 text-center text-sm font-extrabold uppercase text-black transition hover:bg-sky-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+        @apply inline-block rounded-[2px] bg-primary py-3.5 px-6 text-center text-sm font-bold text-[#08111F] transition-colors duration-150 hover:bg-[#74CEFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary;
     }
     .heading {
-        @apply mb-10 lg:mb-14;
+        @apply mb-8 lg:mb-10;
     }
     .heading h6,
     .heading .subtitle {
-        @apply mb-3 text-lg font-extrabold text-primary sm:mb-4 block;
+        @apply mb-2 text-sm font-bold text-primary block;
     }
     .heading h1,
     .heading h2,
     .heading h4 {
-        @apply text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px];
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-weight: 600;
+        text-transform: none;
+        @apply text-2xl text-[var(--ink)] sm:text-3xl lg:text-[36px] lg:!leading-[1.2];
     }
 
     /* Header */

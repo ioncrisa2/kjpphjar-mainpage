@@ -129,227 +129,198 @@ function resetFormToNewMessage() {
 <template>
   <div>
     <!-- Banner -->
-    <div class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
+    <div class="pub-page-banner">
       <div class="container">
-        <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
-          <div class="heading mb-0 text-center md:text-left">
-            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Contact Us</h1>
-          </div>
-        </div>
+        <span class="pub-eyebrow">Hubungi Kami</span>
+        <h1 class="pub-h1">Contact Us</h1>
       </div>
     </div>
 
     <!-- Form & Head Office Info + Google Maps Embed -->
-    <section class="bg-gradient-to-t from-white/[55%] to-transparent py-14 dark:bg-none lg:py-[50px]">
+    <section class="pub-section bg-[var(--paper)]">
       <div class="container">
-        <UiBreadcrumbs :items="[{ label: 'Contact Us' }]" class="mb-6" />
-        <div class="relative z-10 lg:flex lg:gap-16">
-          <div class="heading text-center lg:text-left">
-            <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Hubungi Kantor Kami</h2>
-            <p class="mt-2 text-sm text-gray max-w-xl">Kirimkan pesan atau pertanyaan Anda kepada kami. Tim penilai publik {{ company.name }} siap membantu kebutuhan penilaian properti, bisnis, studi kelayakan, dan pengawasan proyek Anda.</p>
-          </div>
-        </div>
+        <UiBreadcrumbs :items="[{ label: 'Contact Us' }]" class="mb-10" />
+        <h2 class="pub-h2">Hubungi Kantor Kami</h2>
+        <p class="mt-3 max-w-[68ch] text-[17px] leading-[1.6] text-[var(--muted)]">Kirimkan pesan atau pertanyaan Anda kepada kami. Tim penilai publik {{ company.name }} siap membantu kebutuhan penilaian properti, bisnis, studi kelayakan, dan pengawasan proyek Anda.</p>
 
-        <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:items-start">
+        <div class="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:items-start">
           <!-- Contact Form / Interactive Feedback Area -->
           <div>
-          <!-- Interactive Success Card -->
-          <Transition
-            enter-active-class="transition duration-300 ease-out"
-            enter-from-class="opacity-0 scale-95"
-            enter-to-class="opacity-100 scale-100"
-            leave-active-class="transition duration-200 ease-in"
-            leave-from-class="opacity-100 scale-100"
-            leave-to-class="opacity-0 scale-95"
-          >
             <div
               v-if="isSubmitted"
-              class="rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-white to-white p-8 dark:from-emerald-950/30 dark:via-gray-dark dark:to-gray-dark shadow-xl"
+              class="pub-box border-l-4 border-l-[var(--brand-navy)] p-8"
             >
-              <div class="flex flex-col items-center text-center">
-                <!-- Success Animated Icon -->
-                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 ring-8 ring-emerald-500/10">
-                  <Icon name="ph:check-bold" class="h-8 w-8" />
+              <h3 class="pub-serif text-[24px] text-[var(--ink)]">
+                Pesan Berhasil Terkirim!
+              </h3>
+
+              <p class="mt-3 max-w-[68ch] text-[16px] leading-[1.6] text-[var(--muted)]">
+                Terima kasih, <strong class="text-[var(--ink)]">{{ submittedData?.fullname }}</strong>! Pesan Anda telah kami terima di sistem admin kami. Tim KJPP HJA'R akan segera menghubungi Anda melalui email <strong class="text-[var(--ink)]">{{ submittedData?.email }}</strong> atau nomor telepon Anda.
+              </p>
+
+              <!-- Receipt / Confirmation Summary Box -->
+              <dl class="mt-6 border-t border-[var(--rule)] text-[14px]">
+                <div class="flex items-center justify-between gap-4 border-b border-[var(--rule)] py-3">
+                  <dt class="text-[var(--muted)]">Status Pengiriman</dt>
+                  <dd class="font-bold text-[var(--ink)]">Diterima di Admin Panel KJPP HJA'R</dd>
                 </div>
-
-                <h3 class="mt-5 text-2xl font-extrabold text-black dark:text-white">
-                  Pesan Berhasil Terkirim!
-                </h3>
-
-                <p class="mt-2 text-sm text-gray leading-relaxed max-w-lg">
-                  Terima kasih, <strong class="text-black dark:text-white">{{ submittedData?.fullname }}</strong>! Pesan Anda telah kami terima di sistem admin kami. Tim KJPP HJA'R akan segera menghubungi Anda melalui email <strong class="text-black dark:text-white">{{ submittedData?.email }}</strong> atau nomor telepon Anda.
-                </p>
-
-                <!-- Receipt / Confirmation Summary Box -->
-                <div class="mt-6 w-full rounded-2xl bg-stone-50 p-4 text-left text-xs border border-gray/10 dark:bg-gray-800/60">
-                  <div class="flex items-center justify-between py-1.5 border-b border-gray/10">
-                    <span class="text-gray">Status Pengiriman</span>
-                    <span class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                      <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      Diterima di Admin Panel KJPP HJA'R
-                    </span>
-                  </div>
-                  <div class="flex items-center justify-between py-1.5 border-b border-gray/10">
-                    <span class="text-gray">Email Pengirim</span>
-                    <span class="font-semibold text-black dark:text-white">{{ submittedData?.email }}</span>
-                  </div>
-                  <div class="flex items-center justify-between py-1.5 pt-2">
-                    <span class="text-gray">Waktu Kirim</span>
-                    <span class="font-semibold text-black dark:text-white">{{ submittedData?.submittedAt }}</span>
-                  </div>
+                <div class="flex items-center justify-between gap-4 border-b border-[var(--rule)] py-3">
+                  <dt class="text-[var(--muted)]">Email Pengirim</dt>
+                  <dd class="font-bold text-[var(--ink)]">{{ submittedData?.email }}</dd>
                 </div>
+                <div class="flex items-center justify-between gap-4 border-b border-[var(--rule)] py-3">
+                  <dt class="text-[var(--muted)]">Waktu Kirim</dt>
+                  <dd class="font-bold tabular-nums text-[var(--ink)]">{{ submittedData?.submittedAt }}</dd>
+                </div>
+              </dl>
 
-                <!-- Button to Send Another Message -->
-                <button
-                  type="button"
-                  @click="resetFormToNewMessage"
-                  class="btn !rounded-xl mt-6 inline-flex items-center gap-2 !bg-primary !text-black hover:!bg-sky-400 transition"
-                >
-                  <Icon name="ph:plus-bold" class="h-4 w-4" />
-                  <span>Kirim Pesan Lainnya</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                class="pub-btn mt-6"
+                @click="resetFormToNewMessage"
+              >
+                Kirim Pesan Lainnya
+              </button>
             </div>
 
             <!-- Active Form -->
-            <form v-else @submit.prevent="submitForm" class="space-y-4" novalidate>
+            <form v-else class="space-y-5" novalidate @submit.prevent="submitForm">
               <!-- General Error Alert -->
               <div
                 v-if="generalError"
-                class="flex items-start gap-3 rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-xs font-semibold text-red-600 dark:text-red-400 animate-fade-in"
+                role="alert"
+                class="flex items-start gap-3 rounded-[2px] border border-red-600/40 bg-red-600/5 p-4 text-[14px] font-bold text-red-700 dark:text-red-300"
               >
-                <Icon name="ph:warning-circle-bold" class="h-5 w-5 shrink-0 mt-0.5" />
                 <div class="flex-1">{{ generalError }}</div>
-                <button type="button" @click="generalError = ''" class="text-red-400 hover:text-red-600">
-                  <Icon name="ph:x-bold" class="h-4 w-4" />
+                <button type="button" class="text-red-700 dark:text-red-300" aria-label="Tutup pesan kesalahan" @click="generalError = ''">
+                  <Icon name="ph:x-bold" class="h-4 w-4" aria-hidden="true" />
                 </button>
               </div>
 
-              <div class="grid gap-4 sm:grid-cols-2">
+              <div class="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label class="mb-1.5 block text-sm font-semibold text-black dark:text-white">
-                    Nama Lengkap <span class="text-red-500">*</span>
+                  <label for="contact-fullname" class="mb-2 block text-[14px] font-bold text-[var(--ink)]">
+                    Nama Lengkap <span class="text-red-700 dark:text-red-300">*</span>
                   </label>
                   <input
+                    id="contact-fullname"
                     v-model="form.fullname"
-                    @input="clearError('fullname')"
                     :disabled="loading"
                     type="text"
                     placeholder="Nama lengkap Anda"
-                    class="w-full rounded-xl border px-4 py-3 text-sm outline-none transition dark:bg-gray-dark dark:text-white"
-                    :class="errors.fullname ? 'border-red-500 bg-red-50/50 dark:bg-red-950/20 focus:border-red-500' : 'border-gray/20 focus:border-primary'"
+                    class="w-full rounded-[2px] border bg-[var(--surface)] px-4 py-3 text-[16px] text-[var(--ink)] outline-none transition-colors duration-150 placeholder:text-[var(--muted)] focus:ring-2 focus:ring-[#47BDFF]/40"
+                    :class="errors.fullname ? 'border-red-600 focus:border-red-600' : 'border-[var(--rule)] focus:border-[var(--brand-navy)]'"
+                    @input="clearError('fullname')"
                   />
-                  <p v-if="errors.fullname" class="text-xs text-red-500 mt-1 font-medium">{{ errors.fullname }}</p>
+                  <p v-if="errors.fullname" class="mt-1 text-[14px] text-red-700 dark:text-red-300">{{ errors.fullname }}</p>
                 </div>
 
                 <div>
-                  <label class="mb-1.5 block text-sm font-semibold text-black dark:text-white">
-                    Email <span class="text-red-500">*</span>
+                  <label for="contact-email" class="mb-2 block text-[14px] font-bold text-[var(--ink)]">
+                    Email <span class="text-red-700 dark:text-red-300">*</span>
                   </label>
                   <input
+                    id="contact-email"
                     v-model="form.email"
-                    @input="clearError('email')"
                     :disabled="loading"
                     type="email"
                     placeholder="email@contoh.com"
-                    class="w-full rounded-xl border px-4 py-3 text-sm outline-none transition dark:bg-gray-dark dark:text-white"
-                    :class="errors.email ? 'border-red-500 bg-red-50/50 dark:bg-red-950/20 focus:border-red-500' : 'border-gray/20 focus:border-primary'"
+                    class="w-full rounded-[2px] border bg-[var(--surface)] px-4 py-3 text-[16px] text-[var(--ink)] outline-none transition-colors duration-150 placeholder:text-[var(--muted)] focus:ring-2 focus:ring-[#47BDFF]/40"
+                    :class="errors.email ? 'border-red-600 focus:border-red-600' : 'border-[var(--rule)] focus:border-[var(--brand-navy)]'"
+                    @input="clearError('email')"
                   />
-                  <p v-if="errors.email" class="text-xs text-red-500 mt-1 font-medium">{{ errors.email }}</p>
+                  <p v-if="errors.email" class="mt-1 text-[14px] text-red-700 dark:text-red-300">{{ errors.email }}</p>
                 </div>
 
                 <div>
-                  <label class="mb-1.5 block text-sm font-semibold text-black dark:text-white">Telepon</label>
+                  <label for="contact-phone" class="mb-2 block text-[14px] font-bold text-[var(--ink)]">Telepon</label>
                   <input
+                    id="contact-phone"
                     v-model="form.phone"
                     :disabled="loading"
                     type="tel"
                     placeholder="08xx-xxxx-xxxx"
-                    class="w-full rounded-xl border border-gray/20 px-4 py-3 text-sm outline-none transition focus:border-primary dark:bg-gray-dark dark:text-white"
+                    class="w-full rounded-[2px] border bg-[var(--surface)] px-4 py-3 text-[16px] text-[var(--ink)] outline-none transition-colors duration-150 placeholder:text-[var(--muted)] focus:ring-2 focus:ring-[#47BDFF]/40 border-[var(--rule)] focus:border-[var(--brand-navy)] tabular-nums"
                   />
                 </div>
 
                 <div>
-                  <label class="mb-1.5 block text-sm font-semibold text-black dark:text-white">Kota</label>
+                  <label for="contact-city" class="mb-2 block text-[14px] font-bold text-[var(--ink)]">Kota</label>
                   <input
+                    id="contact-city"
                     v-model="form.city"
                     :disabled="loading"
                     type="text"
                     placeholder="Kota Anda"
-                    class="w-full rounded-xl border border-gray/20 px-4 py-3 text-sm outline-none transition focus:border-primary dark:bg-gray-dark dark:text-white"
+                    class="w-full rounded-[2px] border bg-[var(--surface)] px-4 py-3 text-[16px] text-[var(--ink)] outline-none transition-colors duration-150 placeholder:text-[var(--muted)] focus:ring-2 focus:ring-[#47BDFF]/40 border-[var(--rule)] focus:border-[var(--brand-navy)]"
                   />
                 </div>
               </div>
 
               <div>
-                <label class="mb-1.5 block text-sm font-semibold text-black dark:text-white">
-                  Pesan <span class="text-red-500">*</span>
+                <label for="contact-message" class="mb-2 block text-[14px] font-bold text-[var(--ink)]">
+                  Pesan <span class="text-red-700 dark:text-red-300">*</span>
                 </label>
                 <textarea
+                  id="contact-message"
                   v-model="form.message"
-                  @input="clearError('message')"
                   :disabled="loading"
                   rows="5"
                   placeholder="Tuliskan pesan atau pertanyaan Anda seputar layanan penilaian properti kami..."
-                  class="w-full rounded-xl border px-4 py-3 text-sm outline-none transition dark:bg-gray-dark dark:text-white resize-none"
-                  :class="errors.message ? 'border-red-500 bg-red-50/50 dark:bg-red-950/20 focus:border-red-500' : 'border-gray/20 focus:border-primary'"
+                  class="w-full rounded-[2px] border bg-[var(--surface)] px-4 py-3 text-[16px] text-[var(--ink)] outline-none transition-colors duration-150 placeholder:text-[var(--muted)] focus:ring-2 focus:ring-[#47BDFF]/40 resize-none"
+                  :class="errors.message ? 'border-red-600 focus:border-red-600' : 'border-[var(--rule)] focus:border-[var(--brand-navy)]'"
+                  @input="clearError('message')"
                 />
-                <p v-if="errors.message" class="text-xs text-red-500 mt-1 font-medium">{{ errors.message }}</p>
+                <p v-if="errors.message" class="mt-1 text-[14px] text-red-700 dark:text-red-300">{{ errors.message }}</p>
               </div>
 
               <button
                 type="submit"
                 :disabled="loading"
-                class="btn !rounded-xl inline-flex items-center justify-center gap-2 min-w-[160px] disabled:opacity-50 shadow-md"
+                class="pub-btn min-w-[160px] disabled:opacity-50"
               >
-                <Icon v-if="loading" name="ph:spinner-gap-bold" class="h-4 w-4 animate-spin" />
-                <Icon v-else name="ph:paper-plane-tilt-bold" class="h-4 w-4" />
+                <Icon v-if="loading" name="ph:spinner-gap-bold" class="h-4 w-4 animate-spin" aria-hidden="true" />
                 <span>{{ loading ? 'Sedang Mengirim Pesan...' : 'Kirim Pesan' }}</span>
               </button>
             </form>
-          </Transition>
           </div>
 
           <!-- Kantor Pusat Palembang, Jam Operasional & Google Maps Embed -->
-          <aside class="space-y-6 rounded-3xl border border-gray/15 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-gray-dark">
+          <aside class="pub-box space-y-6 p-6 lg:p-8">
             <div>
-              <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-primary">
-                <Icon name="ph:buildings-bold" class="h-4 w-4" aria-hidden="true" />
+              <span class="text-[14px] font-bold text-[var(--brand-navy)]">
                 {{ headOffice.name }}
               </span>
-              <h3 class="mt-3 text-xl font-extrabold text-black dark:text-white">
+              <h3 class="pub-serif mt-2 text-[24px] leading-[1.25] text-[var(--ink)]">
                 {{ company.name }}
               </h3>
-              <ul class="mt-4 space-y-3 text-sm text-gray-700 dark:text-gray-300">
-                <li class="flex items-start gap-3">
-                  <Icon name="ph:map-pin-bold" class="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  <span>{{ headOffice.fullAddress }}</span>
-                </li>
-                <li class="flex items-start gap-3">
-                  <Icon name="ph:phone-bold" class="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  <div>
-                    <a :href="`tel:${headOffice.phoneE164}`" class="font-bold text-black hover:text-primary dark:text-white">{{ headOffice.phone }}</a>
-                    <span class="mx-1.5 text-gray">·</span>
-                    <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="font-bold text-emerald-700 hover:underline dark:text-emerald-400">WhatsApp {{ headOffice.whatsapp }}</a>
-                  </div>
-                </li>
-                <li class="flex items-start gap-3">
-                  <Icon name="ph:envelope-simple-bold" class="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  <a :href="`mailto:${headOffice.email}`" class="font-semibold text-black hover:text-primary dark:text-white">{{ headOffice.email }}</a>
-                </li>
-                <li class="flex items-start gap-3 rounded-xl bg-stone-50 p-3 dark:bg-white/5">
-                  <Icon name="ph:clock-bold" class="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-                  <div>
-                    <p class="font-extrabold text-black dark:text-white">Jam Operasional Kantor</p>
-                    <p class="mt-0.5 text-xs font-semibold text-gray-700 dark:text-gray-300">{{ company.operatingHours.display }}</p>
-                    <p class="text-xs text-gray">{{ company.operatingHours.weekendDisplay }}</p>
-                  </div>
-                </li>
-              </ul>
+              <dl class="mt-5 border-t border-[var(--rule)] text-[16px]">
+                <div class="border-b border-[var(--rule)] py-3">
+                  <dt class="text-[14px] text-[var(--muted)]">Alamat</dt>
+                  <dd class="mt-1 leading-[1.6] text-[var(--ink)]">{{ headOffice.fullAddress }}</dd>
+                </div>
+                <div class="border-b border-[var(--rule)] py-3">
+                  <dt class="text-[14px] text-[var(--muted)]">Telepon</dt>
+                  <dd class="mt-1 tabular-nums">
+                    <a :href="`tel:${headOffice.phoneE164}`" class="pub-link font-bold">{{ headOffice.phone }}</a>
+                    <span class="mx-1.5 text-[var(--muted)]">·</span>
+                    <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="pub-link font-bold">WhatsApp {{ headOffice.whatsapp }}</a>
+                  </dd>
+                </div>
+                <div class="border-b border-[var(--rule)] py-3">
+                  <dt class="text-[14px] text-[var(--muted)]">Email</dt>
+                  <dd class="mt-1"><a :href="`mailto:${headOffice.email}`" class="pub-link font-bold">{{ headOffice.email }}</a></dd>
+                </div>
+                <div class="border-b border-[var(--rule)] py-3">
+                  <dt class="text-[14px] text-[var(--muted)]">Jam Operasional Kantor</dt>
+                  <dd class="mt-1 font-bold tabular-nums text-[var(--ink)]">{{ company.operatingHours.display }}</dd>
+                  <dd class="text-[14px] text-[var(--muted)]">{{ company.operatingHours.weekendDisplay }}</dd>
+                </div>
+              </dl>
             </div>
 
             <div>
-              <h4 class="mb-2 text-sm font-extrabold text-black dark:text-white">Peta Google Maps Kantor Pusat Palembang</h4>
+              <h4 class="mb-3 text-[14px] font-bold text-[var(--ink)]">Peta Google Maps Kantor Pusat Palembang</h4>
               <iframe
                 :src="headOffice.googleMapsEmbedUrl"
                 :title="`Peta Google Maps ${headOffice.name} ${company.name}`"
@@ -358,16 +329,15 @@ function resetFormToNewMessage() {
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
                 allowfullscreen
-                class="h-64 w-full rounded-2xl border border-gray/15"
+                class="h-64 w-full rounded-[2px] border border-[var(--rule)]"
               />
               <a
                 :href="headOffice.googleMapsUrl"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold text-sky-700 hover:text-primary dark:text-primary"
+                class="pub-link mt-3 inline-block text-[14px] font-bold"
               >
-                <span>Buka lokasi Kantor Pusat Palembang di Google Maps</span>
-                <Icon name="ph:arrow-square-out-bold" class="h-3.5 w-3.5" aria-hidden="true" />
+                Buka lokasi Kantor Pusat Palembang di Google Maps ↗
               </a>
             </div>
           </aside>
@@ -376,20 +346,18 @@ function resetFormToNewMessage() {
     </section>
 
     <!-- Branches with Map -->
-    <section class="py-14 lg:py-[50px]">
+    <section class="pub-section border-t border-[var(--rule)] bg-[var(--paper)]">
       <div class="container">
-        <div class="heading text-center">
-          <p class="subtitle">Lokasi Kami</p>
-          <h2 class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Kantor &amp; Cabang</h2>
-        </div>
+        <span class="mb-3 block text-[14px] font-bold text-[var(--brand-navy)]">Lokasi Kami</span>
+        <h2 class="pub-h2 mb-10">Kantor &amp; Cabang</h2>
 
-        <div v-if="branches.length === 0" class="text-center text-gray py-10">Memuat data lokasi...</div>
+        <div v-if="branches.length === 0" class="py-10 text-[var(--muted)]">Memuat data lokasi...</div>
 
-        <div v-else class="space-y-10">
+        <div v-else class="border-t border-[var(--rule)]">
           <div
             v-for="branch in branches"
             :key="branch.id"
-            class="flex flex-col gap-6 rounded-[32px] border border-gray/10 overflow-hidden sm:flex-row"
+            class="grid gap-8 border-b border-[var(--rule)] py-10 md:grid-cols-2"
           >
             <!-- Map -->
             <ClientOnly>
@@ -398,52 +366,51 @@ function resetFormToNewMessage() {
                 :lat="branch.latitude"
                 :lng="branch.longitude"
                 :title="branch.name"
-                class="sm:w-1/2 h-64 sm:h-auto min-h-[250px]"
+                class="h-64 min-h-[250px] overflow-hidden rounded-[2px] border border-[var(--rule)] md:h-auto"
               />
-              <div v-else class="sm:w-1/2 h-64 sm:h-auto min-h-[250px] bg-gray-100 flex items-center justify-center text-gray-500">
+              <div v-else class="flex h-64 min-h-[250px] items-center justify-center rounded-[2px] border border-[var(--rule)] bg-[var(--surface)] text-[var(--muted)] md:h-auto">
                 Peta tidak tersedia
               </div>
               <template #fallback>
-                <div class="sm:w-1/2 h-64 bg-gray/10 animate-pulse" />
+                <div class="h-64 animate-pulse rounded-[2px] bg-[var(--surface)]" />
               </template>
             </ClientOnly>
 
             <!-- Info -->
-            <div class="sm:w-1/2 flex flex-col justify-center py-8 px-6">
-              <h3 class="text-xl font-extrabold text-primary">{{ branch.name }}</h3>
-              <p class="text-gray font-semibold mt-1">{{ branch.city }}</p>
-              <ul class="mt-4 space-y-3 text-sm">
-                <li class="flex items-start gap-3">
-                  <Icon name="ph:map-pin-bold" class="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  <a :href="branch.mapsUrl" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition text-black dark:text-white">{{ branch.address }}</a>
-                </li>
-                <li class="flex items-start gap-3">
-                  <Icon name="ph:phone-bold" class="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  <a :href="branch.phoneHref" class="hover:text-primary transition text-black dark:text-white">{{ branch.phone }}</a>
-                </li>
-                <li class="flex items-start gap-3">
-                  <Icon name="ph:envelope-simple-bold" class="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  <a :href="`mailto:${branch.email}`" class="hover:text-primary transition text-black dark:text-white">{{ branch.email }}</a>
-                </li>
-              </ul>
+            <div class="flex flex-col justify-center">
+              <h3 class="pub-serif text-[24px] leading-[1.25] text-[var(--ink)]">{{ branch.name }}</h3>
+              <p class="mt-1 text-[14px] text-[var(--muted)]">{{ branch.city }}</p>
+              <dl class="mt-5 border-t border-[var(--rule)] text-[16px]">
+                <div class="border-b border-[var(--rule)] py-3">
+                  <dt class="text-[14px] text-[var(--muted)]">Alamat</dt>
+                  <dd class="mt-1"><a :href="branch.mapsUrl" target="_blank" rel="noopener noreferrer" class="leading-[1.6] text-[var(--ink)] transition-colors duration-150 hover:text-[var(--brand-navy)]">{{ branch.address }}</a></dd>
+                </div>
+                <div class="border-b border-[var(--rule)] py-3">
+                  <dt class="text-[14px] text-[var(--muted)]">Telepon</dt>
+                  <dd class="mt-1"><a :href="branch.phoneHref" class="pub-link font-bold tabular-nums">{{ branch.phone }}</a></dd>
+                </div>
+                <div class="border-b border-[var(--rule)] py-3">
+                  <dt class="text-[14px] text-[var(--muted)]">Email</dt>
+                  <dd class="mt-1"><a :href="`mailto:${branch.email}`" class="pub-link font-bold">{{ branch.email }}</a></dd>
+                </div>
+              </dl>
 
-              <div v-if="branchStaff(branch.id).length" class="mt-6 border-t border-gray/10 pt-5">
-                <p class="text-xs font-bold uppercase tracking-wider text-gray">Tim di kantor ini</p>
+              <div v-if="branchStaff(branch.id).length" class="mt-6">
+                <p class="text-[14px] font-bold text-[var(--ink)]">Tim di kantor ini</p>
                 <ul class="mt-3 grid gap-x-6 gap-y-3 lg:grid-cols-2">
-                  <li v-for="member in branchStaff(branch.id).slice(0, STAFF_PREVIEW_LIMIT)" :key="member._id" class="text-sm">
-                    <p class="font-bold text-black dark:text-white">{{ member.name }}</p>
-                    <p class="text-xs text-gray">
-                      {{ member.position }}<template v-if="member.mappiNumber"> · No. MAPPI {{ member.mappiNumber }}</template>
+                  <li v-for="member in branchStaff(branch.id).slice(0, STAFF_PREVIEW_LIMIT)" :key="member._id" class="text-[14px]">
+                    <p class="font-bold text-[var(--ink)]">{{ member.name }}</p>
+                    <p class="text-[var(--muted)]">
+                      {{ member.position }}<template v-if="member.mappiNumber"> · <span class="tabular-nums">No. MAPPI {{ member.mappiNumber }}</span></template>
                     </p>
                   </li>
                 </ul>
                 <NuxtLink
                   v-if="branchStaff(branch.id).length > STAFF_PREVIEW_LIMIT"
                   :to="`/about-us#staff-${branch.id}`"
-                  class="mt-4 inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:underline"
+                  class="pub-link mt-4 inline-block text-[14px] font-bold"
                 >
-                  Lihat semua {{ branchStaff(branch.id).length }} staff
-                  <Icon name="ph:arrow-right-bold" aria-hidden="true" />
+                  Lihat semua {{ branchStaff(branch.id).length }} staff →
                 </NuxtLink>
               </div>
             </div>
@@ -458,8 +425,9 @@ function resetFormToNewMessage() {
         v-if="toast.show"
         class="toast"
         :class="toast.success ? 'toast-success' : 'toast-error'"
+        role="status"
       >
-        <Icon :name="toast.success ? 'ph:check-circle-bold' : 'ph:warning-circle-bold'" class="h-5 w-5 shrink-0" />
+        <Icon :name="toast.success ? 'ph:check-circle-bold' : 'ph:warning-circle-bold'" class="h-5 w-5 shrink-0" aria-hidden="true" />
         <span class="text-xs font-semibold">{{ toast.message }}</span>
       </div>
     </Transition>

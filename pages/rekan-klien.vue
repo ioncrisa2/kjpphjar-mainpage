@@ -34,64 +34,55 @@ const filteredClients = computed(() => {
 <template>
   <div>
     <!-- Banner -->
-    <div class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
+    <div class="pub-page-banner">
       <div class="container">
-        <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
-          <div class="heading mb-0 text-center md:text-left">
-            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Rekan dan Client</h1>
-          </div>
-        </div>
+        <span class="pub-eyebrow">Rekan &amp; Klien Institusi</span>
+        <h1 class="pub-h1">Rekan dan Client</h1>
       </div>
     </div>
 
     <!-- Content Section -->
-    <div class="py-16 sm:py-24">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <UiBreadcrumbs :items="[{ label: 'Rekan dan Klien' }]" class="mb-6" />
+    <div class="pub-section bg-[var(--paper)]">
+      <div class="container">
+        <UiBreadcrumbs :items="[{ label: 'Rekan dan Klien' }]" class="mb-10" />
 
-        <div class="text-center mb-12">
-           <h2 class="text-2xl sm:text-3xl font-extrabold text-black font-mulish dark:text-white">
-             Rekan dan Client yang pernah menggunakan Jasa KJPP Henricus Judi Adrianto dan Rekan
-           </h2>
-        </div>
+        <h2 class="pub-h2 mb-10 max-w-4xl">
+          Rekan dan Client yang pernah menggunakan Jasa KJPP Henricus Judi Adrianto dan Rekan
+        </h2>
 
         <!-- Filter Tabs -->
-        <div v-if="categories.length > 1" class="flex flex-wrap justify-center gap-2 mb-12">
+        <div v-if="categories.length > 1" class="mb-10 flex flex-wrap gap-2">
           <button
             v-for="cat in categories"
             :key="cat"
+            type="button"
+            class="pub-chip"
+            :class="activeCategory === cat ? 'pub-chip-active' : 'pub-chip-idle'"
+            :aria-pressed="activeCategory === cat"
             @click="activeCategory = cat"
-            class="px-4 py-2 rounded-full text-sm font-semibold transition-colors duration-200"
-            :class="activeCategory === cat ? 'bg-primary text-black' : 'bg-gray-100 text-gray hover:bg-gray-200 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20'"
           >
             {{ cat }}
           </button>
         </div>
 
         <!-- Grid Klien -->
-        <div v-if="pending" class="text-center text-gray py-12">
-          <div class="animate-pulse flex space-x-4 justify-center">
-            <div class="h-12 w-12 bg-gray-200 rounded-full dark:bg-white/10"></div>
-            <div class="space-y-3">
-              <div class="h-4 w-32 bg-gray-200 rounded dark:bg-white/10"></div>
-              <div class="h-4 w-24 bg-gray-200 rounded dark:bg-white/10"></div>
-            </div>
-          </div>
+        <div v-if="pending" class="grid grid-cols-2 gap-px sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          <div v-for="i in 12" :key="i" class="h-40 animate-pulse bg-[var(--surface)]" />
         </div>
 
-        <div v-else-if="!filteredClients.length" class="text-center text-gray py-12">
+        <div v-else-if="!filteredClients.length" class="py-12 text-[var(--muted)]">
           Belum ada data klien untuk kategori ini.
         </div>
 
-        <div v-else class="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          <div
+        <ul v-else class="grid grid-cols-2 border-l border-t border-[var(--rule)] sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          <li
             v-for="client in filteredClients"
             :key="client._id"
-            class="group col-span-1 flex flex-col items-center justify-center bg-gray-50 rounded-lg p-6 hover:bg-white hover:shadow-lg transition-all duration-300 border border-transparent hover:border-gray-200"
+            class="group flex flex-col items-center justify-center border-b border-r border-[var(--rule)] bg-[var(--surface)] p-6"
           >
-            <div class="h-24 w-full flex items-center justify-center">
+            <div class="flex h-20 w-full items-center justify-center">
               <img
-                class="max-h-full max-w-full object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                class="max-h-16 max-w-full object-contain grayscale opacity-70 transition duration-150 group-hover:grayscale-0 group-hover:opacity-100"
                 :src="client.logoUrl"
                 :alt="`Logo ${client.name} – rekan dan klien KJPP HJA'R`"
                 width="160"
@@ -100,12 +91,11 @@ const filteredClients = computed(() => {
                 decoding="async"
               >
             </div>
-            <h3 class="mt-4 text-sm font-medium text-black text-center line-clamp-2" :title="client.name">
+            <h3 class="mt-4 text-center text-[14px] leading-[1.4] text-[var(--ink)]">
               {{ client.name }}
             </h3>
-          </div>
-        </div>
-
+          </li>
+        </ul>
       </div>
     </div>
   </div>

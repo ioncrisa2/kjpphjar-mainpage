@@ -84,62 +84,62 @@ function formatDate(value: string) {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-black">
-    <section class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
-      <div class="container flex min-h-[300px] items-center py-12 md:min-h-[400px]">
-        <div class="max-w-3xl text-center md:text-left">
-          <h1 class="text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-[46px] lg:leading-[1.15]">Wawasan untuk keputusan bernilai</h1>
-          <p class="mt-5 max-w-2xl text-base leading-7 text-white/80 sm:text-lg">Berita, panduan, dan perspektif praktis dari tim KJPP HJA'R mengenai penilaian properti, bisnis, dan konsultasi.</p>
-        </div>
+  <div class="bg-[var(--paper)]">
+    <section class="pub-page-banner">
+      <div class="container">
+        <span class="pub-eyebrow">Blog &amp; Publikasi</span>
+        <h1 class="pub-h1">Wawasan untuk keputusan bernilai</h1>
+        <p class="pub-lead">Berita, panduan, dan perspektif praktis dari tim KJPP HJA'R mengenai penilaian properti, bisnis, dan konsultasi.</p>
       </div>
     </section>
 
-    <main class="py-14 sm:py-20">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <UiBreadcrumbs :items="[{ label: 'Blog & Publikasi' }]" class="mb-8" />
-        
+    <main class="pub-section">
+      <div class="container">
+        <UiBreadcrumbs :items="[{ label: 'Blog & Publikasi' }]" class="mb-10" />
+
         <NuxtLink
           v-if="showFeatured"
           :to="`/blog/${featured.slug}`"
-          class="group grid overflow-hidden rounded-2xl bg-black md:grid-cols-[1.05fr_.95fr]"
+          class="group grid overflow-hidden rounded-[2px] bg-[#0B1640] md:grid-cols-[1.05fr_.95fr]"
         >
-          <div class="relative min-h-[280px] overflow-hidden bg-slate-800 md:order-2 md:min-h-[390px]">
-            <img v-if="featured.coverImageUrl" :src="featured.coverImageUrl" :alt="`Ilustrasi artikel unggulan: ${featured.title}`" class="absolute inset-0 h-full w-full object-cover transition duration-500 ease-out group-hover:scale-[1.03]">
+          <div class="relative min-h-[280px] overflow-hidden bg-[#0D162B] md:order-2 md:min-h-[390px]">
+            <img v-if="featured.coverImageUrl" :src="featured.coverImageUrl" :alt="`Ilustrasi artikel unggulan: ${featured.title}`" class="absolute inset-0 h-full w-full object-cover">
             <div v-else class="absolute inset-0 flex items-center justify-center text-white/30"><Icon name="ph:newspaper-clipping-bold" class="text-7xl" /></div>
           </div>
-          <div class="flex flex-col justify-center p-7 sm:p-10 lg:p-12">
-            <div class="flex flex-wrap items-center gap-3 text-sm font-semibold text-primary">
-              <span class="rounded-full bg-primary/15 px-3 py-1">Artikel unggulan</span>
-              <span v-if="featured.category">{{ featured.category.name }}</span>
+          <div class="flex flex-col justify-center p-8 sm:p-10 lg:p-12">
+            <div class="flex flex-wrap items-center gap-3 text-[14px] font-bold text-[#47BDFF]">
+              <span>Artikel unggulan</span>
+              <span v-if="featured.category" class="text-[#CBD5E1]">· {{ featured.category.name }}</span>
             </div>
-            <h2 class="mt-5 text-2xl font-extrabold leading-tight text-white sm:text-3xl lg:text-4xl">{{ featured.title }}</h2>
-            <p class="mt-4 line-clamp-3 max-w-[65ch] text-base leading-7 text-white/70">{{ featured.excerpt }}</p>
-            <div class="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/65">
-              <span class="inline-flex items-center gap-1.5"><Icon name="ph:calendar-blank-bold" /> {{ formatDate(featured.publishedAt || featured.createdAt) }}</span>
-              <span class="inline-flex items-center gap-1.5"><Icon name="ph:clock-bold" /> {{ featured.readingTime }} menit baca</span>
+            <h2 class="pub-serif mt-4 text-[24px] leading-[1.25] text-white lg:text-[32px]">{{ featured.title }}</h2>
+            <p class="mt-4 max-w-[65ch] text-[16px] leading-[1.6] text-[#CBD5E1]">{{ featured.excerpt }}</p>
+            <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-[14px] tabular-nums text-[#CBD5E1]">
+              <span>{{ formatDate(featured.publishedAt || featured.createdAt) }}</span>
+              <span aria-hidden="true">·</span>
+              <span>{{ featured.readingTime }} menit baca</span>
             </div>
-            <span class="mt-8 inline-flex items-center gap-2 font-bold text-primary">Baca artikel <Icon name="ph:arrow-right-bold" class="transition-transform group-hover:translate-x-1" /></span>
+            <span class="mt-8 inline-block font-bold text-[#47BDFF] group-hover:underline">Baca artikel →</span>
           </div>
         </NuxtLink>
 
-        <section class="mt-12 border-b border-gray/10 pb-8 dark:border-white/10" aria-labelledby="article-filter-heading">
+        <section class="mt-16 border-b border-[var(--rule)] pb-8" aria-labelledby="article-filter-heading">
           <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 id="article-filter-heading" class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl">Jelajahi artikel</h2>
-              <p class="mt-2 text-sm text-gray dark:text-slate-300">Temukan topik berdasarkan kata kunci, kategori, atau tag.</p>
+              <h2 id="article-filter-heading" class="pub-h2">Jelajahi artikel</h2>
+              <p class="mt-2 text-[16px] text-[var(--muted)]">Temukan topik berdasarkan kata kunci, kategori, atau tag.</p>
             </div>
-            <button v-if="hasFilters" type="button" class="text-sm font-bold text-primary hover:underline" @click="resetFilters">Reset semua filter</button>
+            <button v-if="hasFilters" type="button" class="pub-link text-[14px] font-bold" @click="resetFilters">Reset semua filter</button>
           </div>
 
           <div class="mt-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_200px]">
             <label class="relative">
               <span class="sr-only">Cari artikel</span>
-              <Icon name="ph:magnifying-glass-bold" class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray dark:text-slate-300" />
-              <input v-model="searchInput" type="search" class="w-full rounded-xl border border-gray/20 bg-white py-3 pl-11 pr-4 text-sm text-black outline-none transition placeholder:text-gray focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-white/15 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400" placeholder="Cari judul, ringkasan, atau tag">
+              <Icon name="ph:magnifying-glass-bold" class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
+              <input v-model="searchInput" type="search" class="w-full rounded-[2px] border border-[var(--rule)] bg-[var(--surface)] py-3 pl-11 pr-4 text-[16px] text-[var(--ink)] outline-none transition-colors duration-150 placeholder:text-[var(--muted)] focus:border-[var(--brand-navy)] focus:ring-2 focus:ring-[#47BDFF]/40" placeholder="Cari judul, ringkasan, atau tag">
             </label>
             <label>
               <span class="sr-only">Urutkan artikel</span>
-              <select v-model="sortBy" class="w-full rounded-xl border border-gray/20 bg-white px-4 py-3 text-sm font-semibold text-black outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-white/15 dark:bg-slate-900 dark:text-white">
+              <select v-model="sortBy" class="w-full rounded-[2px] border border-[var(--rule)] bg-[var(--surface)] px-4 py-3 text-[16px] font-bold text-[var(--ink)] outline-none transition-colors duration-150 focus:border-[var(--brand-navy)] focus:ring-2 focus:ring-[#47BDFF]/40">
                 <option value="latest">Terbaru</option>
                 <option value="popular">Terpopuler</option>
               </select>
@@ -149,8 +149,9 @@ function formatDate(value: string) {
           <div v-if="categories.length" class="mt-4 flex flex-wrap items-center gap-2" role="group" aria-label="Filter kategori artikel">
             <button
               type="button"
-              class="rounded-full px-3.5 py-1.5 text-xs font-bold transition"
-              :class="!activeCategory ? 'bg-primary text-black' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15'"
+              class="pub-chip"
+              :class="!activeCategory ? 'pub-chip-active' : 'pub-chip-idle'"
+              :aria-pressed="!activeCategory"
               @click="activeCategory = ''"
             >
               Semua kategori
@@ -159,93 +160,89 @@ function formatDate(value: string) {
               v-for="category in categories"
               :key="category._id"
               type="button"
-              class="rounded-full px-3.5 py-1.5 text-xs font-bold transition"
-              :class="activeCategory === category.slug ? 'bg-primary text-black' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15'"
+              class="pub-chip"
+              :class="activeCategory === category.slug ? 'pub-chip-active' : 'pub-chip-idle'"
+              :aria-pressed="activeCategory === category.slug"
               @click="activeCategory = activeCategory === category.slug ? '' : category.slug"
             >
               {{ category.name }}
             </button>
           </div>
 
-          <div v-if="activeTag || activeAuthor" class="mt-4 flex flex-wrap items-center gap-2 text-sm">
-            <span class="text-gray dark:text-slate-300">Filter aktif:</span>
-            <button v-if="activeTag" type="button" class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 font-semibold text-blue-800 dark:bg-blue-400/15 dark:text-blue-200" @click="activeTag = ''">#{{ activeTag }} <Icon name="ph:x-bold" /></button>
-            <button v-if="activeAuthor" type="button" class="inline-flex items-center gap-1 rounded-full bg-purple-50 px-3 py-1.5 font-semibold text-purple-800 dark:bg-purple-400/15 dark:text-purple-200" @click="activeAuthor = ''">Penulis: {{ activeAuthorLabel }} <Icon name="ph:x-bold" /></button>
+          <div v-if="activeTag || activeAuthor" class="mt-4 flex flex-wrap items-center gap-2 text-[14px]">
+            <span class="text-[var(--muted)]">Filter aktif:</span>
+            <button v-if="activeTag" type="button" class="pub-chip pub-chip-idle inline-flex items-center gap-1" @click="activeTag = ''">#{{ activeTag }} <Icon name="ph:x-bold" aria-hidden="true" /></button>
+            <button v-if="activeAuthor" type="button" class="pub-chip pub-chip-idle inline-flex items-center gap-1" @click="activeAuthor = ''">Penulis: {{ activeAuthorLabel }} <Icon name="ph:x-bold" aria-hidden="true" /></button>
           </div>
         </section>
 
-        <div v-if="pending" class="mt-10 grid gap-7 md:grid-cols-2 lg:grid-cols-3" aria-label="Memuat artikel">
-          <div v-for="index in 6" :key="index" class="overflow-hidden rounded-xl border border-gray/10 dark:border-white/10 dark:bg-slate-900">
-            <div class="h-48 animate-pulse bg-slate-100 dark:bg-white/10"></div>
-            <div class="space-y-3 p-6"><div class="h-4 w-24 animate-pulse rounded bg-slate-100 dark:bg-white/10"></div><div class="h-6 animate-pulse rounded bg-slate-100 dark:bg-white/10"></div><div class="h-16 animate-pulse rounded bg-slate-100 dark:bg-white/10"></div></div>
+        <div v-if="pending" class="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3" aria-label="Memuat artikel">
+          <div v-for="index in 6" :key="index" class="pub-box overflow-hidden">
+            <div class="h-48 animate-pulse bg-[var(--rule)]/40"></div>
+            <div class="space-y-3 p-6"><div class="h-4 w-24 animate-pulse bg-[var(--rule)]/40"></div><div class="h-6 animate-pulse bg-[var(--rule)]/40"></div><div class="h-16 animate-pulse bg-[var(--rule)]/40"></div></div>
           </div>
         </div>
 
-        <div v-else-if="listError" class="py-20 text-center" role="alert">
-          <Icon name="ph:warning-circle-bold" class="mx-auto text-5xl text-amber-500" />
-          <h2 class="mt-5 text-xl font-extrabold text-black dark:text-white">Artikel gagal dimuat</h2>
-          <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-gray dark:text-slate-300">Koneksi ke server sedang bermasalah. Coba muat ulang daftar artikel.</p>
-          <button type="button" class="mt-6 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-black transition hover:bg-secondary hover:text-white" @click="refresh()">Coba lagi</button>
+        <div v-else-if="listError" class="py-20" role="alert">
+          <h2 class="pub-serif text-[24px] text-[var(--ink)]">Artikel gagal dimuat</h2>
+          <p class="mt-2 max-w-md text-[16px] leading-[1.6] text-[var(--muted)]">Koneksi ke server sedang bermasalah. Coba muat ulang daftar artikel.</p>
+          <button type="button" class="pub-btn mt-6" @click="refresh()">Coba lagi</button>
         </div>
 
-        <div v-else-if="!articles.length" class="py-20 text-center">
-          <Icon name="ph:magnifying-glass-bold" class="mx-auto text-5xl text-slate-300" />
-          <h2 class="mt-5 text-xl font-extrabold text-black dark:text-white">{{ hasFilters ? 'Artikel tidak ditemukan' : 'Belum ada artikel lainnya' }}</h2>
-          <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-gray dark:text-slate-300">{{ hasFilters ? 'Coba kata kunci atau kategori lain untuk memperluas hasil pencarian.' : 'Kunjungi kembali halaman ini untuk publikasi berikutnya.' }}</p>
-          <button v-if="hasFilters" type="button" class="mt-6 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-black transition hover:bg-secondary hover:text-white" @click="resetFilters">Reset filter</button>
+        <div v-else-if="!articles.length" class="py-20">
+          <h2 class="pub-serif text-[24px] text-[var(--ink)]">{{ hasFilters ? 'Artikel tidak ditemukan' : 'Belum ada artikel lainnya' }}</h2>
+          <p class="mt-2 max-w-md text-[16px] leading-[1.6] text-[var(--muted)]">{{ hasFilters ? 'Coba kata kunci atau kategori lain untuk memperluas hasil pencarian.' : 'Kunjungi kembali halaman ini untuk publikasi berikutnya.' }}</p>
+          <button v-if="hasFilters" type="button" class="pub-btn mt-6" @click="resetFilters">Reset filter</button>
         </div>
 
-        <div v-else class="mt-10 grid gap-7 md:grid-cols-2 lg:grid-cols-3">
-          <article v-for="article in articles" :key="article._id" class="group flex min-h-full flex-col overflow-hidden rounded-xl border border-gray/15 bg-white transition duration-200 hover:border-primary/60 dark:border-white/10 dark:bg-slate-900">
-            <NuxtLink :to="`/blog/${article.slug}`" class="relative block h-52 overflow-hidden bg-slate-100 dark:bg-white/5">
-              <img v-if="article.coverImageUrl" :src="article.coverImageUrl" :alt="`Ilustrasi artikel: ${article.title}`" loading="lazy" class="h-full w-full object-cover transition duration-500 ease-out group-hover:scale-[1.04]">
-              <div v-else class="flex h-full items-center justify-center text-slate-300"><Icon name="ph:image-bold" class="text-5xl" /></div>
+        <div v-else class="mt-10 grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+          <article v-for="article in articles" :key="article._id" class="group flex min-h-full flex-col border-t border-[var(--rule)] pt-6">
+            <NuxtLink :to="`/blog/${article.slug}`" class="relative block aspect-[16/10] overflow-hidden rounded-[2px] bg-[var(--surface)]">
+              <img v-if="article.coverImageUrl" :src="article.coverImageUrl" :alt="`Ilustrasi artikel: ${article.title}`" loading="lazy" class="h-full w-full object-cover">
+              <div v-else class="flex h-full items-center justify-center text-[var(--rule)]"><Icon name="ph:image-bold" class="text-5xl" /></div>
             </NuxtLink>
-            <div class="flex flex-1 flex-col p-6">
-              <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-semibold text-gray dark:text-slate-300">
-                <button v-if="article.category" type="button" class="text-primary hover:underline" @click="activeCategory = article.category.slug">{{ article.category.name }}</button>
-                <span>{{ article.readingTime }} menit baca</span>
+            <div class="flex flex-1 flex-col pt-5">
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[14px] text-[var(--muted)]">
+                <button v-if="article.category" type="button" class="pub-link font-bold" @click="activeCategory = article.category.slug">{{ article.category.name }}</button>
+                <span class="tabular-nums">{{ article.readingTime }} menit baca</span>
               </div>
-              <h2 class="mt-3 text-xl font-extrabold leading-snug text-black dark:text-white">
-                <NuxtLink :to="`/blog/${article.slug}`" class="transition hover:text-primary">{{ article.title }}</NuxtLink>
+              <h2 class="pub-serif mt-3 text-[20px] leading-[1.3] text-[var(--ink)]">
+                <NuxtLink :to="`/blog/${article.slug}`" class="transition-colors duration-150 hover:text-[var(--brand-navy)]">{{ article.title }}</NuxtLink>
               </h2>
-              <p class="mt-3 line-clamp-3 text-sm leading-6 text-gray dark:text-slate-300">{{ article.excerpt }}</p>
-              <div v-if="article.tags.length" class="mt-4 flex flex-wrap gap-1.5">
-                <button v-for="tag in article.tags.slice(0, 3)" :key="tag" type="button" class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-800 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-blue-400/15 dark:hover:text-blue-200" @click="selectTag(tag)">#{{ tag }}</button>
+              <p class="mt-3 text-[16px] leading-[1.6] text-[var(--muted)]">{{ article.excerpt }}</p>
+              <div v-if="article.tags.length" class="mt-4 flex flex-wrap gap-x-3 gap-y-1">
+                <button v-for="tag in article.tags.slice(0, 3)" :key="tag" type="button" class="text-[14px] text-[var(--muted)] transition-colors duration-150 hover:text-[var(--brand-navy)]" @click="selectTag(tag)">#{{ tag }}</button>
               </div>
-              <div class="mt-auto flex items-center justify-between border-t border-gray/10 pt-4 text-xs text-gray dark:border-white/10 dark:text-slate-300" :class="article.tags.length ? 'mt-5' : 'mt-6'">
-                <div class="flex items-center gap-2 min-w-0 pr-2">
+              <div class="mt-auto flex items-center justify-between gap-3 border-t border-[var(--rule)] pt-4 text-[14px] text-[var(--muted)]" :class="article.tags.length ? 'mt-5' : 'mt-6'">
+                <div class="flex min-w-0 items-center gap-2 pr-2">
                   <img
                     v-if="article.leader?.photoUrl"
                     :src="article.leader.photoUrl"
                     :alt="`Foto penulis ${article.author}`"
                     width="24"
                     height="24"
-                    class="h-6 w-6 rounded-full object-cover shrink-0 border border-primary/40"
+                    class="h-6 w-6 shrink-0 rounded-[2px] object-cover"
                     loading="lazy"
                   />
-                  <Icon v-else name="ph:user-circle-bold" class="text-base shrink-0 text-primary" />
                   <button
                     type="button"
-                    class="truncate font-semibold text-black dark:text-white hover:text-primary transition text-left"
+                    class="truncate text-left font-bold text-[var(--ink)] transition-colors duration-150 hover:text-[var(--brand-navy)]"
                     :title="`Lihat artikel oleh ${article.author}`"
                     @click="activeAuthor = article.leader?._id || article.author"
                   >
                     {{ article.author }}
                   </button>
                 </div>
-                <div class="flex items-center gap-2 shrink-0">
-                  <span>{{ formatDate(article.publishedAt || article.createdAt) }}</span>
-                </div>
+                <span class="shrink-0 tabular-nums">{{ formatDate(article.publishedAt || article.createdAt) }}</span>
               </div>
             </div>
           </article>
         </div>
 
-        <nav v-if="data?.totalPages && data.totalPages > 1" class="mt-14 flex items-center justify-center gap-3" aria-label="Pagination artikel">
-          <button class="rounded-xl border border-gray/20 px-4 py-2.5 text-sm font-bold text-black transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/15 dark:text-white" :disabled="page === 1" @click="page--">Sebelumnya</button>
-          <span class="px-2 text-sm font-semibold text-gray dark:text-slate-300">{{ page }} / {{ data.totalPages }}</span>
-          <button class="rounded-xl border border-gray/20 px-4 py-2.5 text-sm font-bold text-black transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/15 dark:text-white" :disabled="page === data.totalPages" @click="page++">Berikutnya</button>
+        <nav v-if="data?.totalPages && data.totalPages > 1" class="mt-16 flex items-center justify-center gap-3" aria-label="Pagination artikel">
+          <button class="pub-btn-ghost disabled:cursor-not-allowed disabled:opacity-40" :disabled="page === 1" @click="page--">Sebelumnya</button>
+          <span class="px-2 text-[14px] font-bold tabular-nums text-[var(--muted)]">{{ page }} / {{ data.totalPages }}</span>
+          <button class="pub-btn-ghost disabled:cursor-not-allowed disabled:opacity-40" :disabled="page === data.totalPages" @click="page++">Berikutnya</button>
         </nav>
       </div>
     </main>

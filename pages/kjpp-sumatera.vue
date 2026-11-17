@@ -29,25 +29,19 @@ useHead({
 <template>
   <div>
     <!-- Banner -->
-    <section class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
+    <section class="pub-page-banner">
       <div class="container">
-        <div class="items-center py-10 md:flex md:h-[360px] md:py-0">
-          <div class="heading mb-0 text-center md:text-left">
-            <span class="subtitle !text-white">Jangkauan Regional Pulau Sumatera</span>
-            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">
-              Jasa Penilai Publik (KJPP) untuk Wilayah Sumatera – KJPP Henricus Judi Adrianto &amp; Rekan
-            </h1>
-          </div>
-        </div>
+        <span class="pub-eyebrow">Jangkauan Regional Pulau Sumatera</span>
+        <h1 class="pub-h1">Jasa Penilai Publik (KJPP) untuk Wilayah Sumatera – KJPP Henricus Judi Adrianto &amp; Rekan</h1>
       </div>
     </section>
 
     <!-- Main Content -->
-    <section class="py-14 lg:py-20">
+    <section class="pub-section bg-[var(--paper)]">
       <div class="container max-w-4xl">
-        <UiBreadcrumbs :items="[{ label: 'KJPP Sumatera' }]" class="mb-8" />
+        <UiBreadcrumbs :items="[{ label: 'KJPP Sumatera' }]" class="mb-10" />
 
-        <article class="prose prose-lg prose-blue max-w-none text-gray-900 dark:prose-invert dark:text-gray-300">
+        <article class="prose prose-lg max-w-none text-[var(--ink)] dark:prose-invert">
           <p>
             Pulau <strong>Sumatera</strong> merupakan salah satu koridor ekonomi utama di Indonesia yang menghubungkan industri agroindustri, perkebunan, pertambangan, manufaktur, pelabuhan, logistik, hingga pusat perdagangan perkotaan dari ujung utara hingga selatan. Dalam mendukung transaksi korporasi, pembiayaan perbankan, pelaporan keuangan, serta tata kelola aset pemerintah daerah di kawasan ini, <strong>{{ company.name }} ({{ company.shortName }})</strong> hadir sebagai Kantor Jasa Penilai Publik independen yang memiliki <NuxtLink to="/kjpp-palembang">Kantor Pusat langsung di Pulau Sumatera, tepatnya di Kota Palembang</NuxtLink>, sejak tahun 2013.
           </p>
@@ -105,22 +99,22 @@ useHead({
         </article>
 
         <!-- Contact CTA Box -->
-        <div class="mt-12 rounded-2xl border border-primary/30 bg-stone-50 p-6 sm:p-8 dark:border-white/10 dark:bg-gray-dark">
-          <h2 class="text-xl font-extrabold text-black dark:text-white sm:text-2xl">
+        <div class="pub-box mt-12 p-6 sm:p-8">
+          <h2 class="pub-serif text-[24px] leading-[1.25] text-[var(--ink)]">
             Koordinasi Penugasan Wilayah Sumatera &amp; Nasional
           </h2>
-          <p class="mt-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+          <p class="mt-3 text-[16px] leading-[1.7] text-[var(--muted)] [&_strong]:text-[var(--ink)]">
             <strong>Kantor Pusat Palembang:</strong> {{ headOffice.fullAddress }}<br />
-            <strong>Telepon:</strong> <a :href="`tel:${headOffice.phoneE164}`" class="font-bold text-primary hover:underline">{{ headOffice.phone }}</a> ·
-            <strong>WhatsApp:</strong> <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="font-bold text-emerald-700 hover:underline dark:text-emerald-400">{{ headOffice.whatsapp }}</a> ·
-            <strong>Email:</strong> <a :href="`mailto:${headOffice.email}`" class="font-bold text-primary hover:underline">{{ headOffice.email }}</a><br />
+            <strong>Telepon:</strong> <a :href="`tel:${headOffice.phoneE164}`" class="pub-link font-bold tabular-nums">{{ headOffice.phone }}</a> ·
+            <strong>WhatsApp:</strong> <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="pub-link font-bold tabular-nums">{{ headOffice.whatsapp }}</a> ·
+            <strong>Email:</strong> <a :href="`mailto:${headOffice.email}`" class="pub-link font-bold tabular-nums">{{ headOffice.email }}</a><br />
             <strong>Jaringan Cabang Pendukung:</strong> {{ otherBranches.map(b => b.city).join(', ') }}
           </p>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <NuxtLink to="/contact-us" class="btn !rounded-xl">
+          <div class="mt-6 flex flex-wrap gap-4">
+            <NuxtLink to="/contact-us" class="pub-btn">
               Konsultasi &amp; Minta Penawaran
             </NuxtLink>
-            <NuxtLink to="/layanan" class="inline-flex items-center gap-2 rounded-xl border border-gray/25 bg-white px-5 py-3.5 text-sm font-extrabold uppercase text-black transition hover:border-primary hover:text-primary dark:border-white/15 dark:bg-black dark:text-white">
+            <NuxtLink to="/layanan" class="pub-btn-ghost">
               Telusuri Layanan Kami
             </NuxtLink>
           </div>

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useAppStore } from '~/stores/app'
+
+const store = useAppStore()
 const route = useRoute()
 const config = useRuntimeConfig()
 const baseUrl = computed(() =>
@@ -34,7 +37,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-white font-mulish dark:bg-black">
+  <div class="public-site flex min-h-screen flex-col font-mulish" :class="{ 'is-dark': store.theme === 'dark' }">
     <LayoutAppHeader />
     <main class="flex-1">
       <slot />

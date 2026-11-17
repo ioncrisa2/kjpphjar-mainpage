@@ -111,52 +111,47 @@ useHead({
 </script>
 
 <template>
-  <div v-if="pending" class="min-h-[60vh] flex items-center justify-center text-gray">
+  <div v-if="pending" class="flex min-h-[60vh] items-center justify-center text-[var(--muted)]">
     Memuat data...
   </div>
   <div v-else-if="service">
     <!-- Banner -->
-    <div class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
+    <div class="pub-page-banner">
       <div class="container">
-        <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
-          <div class="heading mb-0 text-center md:text-left">
-            <span v-if="service.titleEn" class="subtitle !text-white">{{ service.titleEn }}</span>
-            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">{{ service.title }}</h1>
-          </div>
-        </div>
+        <span v-if="service.titleEn" class="pub-eyebrow">{{ service.titleEn }}</span>
+        <h1 class="pub-h1">{{ service.title }}</h1>
       </div>
     </div>
     <!-- Main Content (Rich Text) -->
-    <div class="py-16 sm:py-24">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <UiBreadcrumbs 
+    <div class="pub-section bg-[var(--paper)]">
+      <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        <UiBreadcrumbs
           :items="[
             { label: 'Layanan', to: '/layanan' },
             { label: service.title }
-          ]" 
-          class="mb-8"
+          ]"
+          class="mb-10"
         />
 
         <!-- Quill/WYSIWYG Output Container -->
         <article
           ref="serviceRef"
-          class="prose prose-lg prose-blue mx-auto max-w-none text-gray-900 dark:prose-invert dark:text-gray-300"
+          class="prose prose-lg mx-auto max-w-none text-[var(--ink)] dark:prose-invert"
           v-html="serviceHtml"
         ></article>
 
         <!-- CTA -->
-        <div class="mt-16 bg-gray-50 rounded-xl p-8 text-center border border-gray-200 dark:bg-white/5 dark:border-white/10">
-          <h2 class="text-2xl font-bold text-black mb-4 dark:text-white">Butuh Layanan {{ service.title }}?</h2>
-          <p class="text-gray mb-8">
-            Hubungi tim penilai publik kami di Palembang untuk konsultasi ruang lingkup, dokumen persyaratan, dan penawaran tertulis, atau pelajari <NuxtLink to="/faq" class="font-bold text-primary hover:underline">Tanya Jawab (FAQ)</NuxtLink> seputar prosedur penilaian.
+        <div class="pub-box mt-16 p-8 lg:p-10">
+          <h2 class="pub-serif mb-4 text-[24px] leading-[1.25] text-[var(--ink)]">Butuh Layanan {{ service.title }}?</h2>
+          <p class="mb-8 max-w-[68ch] text-[17px] leading-[1.6] text-[var(--muted)]">
+            Hubungi tim penilai publik kami di Palembang untuk konsultasi ruang lingkup, dokumen persyaratan, dan penawaran tertulis, atau pelajari <NuxtLink to="/faq" class="pub-link font-bold underline underline-offset-[3px]">Tanya Jawab (FAQ)</NuxtLink> seputar prosedur penilaian.
           </p>
-          <div class="flex flex-wrap items-center justify-center gap-4">
-            <NuxtLink to="/contact-us" class="btn !rounded-xl inline-flex items-center justify-center gap-2 md:px-10 md:py-4 md:text-base">
-              <span>Hubungi Kami Sekarang</span>
-              <Icon name="ph:arrow-right-bold" class="h-4 w-4" aria-hidden="true" />
+          <div class="flex flex-wrap items-center gap-4">
+            <NuxtLink to="/contact-us" class="pub-btn">
+              Hubungi Kami Sekarang
             </NuxtLink>
-            <NuxtLink to="/faq" class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray/25 bg-white px-6 py-4 text-sm font-extrabold uppercase text-black transition hover:border-primary hover:text-primary dark:border-white/15 dark:bg-gray-dark dark:text-white">
-              <span>Baca Tanya Jawab (FAQ)</span>
+            <NuxtLink to="/faq" class="pub-btn-ghost">
+              Baca Tanya Jawab (FAQ)
             </NuxtLink>
           </div>
         </div>
@@ -165,7 +160,7 @@ useHead({
 
     <!-- Artikel sekategori dengan layanan (slug kategori = slug layanan), fallback ke artikel terbaru -->
     <BlogRecentArticles
-      class="border-t border-gray-100 bg-gray-50 py-16 dark:border-white/10 dark:bg-white/5 sm:py-20"
+      class="border-t border-[var(--rule)] bg-[var(--surface)] py-16 sm:py-20"
       :category="service.slug"
       :category-title="`Artikel seputar ${service.title}`"
       description="Bacaan lanjutan untuk membantu Anda memahami layanan ini lebih dalam."

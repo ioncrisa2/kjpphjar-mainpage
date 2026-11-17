@@ -29,25 +29,19 @@ useHead({
 <template>
   <div>
     <!-- Banner -->
-    <section class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
+    <section class="pub-page-banner">
       <div class="container">
-        <div class="items-center py-10 md:flex md:h-[360px] md:py-0">
-          <div class="heading mb-0 text-center md:text-left">
-            <span class="subtitle !text-white">Wilayah Layanan Provinsi Sumatera Selatan</span>
-            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">
-              Layanan KJPP di Sumatera Selatan (Sumsel) – Penilaian Aset, Bisnis &amp; Proyek
-            </h1>
-          </div>
-        </div>
+        <span class="pub-eyebrow">Wilayah Layanan Provinsi Sumatera Selatan</span>
+        <h1 class="pub-h1">Layanan KJPP di Sumatera Selatan (Sumsel) – Penilaian Aset, Bisnis &amp; Proyek</h1>
       </div>
     </section>
 
     <!-- Main Content -->
-    <section class="py-14 lg:py-20">
+    <section class="pub-section bg-[var(--paper)]">
       <div class="container max-w-4xl">
-        <UiBreadcrumbs :items="[{ label: 'KJPP Sumatera Selatan' }]" class="mb-8" />
+        <UiBreadcrumbs :items="[{ label: 'KJPP Sumatera Selatan' }]" class="mb-10" />
 
-        <article class="prose prose-lg prose-blue max-w-none text-gray-900 dark:prose-invert dark:text-gray-300">
+        <article class="prose prose-lg max-w-none text-[var(--ink)] dark:prose-invert">
           <p>
             Provinsi <strong>Sumatera Selatan (Sumsel)</strong> memiliki struktur ekonomi yang ditopang oleh sektor perkebunan, pertambangan dan energi, pertanian pangan, industri pengolahan, perdagangan antardaerah, serta pembangunan infrastruktur kawasan. Untuk mendukung kebutuhan opini nilai yang objektif bagi dunia usaha, perbankan, maupun pemerintah daerah di seluruh provinsi ini, <strong>{{ company.name }} ({{ company.shortName }})</strong> mengoperasikan pusat kendali penugasan langsung dari <NuxtLink to="/kjpp-palembang">Kantor Pusat di Palembang</NuxtLink> sejak tahun 2013. Kedekatan geografis dari ibu kota provinsi memudahkan mobilisasi tim penilai ke seluruh kabupaten dan kota di Sumatera Selatan secara terjadwal dan efisien.
           </p>
@@ -104,21 +98,21 @@ useHead({
         </article>
 
         <!-- Contact CTA Box -->
-        <div class="mt-12 rounded-2xl border border-primary/30 bg-stone-50 p-6 sm:p-8 dark:border-white/10 dark:bg-gray-dark">
-          <h2 class="text-xl font-extrabold text-black dark:text-white sm:text-2xl">
+        <div class="pub-box mt-12 p-6 sm:p-8">
+          <h2 class="pub-serif text-[24px] leading-[1.25] text-[var(--ink)]">
             Jadwalkan Penilaian Aset di Wilayah Sumatera Selatan
           </h2>
-          <p class="mt-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+          <p class="mt-3 text-[16px] leading-[1.7] text-[var(--muted)] [&_strong]:text-[var(--ink)]">
             <strong>Kantor Pusat Koordinasi Sumsel:</strong> {{ headOffice.fullAddress }}<br />
-            <strong>Telepon:</strong> <a :href="`tel:${headOffice.phoneE164}`" class="font-bold text-primary hover:underline">{{ headOffice.phone }}</a> ·
-            <strong>WhatsApp:</strong> <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="font-bold text-emerald-700 hover:underline dark:text-emerald-400">{{ headOffice.whatsapp }}</a> ·
-            <strong>Email:</strong> <a :href="`mailto:${headOffice.email}`" class="font-bold text-primary hover:underline">{{ headOffice.email }}</a>
+            <strong>Telepon:</strong> <a :href="`tel:${headOffice.phoneE164}`" class="pub-link font-bold tabular-nums">{{ headOffice.phone }}</a> ·
+            <strong>WhatsApp:</strong> <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="pub-link font-bold tabular-nums">{{ headOffice.whatsapp }}</a> ·
+            <strong>Email:</strong> <a :href="`mailto:${headOffice.email}`" class="pub-link font-bold tabular-nums">{{ headOffice.email }}</a>
           </p>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <NuxtLink to="/contact-us" class="btn !rounded-xl">
+          <div class="mt-6 flex flex-wrap gap-4">
+            <NuxtLink to="/contact-us" class="pub-btn">
               Minta Penawaran Tertulis
             </NuxtLink>
-            <NuxtLink to="/faq" class="inline-flex items-center gap-2 rounded-xl border border-gray/25 bg-white px-5 py-3.5 text-sm font-extrabold uppercase text-black transition hover:border-primary hover:text-primary dark:border-white/15 dark:bg-black dark:text-white">
+            <NuxtLink to="/faq" class="pub-btn-ghost">
               Pelajari Prosedur &amp; FAQ
             </NuxtLink>
           </div>

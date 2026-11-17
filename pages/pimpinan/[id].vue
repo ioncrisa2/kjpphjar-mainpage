@@ -96,74 +96,63 @@ useHead({
 <template>
   <div v-if="leader">
     <!-- Banner -->
-    <div class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
+    <div class="pub-page-banner">
       <div class="container">
-        <div class="items-center py-10 md:flex md:h-[300px] md:py-0">
-          <div class="heading relative mb-0 text-center md:text-left">
-            <span class="subtitle !text-white">Tim Pimpinan</span>
-            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">{{ leader.name }}</h1>
-          </div>
-        </div>
+        <span class="pub-eyebrow">Tim Pimpinan</span>
+        <h1 class="pub-h1">{{ leader.name }}</h1>
       </div>
     </div>
 
     <!-- Profil -->
-    <section class="bg-stone-100 py-14 dark:bg-gray-dark/30 lg:py-20">
+    <section class="pub-section bg-[var(--paper)]">
       <div class="container">
         <UiBreadcrumbs
           :items="[
             { label: 'Tentang Kami', to: '/about-us' },
             { label: leader.name }
           ]"
-          class="mb-8"
+          class="mb-10"
         />
 
-        <div class="grid gap-10 lg:grid-cols-[minmax(0,380px)_1fr] lg:gap-14">
-          <div>
-            <div class="overflow-hidden rounded-2xl shadow-lg">
-              <img
-                :src="leader.photoUrl"
-                :alt="`Foto profil ${leader.name}, ${leader.position} KJPP Henricus Judi Adrianto & Rekan`"
-                width="600"
-                height="750"
-                class="aspect-[4/5] w-full object-cover"
-                decoding="async"
-              />
-            </div>
-          </div>
+        <div class="grid gap-10 lg:grid-cols-[minmax(0,380px)_1fr] lg:gap-16">
+          <figure>
+            <img
+              :src="leader.photoUrl"
+              :alt="`Foto profil ${leader.name}, ${leader.position} KJPP Henricus Judi Adrianto & Rekan`"
+              width="600"
+              height="750"
+              class="aspect-[4/5] w-full rounded-[2px] object-cover"
+              decoding="async"
+            />
+          </figure>
 
           <div class="flex flex-col">
-            <p class="text-sm font-extrabold uppercase tracking-wider text-primary">{{ leader.position }}</p>
-            <h2 class="mt-2 text-3xl font-extrabold text-black dark:text-white lg:text-4xl">{{ leader.name }}</h2>
-            <p class="mt-1 text-sm font-semibold text-gray dark:text-slate-300">KJPP Henricus Judi Adrianto dan Rekan</p>
+            <p class="text-[14px] font-bold text-[var(--brand-navy)]">{{ leader.position }}</p>
+            <h2 class="pub-serif mt-2 text-[32px] leading-[1.2] text-[var(--ink)] lg:text-[40px]">{{ leader.name }}</h2>
+            <p class="mt-1 text-[16px] text-[var(--muted)]">KJPP Henricus Judi Adrianto dan Rekan</p>
 
-            <dl v-if="credentials.length" class="mt-8 grid gap-4 sm:grid-cols-2">
+            <dl v-if="credentials.length" class="mt-8 border-t border-[var(--rule)] text-[16px]">
               <div
                 v-for="item in credentials"
                 :key="item.label"
-                class="flex items-start gap-4 rounded-2xl border border-primary/20 bg-white p-5 dark:border-white/10 dark:bg-gray-dark"
+                class="flex flex-col gap-1 border-b border-[var(--rule)] py-4 sm:flex-row sm:justify-between sm:gap-6"
               >
-                <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <Icon :name="item.icon" class="h-5 w-5" aria-hidden="true" />
-                </span>
-                <div class="min-w-0">
-                  <dt class="text-xs font-bold uppercase tracking-wider text-gray dark:text-slate-400">{{ item.label }}</dt>
-                  <dd class="mt-1 break-words text-base font-extrabold text-black dark:text-white">{{ item.value }}</dd>
-                </div>
+                <dt class="text-[var(--muted)]">{{ item.label }}</dt>
+                <dd class="break-words font-bold tabular-nums text-[var(--ink)] sm:text-right">{{ item.value }}</dd>
               </div>
             </dl>
 
             <div v-if="leader.bio" class="mt-8">
-              <h3 class="text-lg font-extrabold text-black dark:text-white">Profil Singkat</h3>
-              <p class="mt-3 whitespace-pre-line text-base leading-relaxed text-gray-700 dark:text-gray-300">{{ leader.bio }}</p>
+              <h3 class="text-[18px] font-bold text-[var(--ink)]">Profil Singkat</h3>
+              <p class="mt-3 max-w-[68ch] whitespace-pre-line text-[17px] leading-[1.6] text-[var(--ink)]">{{ leader.bio }}</p>
             </div>
 
-            <div class="mt-10 flex flex-wrap gap-3">
-              <NuxtLink to="/about-us" class="inline-flex items-center gap-2 rounded-xl border border-gray/20 bg-white px-5 py-2.5 text-sm font-bold text-black transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-gray-dark dark:text-white">
-                <Icon name="ph:arrow-left-bold" aria-hidden="true" /> Kembali ke Tentang Kami
+            <div class="mt-10 flex flex-wrap items-center gap-4">
+              <NuxtLink to="/contact-us" class="pub-btn">
+                Hubungi Kami
               </NuxtLink>
-              <NuxtLink to="/contact-us" class="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-black transition hover:bg-primary/90">
-                Hubungi Kami <Icon name="ph:arrow-right-bold" aria-hidden="true" />
+              <NuxtLink to="/about-us" class="pub-link text-[16px] font-bold">
+                ← Kembali ke Tentang Kami
               </NuxtLink>
             </div>
           </div>
@@ -172,30 +161,30 @@ useHead({
     </section>
 
     <!-- Artikel yang ditulis pimpinan ini -->
-    <section v-if="articles.length" class="py-14 lg:py-20" aria-labelledby="leader-articles-heading">
+    <section v-if="articles.length" class="pub-section border-t border-[var(--rule)] bg-[var(--paper)]" aria-labelledby="leader-articles-heading">
       <div class="container">
         <div class="mb-8 flex items-end justify-between gap-4">
           <div>
-            <h2 id="leader-articles-heading" class="text-2xl font-extrabold text-black dark:text-white sm:text-3xl">Artikel oleh {{ leader.name }}</h2>
-            <p class="mt-2 text-sm text-gray dark:text-slate-300">Wawasan dan tulisan dari {{ leader.name }}.</p>
+            <h2 id="leader-articles-heading" class="pub-h2">Artikel oleh {{ leader.name }}</h2>
+            <p class="mt-2 text-[16px] text-[var(--muted)]">Wawasan dan tulisan dari {{ leader.name }}.</p>
           </div>
           <NuxtLink
             v-if="totalArticles > articles.length"
             :to="{ path: '/blog', query: { author: leaderObjectId } }"
-            class="hidden shrink-0 text-sm font-bold text-primary hover:underline sm:inline"
+            class="pub-link hidden shrink-0 text-[14px] font-bold tabular-nums sm:inline"
           >
-            Lihat semua ({{ totalArticles }})
+            Lihat semua ({{ totalArticles }}) →
           </NuxtLink>
         </div>
-        <div class="grid gap-7 md:grid-cols-3">
+        <div class="grid gap-8 md:grid-cols-3">
           <BlogArticleCard v-for="article in articles" :key="article._id" :article="article" />
         </div>
         <NuxtLink
           v-if="totalArticles > articles.length"
           :to="{ path: '/blog', query: { author: leaderObjectId } }"
-          class="mt-6 inline-block text-sm font-bold text-primary hover:underline sm:hidden"
+          class="pub-link mt-6 inline-block text-[14px] font-bold tabular-nums sm:hidden"
         >
-          Lihat semua artikel ({{ totalArticles }})
+          Lihat semua artikel ({{ totalArticles }}) →
         </NuxtLink>
       </div>
     </section>

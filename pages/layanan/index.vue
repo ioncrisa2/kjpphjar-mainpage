@@ -13,108 +13,73 @@ useSeoMeta({
 })
 
 const { data: services, pending } = await useFetch<any[]>('/api/services')
-const { data: categoriesData } = await useFetch<{ items: Array<{ slug: string; articleCount?: number }> }>('/api/categories')
-
-const activeCategorySlugs = computed(
-  () => new Set((categoriesData.value?.items || []).map((cat) => cat.slug))
-)
-
-function formatServiceCode(index: number) {
-  return String(index + 1).padStart(2, '0')
-}
 </script>
 
 <template>
   <div>
     <!-- Banner -->
-    <div class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
+    <div class="pub-page-banner">
       <div class="container">
-        <div class="items-center py-10 md:flex md:h-[400px] md:py-0">
-          <div class="heading mb-0 text-center md:text-left">
-            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">Layanan Kami</h1>
-          </div>
-        </div>
+        <span class="pub-eyebrow">Lingkup Jasa Penilaian &amp; Konsultasi</span>
+        <h1 class="pub-h1">Layanan Kami</h1>
       </div>
     </div>
 
     <!-- Content Section -->
-    <div class="bg-white py-16 dark:bg-black sm:py-24">
-      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <UiBreadcrumbs :items="[{ label: 'Layanan' }]" class="mb-6" />
+    <div class="pub-section bg-[var(--paper)]">
+      <div class="container">
+        <UiBreadcrumbs :items="[{ label: 'Layanan' }]" class="mb-10" />
 
-        <div class="mb-12 text-center">
-          <p class="mx-auto max-w-3xl font-mulish text-xl font-extrabold text-black dark:text-white sm:text-2xl">
-            Berbagai solusi penilaian dan konsultasi properti terbaik yang disesuaikan dengan kebutuhan Anda.
-          </p>
+        <p class="mb-12 max-w-[68ch] text-[20px] leading-[1.6] text-[var(--ink)]">
+          Berbagai solusi penilaian dan konsultasi properti terbaik yang disesuaikan dengan kebutuhan Anda.
+        </p>
+
+        <div v-if="pending" class="border-t border-[var(--rule)]">
+          <div v-for="i in 4" :key="i" class="h-32 animate-pulse border-b border-[var(--rule)] bg-[var(--surface)]" />
         </div>
 
-        <div v-if="pending" class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          <div v-for="i in 6" :key="i" class="h-64 animate-pulse rounded-2xl bg-gray/10" />
-        </div>
-
-        <div v-else-if="!services?.length" class="py-12 text-center text-gray">
+        <div v-else-if="!services?.length" class="py-12 text-[var(--muted)]">
           Belum ada layanan yang ditambahkan.
         </div>
 
-        <div v-else class="grid grid-cols-1 gap-7 md:grid-cols-2 lg:grid-cols-3">
-          <NuxtLink
-            v-for="(service, index) in services"
+        <ul v-else class="border-t border-[var(--rule)]">
+          <li
+            v-for="service in services"
             :key="service._id"
-            :to="`/layanan/${service.slug}`"
-            class="group flex flex-col justify-between rounded-2xl border border-gray/15 bg-white p-7 transition-all duration-200 hover:border-primary/60 hover:shadow-lg dark:border-white/10 dark:bg-gray-dark"
+            class="grid gap-4 border-b border-[var(--rule)] py-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,6fr)_auto] lg:gap-10"
           >
             <div>
-              <div class="mb-5 flex items-center justify-between gap-3">
-                <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary transition-colors duration-200 group-hover:bg-primary group-hover:text-black">
-                  <ClientOnly v-if="service.icon">
-                    <Icon :name="getNuxtIconName(service.icon)" class="h-6 w-6" aria-hidden="true" />
-                  </ClientOnly>
-                  <Icon v-else name="ph:buildings-bold" class="h-6 w-6" aria-hidden="true" />
-                </div>
-                <span class="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-bold tabular-nums text-gray-600 dark:bg-white/10 dark:text-gray-300">
-                  {{ formatServiceCode(index) }}
-                </span>
-              </div>
-
-              <h2 class="text-xl font-extrabold text-black transition-colors group-hover:text-primary dark:text-white">
-                {{ service.title }}
+              <h2 class="pub-serif text-[24px] leading-[1.25] text-[var(--ink)]">
+                <NuxtLink :to="`/layanan/${service.slug}`" class="transition-colors duration-150 hover:text-[var(--brand-navy)]">{{ service.title }}</NuxtLink>
               </h2>
-              <p v-if="service.titleEn" class="mt-1 text-xs font-bold uppercase tracking-wider text-gray">
+              <p v-if="service.titleEn" class="mt-1 text-[14px] text-[var(--muted)]">
                 {{ service.titleEn }}
               </p>
-              <p class="mt-3 text-sm leading-relaxed text-gray-700 line-clamp-3 dark:text-gray-300">
-                {{ service.description }}
-              </p>
             </div>
-
-            <div class="mt-6 flex items-center justify-between gap-3 border-t border-gray/10 pt-4 text-xs font-bold">
-              <span class="inline-flex items-center gap-1.5 text-sky-700 group-hover:text-primary dark:text-primary">
-                <span>Ruang lingkup &amp; detail</span>
-                <Icon name="ph:arrow-right-bold" class="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
-              </span>
-              <span
-                v-if="activeCategorySlugs.has(service.slug)"
-                class="rounded-md bg-stone-100 px-2 py-0.5 text-[11px] font-semibold text-gray-600 dark:bg-white/10 dark:text-gray-300"
-              >
-                Artikel terkait
-              </span>
+            <p class="max-w-[68ch] text-[17px] leading-[1.6] text-[var(--ink)]">
+              {{ service.description }}
+            </p>
+            <div class="lg:text-right">
+              <NuxtLink :to="`/layanan/${service.slug}`" class="pub-link whitespace-nowrap text-[16px] font-bold">
+                Pelajari ruang lingkup →
+              </NuxtLink>
             </div>
-          </NuxtLink>
-        </div>
+          </li>
+        </ul>
 
         <!-- Internal Links to FAQ, Contact & Regional Pages -->
-        <div class="mt-16 rounded-2xl border border-gray/15 bg-stone-50 p-8 text-center dark:border-white/10 dark:bg-gray-dark">
-          <h2 class="text-2xl font-extrabold text-black dark:text-white">
+        <div class="pub-box mt-16 p-8 lg:p-12">
+          <h2 class="pub-serif max-w-3xl text-[24px] leading-[1.25] text-[var(--ink)]">
             Konsultasi Kebutuhan Penilaian di Palembang, Sumatera Selatan &amp; Sumatera
           </h2>
-          <p class="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-gray-700 dark:text-gray-300">
-            Pelajari prosedur, estimasi waktu, dan dokumen yang perlu disiapkan melalui halaman <NuxtLink to="/faq" class="font-bold text-primary hover:underline">Tanya Jawab (FAQ)</NuxtLink>, atau tinjau cakupan wilayah kami di <NuxtLink to="/kjpp-palembang" class="font-bold text-primary hover:underline">Palembang</NuxtLink>, <NuxtLink to="/kjpp-sumatera-selatan" class="font-bold text-primary hover:underline">Sumatera Selatan</NuxtLink>, dan <NuxtLink to="/kjpp-sumatera" class="font-bold text-primary hover:underline">Pulau Sumatera</NuxtLink>.
+          <p class="mt-3 max-w-[68ch] text-[17px] leading-[1.6] text-[var(--muted)]">
+            Pelajari prosedur, estimasi waktu, dan dokumen yang perlu disiapkan melalui halaman <NuxtLink to="/faq" class="pub-link font-bold underline underline-offset-[3px]">Tanya Jawab (FAQ)</NuxtLink>, atau tinjau cakupan wilayah kami di <NuxtLink to="/kjpp-palembang" class="pub-link font-bold underline underline-offset-[3px]">Palembang</NuxtLink>, <NuxtLink to="/kjpp-sumatera-selatan" class="pub-link font-bold underline underline-offset-[3px]">Sumatera Selatan</NuxtLink>, dan <NuxtLink to="/kjpp-sumatera" class="pub-link font-bold underline underline-offset-[3px]">Pulau Sumatera</NuxtLink>.
           </p>
-          <div class="mt-6 flex flex-wrap items-center justify-center gap-4">
-            <NuxtLink to="/contact-us" class="btn !rounded-xl">
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <NuxtLink to="/contact-us" class="pub-btn">
               Hubungi Kami untuk Penawaran
             </NuxtLink>
-            <NuxtLink to="/faq" class="inline-flex items-center gap-2 rounded-xl border border-gray/25 bg-white px-6 py-4 text-sm font-extrabold uppercase text-black transition hover:border-primary hover:text-primary dark:border-white/15 dark:bg-black dark:text-white">
+            <NuxtLink to="/faq" class="pub-btn-ghost">
               Baca FAQ Penilaian
             </NuxtLink>
           </div>

@@ -29,25 +29,19 @@ useHead({
 <template>
   <div>
     <!-- Banner -->
-    <section class="bg-[url(/assets/images/consulting/banner-bg.jpg)] bg-cover bg-bottom bg-no-repeat pt-[82px] lg:pt-[106px]">
+    <section class="pub-page-banner">
       <div class="container">
-        <div class="items-center py-10 md:flex md:h-[360px] md:py-0">
-          <div class="heading mb-0 text-center md:text-left">
-            <span class="subtitle !text-white">Kantor Pusat Palembang</span>
-            <h1 class="!text-white text-2xl font-extrabold sm:text-3xl lg:text-[40px] lg:!leading-[50px]">
-              KJPP di Palembang – Kantor Jasa Penilai Publik Henricus Judi Adrianto &amp; Rekan
-            </h1>
-          </div>
-        </div>
+        <span class="pub-eyebrow">Kantor Pusat Palembang</span>
+        <h1 class="pub-h1">KJPP di Palembang – Kantor Jasa Penilai Publik Henricus Judi Adrianto &amp; Rekan</h1>
       </div>
     </section>
 
     <!-- Main Content -->
-    <section class="py-14 lg:py-20">
+    <section class="pub-section bg-[var(--paper)]">
       <div class="container max-w-4xl">
-        <UiBreadcrumbs :items="[{ label: 'KJPP Palembang' }]" class="mb-8" />
+        <UiBreadcrumbs :items="[{ label: 'KJPP Palembang' }]" class="mb-10" />
 
-        <article class="prose prose-lg prose-blue max-w-none text-gray-900 dark:prose-invert dark:text-gray-300">
+        <article class="prose prose-lg max-w-none text-[var(--ink)] dark:prose-invert">
           <p>
             <strong>{{ company.name }} ({{ company.shortName }})</strong> adalah Kantor Jasa Penilai Publik berizin resmi dari Kementerian Keuangan Republik Indonesia yang berkantor pusat langsung di <strong>Kota Palembang</strong> sejak berdiri pada 28 November 2013. Berbeda dari kantor perwakilan yang hanya menerima penerusan berkas, seluruh fungsi pimpinan rekan, direktur teknis, pengendalian mutu laporan, hingga tim pelaksana inspeksi lapangan berpusat di kantor kami di {{ headOffice.fullAddress }}. Kehadiran kantor pusat di Palembang memungkinkan komunikasi tatap muka yang cepat, verifikasi dokumen yang lebih cermat, serta jadwal survei lapangan yang efisien bagi nasabah perorangan, pelaku usaha, perbankan, maupun instansi di Kota Palembang.
           </p>
@@ -104,22 +98,22 @@ useHead({
         </article>
 
         <!-- Contact CTA Box -->
-        <div class="mt-12 rounded-2xl border border-primary/30 bg-stone-50 p-6 sm:p-8 dark:border-white/10 dark:bg-gray-dark">
-          <h2 class="text-xl font-extrabold text-black dark:text-white sm:text-2xl">
+        <div class="pub-box mt-12 p-6 sm:p-8">
+          <h2 class="pub-serif text-[24px] leading-[1.25] text-[var(--ink)]">
             Konsultasi &amp; Permintaan Penawaran – Kantor Pusat Palembang
           </h2>
-          <p class="mt-2 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+          <p class="mt-3 text-[16px] leading-[1.7] text-[var(--muted)] [&_strong]:text-[var(--ink)]">
             <strong>Alamat:</strong> {{ headOffice.fullAddress }}<br />
-            <strong>Telepon Kantor:</strong> <a :href="`tel:${headOffice.phoneE164}`" class="font-bold text-primary hover:underline">{{ headOffice.phone }}</a> ·
-            <strong>WhatsApp:</strong> <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="font-bold text-emerald-700 hover:underline dark:text-emerald-400">{{ headOffice.whatsapp }}</a> ·
-            <strong>Email:</strong> <a :href="`mailto:${headOffice.email}`" class="font-bold text-primary hover:underline">{{ headOffice.email }}</a><br />
+            <strong>Telepon Kantor:</strong> <a :href="`tel:${headOffice.phoneE164}`" class="pub-link font-bold tabular-nums">{{ headOffice.phone }}</a> ·
+            <strong>WhatsApp:</strong> <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="pub-link font-bold tabular-nums">{{ headOffice.whatsapp }}</a> ·
+            <strong>Email:</strong> <a :href="`mailto:${headOffice.email}`" class="pub-link font-bold tabular-nums">{{ headOffice.email }}</a><br />
             <strong>Jam Operasional:</strong> {{ company.operatingHours.display }}
           </p>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <NuxtLink to="/contact-us" class="btn !rounded-xl">
+          <div class="mt-6 flex flex-wrap gap-4">
+            <NuxtLink to="/contact-us" class="pub-btn">
               Hubungi Kami Sekarang
             </NuxtLink>
-            <NuxtLink to="/layanan" class="inline-flex items-center gap-2 rounded-xl border border-gray/25 bg-white px-5 py-3.5 text-sm font-extrabold uppercase text-black transition hover:border-primary hover:text-primary dark:border-white/15 dark:bg-black dark:text-white">
+            <NuxtLink to="/layanan" class="pub-btn-ghost">
               Lihat Semua Layanan
             </NuxtLink>
           </div>
