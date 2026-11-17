@@ -21,6 +21,7 @@ const search = refDebounced(searchInput, 350)
 const activeCategory = ref(String(route.query.category || ''))
 const activeTag = ref(String(route.query.tag || ''))
 const activeAuthor = ref(String(route.query.author || ''))
+const sortBy = ref(String(route.query.sort || '') === 'popular' ? 'popular' : 'latest')
 
 const { data: categoryData } = await useFetch('/api/categories')
 const categories = computed(() => categoryData.value?.items || [])
@@ -28,7 +29,7 @@ const { data: featuredData } = await useFetch('/api/blog', {
   query: { featured: 'true', page: 1, limit: 1 },
 })
 const featured = computed(() => featuredData.value?.items?.[0] || null)
-const hasFilters = computed(() => Boolean(search.value || activeCategory.value || activeTag.value || activeAuthor.value))
+const hasFilters = computed(() => Boolean(search.value || activeCategory.value || activeTag.value || activeAuthor.value || sortBy.value !== 'latest'))
 const showFeatured = computed(() => Boolean(featured.value && page.value === 1 && !hasFilters.value))
 const excludeFeatured = computed(() => Boolean(featured.value && !hasFilters.value))
 
@@ -40,13 +41,15 @@ const { data, pending, error: listError, refresh } = await useFetch('/api/blog',
     category: activeCategory.value || undefined,
     tag: activeTag.value || undefined,
     author: activeAuthor.value || undefined,
+    sort: sortBy.value === 'popular' ? 'popular' : undefined,
     exclude: excludeFeatured.value ? featured.value?._id : undefined,
   })),
 })
 const articles = computed(() => data.value?.items || [])
+const activeAuthorLabel = computed(() => data.value?.activeAuthorName || activeAuthor.value)
 
-watch([search, activeCategory, activeTag, activeAuthor], () => { page.value = 1 })
-watch([page, search, activeCategory, activeTag, activeAuthor], () => {
+watch([search, activeCategory, activeTag, activeAuthor, sortBy], () => { page.value = 1 })
+watch([page, search, activeCategory, activeTag, activeAuthor, sortBy], () => {
   if (!import.meta.client) return
   router.replace({
     query: {
@@ -55,6 +58,7 @@ watch([page, search, activeCategory, activeTag, activeAuthor], () => {
       category: activeCategory.value || undefined,
       tag: activeTag.value || undefined,
       author: activeAuthor.value || undefined,
+      sort: sortBy.value === 'popular' ? 'popular' : undefined,
     },
   })
 })
@@ -67,6 +71,7 @@ function resetFilters() {
   activeCategory.value = ''
   activeTag.value = ''
   activeAuthor.value = ''
+  sortBy.value = 'latest'
 }
 
 function selectTag(tag: string) {
@@ -126,25 +131,46 @@ function formatDate(value: string) {
             <button v-if="hasFilters" type="button" class="text-sm font-bold text-primary hover:underline" @click="resetFilters">Reset semua filter</button>
           </div>
 
-          <div class="mt-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_260px]">
+          <div class="mt-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_200px]">
             <label class="relative">
               <span class="sr-only">Cari artikel</span>
               <Icon name="ph:magnifying-glass-bold" class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray dark:text-slate-300" />
               <input v-model="searchInput" type="search" class="w-full rounded-xl border border-gray/20 bg-white py-3 pl-11 pr-4 text-sm text-black outline-none transition placeholder:text-gray focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-white/15 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-400" placeholder="Cari judul, ringkasan, atau tag">
             </label>
             <label>
-              <span class="sr-only">Pilih kategori</span>
-              <select v-model="activeCategory" class="w-full rounded-xl border border-gray/20 bg-white px-4 py-3 text-sm text-black outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-white/15 dark:bg-slate-900 dark:text-white">
-                <option value="">Semua kategori</option>
-                <option v-for="category in categories" :key="category._id" :value="category.slug">{{ category.name }}</option>
+              <span class="sr-only">Urutkan artikel</span>
+              <select v-model="sortBy" class="w-full rounded-xl border border-gray/20 bg-white px-4 py-3 text-sm font-semibold text-black outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-white/15 dark:bg-slate-900 dark:text-white">
+                <option value="latest">Terbaru</option>
+                <option value="popular">Terpopuler</option>
               </select>
             </label>
+          </div>
+
+          <div v-if="categories.length" class="mt-4 flex flex-wrap items-center gap-2" role="group" aria-label="Filter kategori artikel">
+            <button
+              type="button"
+              class="rounded-full px-3.5 py-1.5 text-xs font-bold transition"
+              :class="!activeCategory ? 'bg-primary text-black' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15'"
+              @click="activeCategory = ''"
+            >
+              Semua kategori
+            </button>
+            <button
+              v-for="category in categories"
+              :key="category._id"
+              type="button"
+              class="rounded-full px-3.5 py-1.5 text-xs font-bold transition"
+              :class="activeCategory === category.slug ? 'bg-primary text-black' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/15'"
+              @click="activeCategory = activeCategory === category.slug ? '' : category.slug"
+            >
+              {{ category.name }}
+            </button>
           </div>
 
           <div v-if="activeTag || activeAuthor" class="mt-4 flex flex-wrap items-center gap-2 text-sm">
             <span class="text-gray dark:text-slate-300">Filter aktif:</span>
             <button v-if="activeTag" type="button" class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1.5 font-semibold text-blue-800 dark:bg-blue-400/15 dark:text-blue-200" @click="activeTag = ''">#{{ activeTag }} <Icon name="ph:x-bold" /></button>
-            <button v-if="activeAuthor" type="button" class="inline-flex items-center gap-1 rounded-full bg-purple-50 px-3 py-1.5 font-semibold text-purple-800 dark:bg-purple-400/15 dark:text-purple-200" @click="activeAuthor = ''">Penulis aktif <Icon name="ph:x-bold" /></button>
+            <button v-if="activeAuthor" type="button" class="inline-flex items-center gap-1 rounded-full bg-purple-50 px-3 py-1.5 font-semibold text-purple-800 dark:bg-purple-400/15 dark:text-purple-200" @click="activeAuthor = ''">Penulis: {{ activeAuthorLabel }} <Icon name="ph:x-bold" /></button>
           </div>
         </section>
 

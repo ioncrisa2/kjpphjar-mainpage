@@ -48,9 +48,11 @@ describe('rute publik tetap terbuka', () => {
 describe('rute privat dipetakan ke permission yang benar', () => {
   const cases = [
     ['GET', '/api/admin/blog', 'blog.view'],
+    ['GET', '/api/admin/blog/tags', ['blog.view', 'blog.create', 'blog.update']],
     ['GET', '/api/admin/blog/123', 'blog.view'],
     ['POST', '/api/admin/blog', 'blog.create'],
     ['PUT', '/api/admin/blog/123', 'blog.update'],
+    ['PATCH', '/api/admin/blog/123', 'blog.update'],
     ['DELETE', '/api/admin/blog/123', 'blog.delete'],
     ['POST', '/api/admin/blog/upload-image', ['blog.create', 'blog.update']],
     ['GET', '/api/admin/categories', ['blog.view', 'blog.categories']],

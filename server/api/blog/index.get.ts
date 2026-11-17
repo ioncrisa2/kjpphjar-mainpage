@@ -1,5 +1,6 @@
 import { BlogPost } from '~/server/models/BlogPost'
 import { Category } from '~/server/models/Category'
+import { Leader } from '~/server/models/Leader'
 import { connectDB } from '~/server/utils/db'
 import {
   clampPagination,
@@ -24,7 +25,7 @@ export default defineEventHandler(async (event) => {
   const categorySlug = sanitizePlainText(query.category, 100)
   if (categorySlug) {
     const category = await Category.findOne({ slug: categorySlug, isActive: true }).select('_id').lean()
-    if (!category) return { items: [], total: 0, page, totalPages: 0 }
+    if (!category) return { items: [], total: 0, page, totalPages: 0, activeAuthorName: '' }
     filters.push({ categoryId: category._id })
   }
 
@@ -33,17 +34,25 @@ export default defineEventHandler(async (event) => {
   if (String(query.featured) === 'true') filters.push({ isFeatured: true })
 
   const authorFilter = sanitizePlainText(query.author, 80)
+  let activeAuthorName = ''
   if (authorFilter) {
     if (/^[a-f\d]{24}$/i.test(authorFilter)) {
       filters.push({ leaderId: authorFilter })
+      const leaderDoc = await Leader.findById(authorFilter).select('name').lean()
+      activeAuthorName = leaderDoc?.name || ''
     } else {
       const authorRegex = new RegExp(escapeRegex(authorFilter), 'i')
       filters.push({ author: authorRegex })
+      activeAuthorName = authorFilter
     }
   }
 
   const excludeId = sanitizePlainText(query.exclude, 30)
   if (excludeId && /^[a-f\d]{24}$/i.test(excludeId)) filters.push({ _id: { $ne: excludeId } })
+
+  const sortOrder: Record<string, 1 | -1> = String(query.sort) === 'popular'
+    ? { views: -1, publishedAt: -1, createdAt: -1 }
+    : { publishedAt: -1, createdAt: -1 }
 
   const filter = { $and: filters }
 
@@ -59,7 +68,7 @@ export default defineEventHandler(async (event) => {
         path: 'leaderId',
         select: 'name slug position photoUrl bio',
       })
-      .sort({ publishedAt: -1, createdAt: -1 })
+      .sort(sortOrder)
       .skip(skip)
       .limit(limit)
       .lean(),
@@ -71,5 +80,6 @@ export default defineEventHandler(async (event) => {
     total,
     page,
     totalPages: Math.ceil(total / limit),
+    activeAuthorName,
   }
 })

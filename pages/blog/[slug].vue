@@ -2,6 +2,7 @@
 import lightGallery from 'lightgallery'
 import lgZoom from 'lightgallery/plugins/zoom'
 import { COMPANY_DATA, sanitizeJsonLd } from '~/shared/company-data'
+import { buildBlogArticleWithToc } from '~/utils/blog-content'
 
 const route = useRoute()
 const slug = route.params.slug as string
@@ -9,6 +10,10 @@ const { data: article, pending, error } = await useFetch(`/api/blog/${slug}`)
 
 if (error.value) {
   throw createError({ statusCode: 404, statusMessage: 'Artikel tidak ditemukan' })
+}
+
+if (article.value?.redirectedFromSlug && article.value?.slug && article.value.slug !== slug) {
+  await navigateTo(`/blog/${article.value.slug}`, { redirectCode: 301 })
 }
 
 const { data: relatedData } = await useFetch(`/api/blog/${slug}/related`)
@@ -27,15 +32,9 @@ const seoTitle = computed(() => {
   return raw.replace(/\s*[|–-]\s*(?:KJPP\s+)?HJA['’]R\s*$/i, '').trim() || 'Blog'
 })
 const seoDescription = computed(() => article.value?.metaDescription || article.value?.excerpt || '')
-const articleHtml = computed(() => {
-  let html = String(article.value?.content || '').replace(/<(\/?)h1(\b[^>]*)>/gi, '<$1h2$2>')
-  if (!/<h2\b/i.test(html) && /<h3\b/i.test(html)) {
-    html = html
-      .replace(/<(\/?)h3(\b[^>]*)>/gi, '<$1h2$2>')
-      .replace(/<(\/?)h4(\b[^>]*)>/gi, '<$1h3$2>')
-  }
-  return html
-})
+const parsedArticle = computed(() => buildBlogArticleWithToc(article.value?.content || ''))
+const articleHtml = computed(() => parsedArticle.value.html)
+const articleToc = computed(() => parsedArticle.value.toc)
 const articleWordCount = computed(() => {
   const text = String(article.value?.content || '')
     .replace(/<[^>]*>/g, ' ')
@@ -222,6 +221,31 @@ function formatDate(value: string) {
           ]" 
         />
 
+        <nav
+          v-if="articleToc.length >= 2"
+          aria-label="Daftar isi artikel"
+          class="mt-6 rounded-2xl border border-gray/15 bg-slate-50 p-5 dark:border-white/10 dark:bg-slate-900/70"
+        >
+          <p class="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-primary">
+            <Icon name="ph:list-bullets-bold" class="text-sm" /> Daftar Isi
+          </p>
+          <ol class="mt-3 space-y-1.5 text-sm">
+            <li
+              v-for="item in articleToc"
+              :key="item.id"
+              :class="item.level === 3 ? 'pl-4' : ''"
+            >
+              <a
+                :href="`#${item.id}`"
+                class="inline-block transition hover:text-primary"
+                :class="item.level === 3 ? 'text-gray-600 dark:text-slate-400' : 'font-semibold text-black dark:text-white'"
+              >
+                {{ item.text }}
+              </a>
+            </li>
+          </ol>
+        </nav>
+
         <article ref="articleRef" class="blog-article prose prose-lg prose-blue mx-auto mt-10 max-w-none text-gray-900 prose-headings:font-extrabold prose-headings:text-black prose-a:text-primary prose-img:rounded-xl dark:prose-invert dark:text-slate-200 dark:prose-headings:text-white" v-html="articleHtml"></article>
 
         <div v-if="article.tags.length" class="mt-12 flex flex-wrap items-center gap-2 border-t border-gray/10 pt-8 dark:border-white/10">
@@ -341,6 +365,11 @@ function formatDate(value: string) {
 
 .blog-article li[data-list='bullet'] {
   list-style-type: disc;
+}
+
+.blog-article h2,
+.blog-article h3 {
+  scroll-margin-top: 7.5rem;
 }
 
 .blog-article li[data-list='ordered'] {

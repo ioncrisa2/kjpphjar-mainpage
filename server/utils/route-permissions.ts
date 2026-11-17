@@ -90,9 +90,10 @@ function crud(
 const RULES: readonly RouteRule[] = [
   // Blog (panel admin)
   rule(['POST'], '/api/admin/blog/upload-image', ['blog.create', 'blog.update']),
+  rule(GET, '/api/admin/blog/tags', ['blog.view', 'blog.create', 'blog.update']),
   rule(GET, new RegExp(`^/api/admin/blog(?:/${ID})?$`), 'blog.view'),
   rule(['POST'], '/api/admin/blog', 'blog.create'),
-  rule(['PUT'], new RegExp(`^/api/admin/blog/${ID}$`), 'blog.update'),
+  rule(['PUT', 'PATCH'], new RegExp(`^/api/admin/blog/${ID}$`), 'blog.update'),
   rule(['DELETE'], new RegExp(`^/api/admin/blog/${ID}$`), 'blog.delete'),
   rule(GET, '/api/blog', 'blog.view', { admin: 'true' }),
 

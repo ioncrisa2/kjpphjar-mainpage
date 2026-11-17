@@ -3,7 +3,7 @@ import slugify from 'slugify'
 import type { FilterQuery } from 'mongoose'
 import type { BlogPostStatus, IBlogPost } from '~/server/models/BlogPost'
 
-export const BLOG_STATUSES: BlogPostStatus[] = ['draft', 'published', 'scheduled']
+export const BLOG_STATUSES: BlogPostStatus[] = ['draft', 'in_review', 'published', 'scheduled']
 
 const contentWhiteList: Record<string, string[]> = {
   p: ['class'],
@@ -123,6 +123,24 @@ export function sanitizeBlogContent(value: unknown) {
   return normalizeContentHeadings(sanitized)
 }
 
+/**
+ * Ekstrak URL gambar lokal konten blog (`/uploads/blog/content/...`) untuk
+ * mendeteksi gambar yatim saat artikel diperbarui atau dihapus.
+ */
+export function extractBlogContentImageUrls(html: unknown): string[] {
+  const source = String(html ?? '')
+  const urls = new Set<string>()
+  const pattern = /<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi
+  let match: RegExpExecArray | null
+  while ((match = pattern.exec(source)) !== null) {
+    const src = match[1]?.trim() || ''
+    if (src.startsWith('/uploads/blog/content/')) {
+      urls.add(src.split(/[?#]/)[0])
+    }
+  }
+  return [...urls]
+}
+
 export function calculateReadingTime(content: unknown, wordsPerMinute = 200) {
   const text = stripHtml(content)
   const words = text ? text.split(/\s+/).length : 0
@@ -216,7 +234,7 @@ export function parsePublicationInput(
   }
 
   if (status === 'published' && !publishedAt) publishedAt = new Date()
-  if (status === 'draft') publishedAt = null
+  if (status === 'draft' || status === 'in_review') publishedAt = null
   if (status === 'scheduled' && !publishedAt) {
     throw createError({ statusCode: 400, statusMessage: 'Tanggal terbit wajib diisi untuk artikel terjadwal.' })
   }
@@ -312,6 +330,7 @@ export function toBlogPostDto(post: Record<string, any>, includeContent = true) 
     metaTitle: post.metaTitle || '',
     metaDescription: post.metaDescription || '',
     status: getLegacyCompatibleStatus(post),
+    editorialNote: typeof post.editorialNote === 'string' ? post.editorialNote : '',
     isPublished: Boolean(post.isPublished),
     publishedAt: post.publishedAt || null,
     author: populatedLeader?.name || post.author || 'Admin',

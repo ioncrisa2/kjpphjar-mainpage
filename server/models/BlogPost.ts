@@ -1,10 +1,11 @@
 import mongoose, { Schema, Types, type Document, type Model } from 'mongoose'
 
-export type BlogPostStatus = 'draft' | 'published' | 'scheduled'
+export type BlogPostStatus = 'draft' | 'in_review' | 'published' | 'scheduled'
 
 export interface IBlogPost extends Document {
   title: string
   slug: string
+  previousSlugs: string[]
   content: string
   publishedAt?: Date | null
   excerpt?: string
@@ -17,6 +18,7 @@ export interface IBlogPost extends Document {
   metaTitle?: string
   metaDescription?: string
   status: BlogPostStatus
+  editorialNote?: string
   /** Legacy compatibility flag. Use status for all new behavior. */
   isPublished: boolean
   leaderId?: Types.ObjectId | null
@@ -32,6 +34,7 @@ const BlogPostSchema = new Schema<IBlogPost>(
   {
     title: { type: String, required: true, trim: true, maxlength: 180 },
     slug: { type: String, required: true, unique: true, trim: true, lowercase: true, maxlength: 180 },
+    previousSlugs: { type: [String], default: [], index: true },
     content: { type: String, required: true },
     publishedAt: { type: Date, default: null },
     excerpt: { type: String, maxlength: 400 },
@@ -46,10 +49,11 @@ const BlogPostSchema = new Schema<IBlogPost>(
     metaDescription: { type: String, maxlength: 180 },
     status: {
       type: String,
-      enum: ['draft', 'published', 'scheduled'],
+      enum: ['draft', 'in_review', 'published', 'scheduled'],
       default: 'draft',
       index: true,
     },
+    editorialNote: { type: String, default: '', maxlength: 500 },
     isPublished: { type: Boolean, default: false },
     author: { type: String, maxlength: 100 },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },

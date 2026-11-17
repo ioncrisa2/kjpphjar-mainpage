@@ -30,13 +30,16 @@ export async function resolveBlogAuthor(user: SessionUser, body: Record<string, 
   return { leaderId, author }
 }
 
-/** Tanpa blog.publish artikel selalu disimpan sebagai draft. */
+/** Tanpa blog.publish artikel hanya bisa disimpan sebagai draft atau siap review. */
 export function resolveBlogPublication(
   user: SessionUser,
   body: Record<string, any>,
   existing?: Record<string, any>,
 ) {
-  if (!hasPermission(user, 'blog.publish')) return parsePublicationInput('draft', null)
+  if (!hasPermission(user, 'blog.publish')) {
+    const requested = body.status === 'in_review' ? 'in_review' : 'draft'
+    return parsePublicationInput(requested, null)
+  }
   if (!existing) return parsePublicationInput(body.status, body.publishedAt)
   return parsePublicationInput(
     body.status || getLegacyCompatibleStatus(existing),
@@ -45,13 +48,28 @@ export function resolveBlogPublication(
   )
 }
 
+export function resolveBlogEditorialNote(
+  user: SessionUser,
+  body: Record<string, any>,
+  existing?: Record<string, any>,
+) {
+  if (!hasPermission(user, 'blog.publish')) {
+    return typeof existing?.editorialNote === 'string' ? existing.editorialNote : ''
+  }
+  if (body.editorialNote === undefined) {
+    return body.status === 'published' ? '' : (typeof existing?.editorialNote === 'string' ? existing.editorialNote : '')
+  }
+  return sanitizePlainText(body.editorialNote, 500)
+}
+
 /**
  * Artikel yang sudah terbit atau terjadwal hanya boleh diubah/dihapus oleh
- * pemegang blog.publish (keputusan D3).
+ * pemegang blog.publish (keputusan D3). Draft dan siap review masih boleh diubah penulis.
  */
 export function assertBlogPublicationUnlocked(user: SessionUser, post: Record<string, any>) {
   if (hasPermission(user, 'blog.publish')) return
-  if (getLegacyCompatibleStatus(post) !== 'draft') {
+  const currentStatus = getLegacyCompatibleStatus(post)
+  if (currentStatus !== 'draft' && currentStatus !== 'in_review') {
     throw createError({
       statusCode: 403,
       statusMessage: 'Artikel yang sudah terbit atau terjadwal hanya bisa diubah oleh editor.',

@@ -1,5 +1,5 @@
 <template>
-  <div class="wysiwyg-wrapper relative overflow-hidden rounded-xl border border-gray-300 bg-white text-gray-900 transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20">
+  <div class="wysiwyg-wrapper relative overflow-hidden rounded-xl border border-gray-300 bg-white text-gray-900 transition focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 dark:border-white/15 dark:bg-slate-900 dark:text-white">
     <ClientOnly fallback-tag="div" fallback="Loading editor...">
       <QuillEditor
         content-type="html"
@@ -19,14 +19,14 @@
     >
     <div
       v-if="pendingImageFile"
-      class="border-t border-gray-200 bg-slate-50 p-4 text-sm text-gray-900"
+      class="border-t border-gray-200 bg-slate-50 p-4 text-sm text-gray-900 dark:border-white/10 dark:bg-slate-800/90 dark:text-white"
       role="region"
       aria-label="Form unggah gambar blog"
     >
-      <p class="font-bold text-gray-900">Unggah Gambar Artikel: {{ pendingImageFile.name }}</p>
+      <p class="font-bold text-gray-900 dark:text-white">Unggah Gambar Artikel: {{ pendingImageFile.name }}</p>
       <div class="mt-2">
-        <label for="wysiwyg-image-alt" class="mb-1 block text-xs font-bold text-gray-700">
-          Teks Alt Gambar (Wajib untuk SEO &amp; Aksesibilitas) <span class="text-red-600">*</span>
+        <label for="wysiwyg-image-alt" class="mb-1 block text-xs font-bold text-gray-700 dark:text-slate-300">
+          Teks Alt Gambar (Wajib untuk SEO &amp; Aksesibilitas) <span class="text-red-600 dark:text-red-400">*</span>
         </label>
         <input
           id="wysiwyg-image-alt"
@@ -35,10 +35,10 @@
           required
           maxlength="200"
           placeholder="Contoh: Penilai publik KJPP HJA'R melakukan inspeksi ruko di Palembang"
-          class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary"
+          class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none focus:border-primary dark:border-white/15 dark:bg-slate-900 dark:text-white"
           @keydown.enter.prevent="confirmUploadImage"
         >
-        <p v-if="altValidationError" class="mt-1 text-xs font-semibold text-red-600" role="alert">
+        <p v-if="altValidationError" class="mt-1 text-xs font-semibold text-red-600 dark:text-red-400" role="alert">
           {{ altValidationError }}
         </p>
       </div>
@@ -54,7 +54,7 @@
         <button
           type="button"
           :disabled="uploading"
-          class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+          class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-100 dark:border-white/15 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
           @click="cancelPendingImage"
         >
           Batal
@@ -63,13 +63,13 @@
     </div>
     <div
       v-if="uploading"
-      class="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-800"
+      class="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-800 dark:bg-blue-950/90 dark:text-blue-200"
       aria-live="polite"
     >
       <Icon name="ph:spinner-gap-bold" class="animate-spin text-base" />
       Mengunggah dan mengoptimalkan gambar…
     </div>
-    <p v-if="uploadError" class="m-0 bg-red-50 px-4 py-2 text-sm text-red-700" role="alert">
+    <p v-if="uploadError" class="m-0 bg-red-50 px-4 py-2 text-sm text-red-700 dark:bg-red-950/80 dark:text-red-300" role="alert">
       {{ uploadError }}
     </p>
   </div>
@@ -199,9 +199,9 @@ async function confirmUploadImage() {
     const index = selection?.index ?? Math.max(0, quillInstance.getLength() - 1)
     quillInstance.insertEmbed(index, 'image', result.url, 'user')
     await nextTick()
-    const imgs = quillInstance.root?.querySelectorAll?.(`img[src="${result.url}"]`) || []
+    const imgs = quillInstance.root?.querySelectorAll?.('img') || []
     for (const img of imgs) {
-      if (!img.getAttribute('alt')) {
+      if (img.getAttribute('src') === result.url && !img.getAttribute('alt')) {
         img.setAttribute('alt', altText)
       }
     }
@@ -234,5 +234,29 @@ async function confirmUploadImage() {
 .wysiwyg-wrapper .ql-editor img {
   max-width: 100%;
   height: auto;
+}
+.dark .wysiwyg-wrapper .ql-toolbar {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.04);
+}
+.dark .wysiwyg-wrapper .ql-stroke {
+  stroke: #cbd5e1;
+}
+.dark .wysiwyg-wrapper .ql-fill {
+  fill: #cbd5e1;
+}
+.dark .wysiwyg-wrapper .ql-picker-label {
+  color: #cbd5e1;
+}
+.dark .wysiwyg-wrapper .ql-picker-options {
+  background-color: #1e293b;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+}
+.dark .wysiwyg-wrapper .ql-editor {
+  color: #f1f5f9;
+}
+.dark .wysiwyg-wrapper .ql-editor.ql-blank::before {
+  color: #64748b;
 }
 </style>

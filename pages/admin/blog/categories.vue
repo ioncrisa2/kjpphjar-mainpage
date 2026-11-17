@@ -107,9 +107,9 @@ async function deleteCategory(category: Record<string, any>) {
       </form>
 
       <section class="admin-card !p-0 overflow-hidden">
-        <div v-if="pending" class="space-y-3 p-6"><div v-for="index in 4" :key="index" class="h-16 animate-pulse rounded-xl bg-slate-100"></div></div>
+        <div v-if="pending" class="space-y-3 p-6"><div v-for="index in 4" :key="index" class="h-16 animate-pulse rounded-xl bg-slate-100 dark:bg-white/10"></div></div>
         <div v-else-if="!categories.length" class="px-6 py-14 text-center">
-          <Icon name="ph:folders-bold" class="mx-auto text-5xl text-slate-300" />
+          <Icon name="ph:folders-bold" class="mx-auto text-5xl text-slate-300 dark:text-slate-600" />
           <h2 class="mt-4 text-lg font-bold text-black dark:text-white">Belum ada kategori</h2>
           <p class="mt-2 text-sm text-gray">Tambahkan kategori pertama menggunakan form di samping.</p>
         </div>
@@ -118,21 +118,26 @@ async function deleteCategory(category: Record<string, any>) {
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-center gap-2">
                 <h2 class="font-bold text-black dark:text-white">{{ category.name }}</h2>
-                <span class="rounded-full px-2 py-0.5 text-xs font-bold" :class="category.isActive ? 'bg-green-100 text-green-800' : 'bg-slate-200 text-slate-700'">{{ category.isActive ? 'Aktif' : 'Nonaktif' }}</span>
+                <span class="rounded-full px-2 py-0.5 text-xs font-bold" :class="category.isActive ? 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300' : 'bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-slate-300'">{{ category.isActive ? 'Aktif' : 'Nonaktif' }}</span>
               </div>
-              <p class="mt-1 text-xs font-semibold text-primary">/kategori/{{ category.slug }}</p>
+              <p class="mt-1 text-xs font-semibold text-primary">
+                <NuxtLink v-if="category.isActive" :to="{ path: '/blog', query: { category: category.slug } }" target="_blank" class="inline-flex items-center gap-1 hover:underline">
+                  /blog?category={{ category.slug }} <Icon name="ph:arrow-square-out-bold" />
+                </NuxtLink>
+                <span v-else>/blog?category={{ category.slug }}</span>
+              </p>
               <p v-if="category.description" class="mt-2 line-clamp-2 max-w-2xl text-sm text-gray">{{ category.description }}</p>
               <p class="mt-2 text-xs text-gray">{{ category.articleCount }} artikel</p>
             </div>
             <div class="flex gap-1">
-              <button type="button" class="rounded-lg p-2 text-primary transition hover:bg-blue-50" :aria-label="`Edit ${category.name}`" @click="editCategory(category)"><Icon name="ph:pencil-simple-bold" class="text-lg" /></button>
-              <button type="button" class="rounded-lg p-2 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40" :disabled="category.articleCount > 0" :title="category.articleCount > 0 ? 'Kategori yang masih dipakai tidak dapat dihapus' : 'Hapus kategori'" :aria-label="`Hapus ${category.name}`" @click="deleteCategory(category)"><Icon name="ph:trash-bold" class="text-lg" /></button>
+              <button type="button" class="rounded-lg p-2 text-primary transition hover:bg-blue-50 dark:hover:bg-primary/15" :aria-label="`Edit ${category.name}`" @click="editCategory(category)"><Icon name="ph:pencil-simple-bold" class="text-lg" /></button>
+              <button type="button" class="rounded-lg p-2 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-red-400 dark:hover:bg-red-500/15" :disabled="category.articleCount > 0" :title="category.articleCount > 0 ? 'Kategori yang masih dipakai tidak dapat dihapus' : 'Hapus kategori'" :aria-label="`Hapus ${category.name}`" @click="deleteCategory(category)"><Icon name="ph:trash-bold" class="text-lg" /></button>
             </div>
           </article>
         </div>
         <div v-else class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray/10">
-            <thead class="bg-gray/5">
+            <thead class="bg-slate-50 dark:bg-white/5">
               <tr>
                 <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Kategori</th>
                 <th class="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray">Artikel</th>
@@ -144,22 +149,27 @@ async function deleteCategory(category: Record<string, any>) {
               <tr v-for="category in categories" :key="category._id" class="transition hover:bg-slate-50 dark:hover:bg-white/5">
                 <td class="px-5 py-4">
                   <p class="font-bold text-black dark:text-white">{{ category.name }}</p>
-                  <p class="mt-0.5 text-xs font-semibold text-primary">/kategori/{{ category.slug }}</p>
+                  <p class="mt-0.5 text-xs font-semibold text-primary">
+                    <NuxtLink v-if="category.isActive" :to="{ path: '/blog', query: { category: category.slug } }" target="_blank" class="inline-flex items-center gap-1 hover:underline">
+                      /blog?category={{ category.slug }} <Icon name="ph:arrow-square-out-bold" />
+                    </NuxtLink>
+                    <span v-else>/blog?category={{ category.slug }}</span>
+                  </p>
                   <p v-if="category.description" class="mt-1 line-clamp-1 max-w-md text-xs text-gray">{{ category.description }}</p>
                 </td>
                 <td class="px-5 py-4 whitespace-nowrap text-sm tabular-nums text-gray">
                   {{ category.articleCount }} artikel
                 </td>
                 <td class="px-5 py-4 whitespace-nowrap">
-                  <span class="rounded-full px-2.5 py-0.5 text-xs font-bold" :class="category.isActive ? 'bg-green-100 text-green-800' : 'bg-slate-200 text-slate-700'">
+                  <span class="rounded-full px-2.5 py-0.5 text-xs font-bold" :class="category.isActive ? 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300' : 'bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-slate-300'">
                     {{ category.isActive ? 'Aktif' : 'Nonaktif' }}
                   </span>
                 </td>
                 <td class="px-5 py-4 whitespace-nowrap text-right">
-                  <button type="button" class="rounded-lg p-2 text-primary transition hover:bg-blue-50" :aria-label="`Edit ${category.name}`" @click="editCategory(category)">
+                  <button type="button" class="rounded-lg p-2 text-primary transition hover:bg-blue-50 dark:hover:bg-primary/15" :aria-label="`Edit ${category.name}`" @click="editCategory(category)">
                     <Icon name="ph:pencil-simple-bold" class="text-lg" />
                   </button>
-                  <button type="button" class="rounded-lg p-2 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40" :disabled="category.articleCount > 0" :title="category.articleCount > 0 ? 'Kategori yang masih dipakai tidak dapat dihapus' : 'Hapus kategori'" :aria-label="`Hapus ${category.name}`" @click="deleteCategory(category)">
+                  <button type="button" class="rounded-lg p-2 text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40 dark:text-red-400 dark:hover:bg-red-500/15" :disabled="category.articleCount > 0" :title="category.articleCount > 0 ? 'Kategori yang masih dipakai tidak dapat dihapus' : 'Hapus kategori'" :aria-label="`Hapus ${category.name}`" @click="deleteCategory(category)">
                     <Icon name="ph:trash-bold" class="text-lg" />
                   </button>
                 </td>

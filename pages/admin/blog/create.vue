@@ -7,13 +7,15 @@ useHead({ title: "Tulis Artikel | KJPP HJA'R" })
 const router = useRouter()
 const toast = useToast()
 const saving = ref(false)
+const formRef = ref<{ markSaved: (enableLeave?: boolean) => void } | null>(null)
 
-async function saveArticle(payload: FormData) {
+async function saveArticle({ payload, stay }: { payload: FormData; stay: boolean }) {
   saving.value = true
   try {
-    await $fetch('/api/admin/blog', { method: 'POST', body: payload })
+    const created = await $fetch<{ _id: string }>('/api/admin/blog', { method: 'POST', body: payload })
+    formRef.value?.markSaved(true)
     toast.success('Artikel berhasil disimpan.')
-    await router.push('/admin/blog')
+    await router.push(stay && created?._id ? `/admin/blog/${created._id}` : '/admin/blog')
   } catch (error: any) {
     toast.error(error?.data?.statusMessage || 'Artikel gagal disimpan.')
   } finally {
@@ -30,10 +32,10 @@ async function saveArticle(payload: FormData) {
       </NuxtLink>
       <div>
         <h1 class="text-2xl font-extrabold text-black dark:text-white">Tulis artikel baru</h1>
-        <p class="mt-1 text-sm text-gray">Simpan sebagai draft, terbitkan sekarang, atau jadwalkan publikasi.</p>
+        <p class="mt-1 text-sm text-gray">Simpan sebagai draft, ajukan untuk review, terbitkan, atau jadwalkan publikasi.</p>
       </div>
     </header>
 
-    <BlogPostForm :saving="saving" submit-label="Simpan artikel" @submit="saveArticle" />
+    <BlogPostForm ref="formRef" :saving="saving" submit-label="Simpan artikel" @submit="saveArticle" />
   </div>
 </template>

@@ -10,18 +10,40 @@ const toast = useToast()
 const id = route.params.id as string
 const { data: article, pending, error } = await useFetch(`/api/admin/blog/${id}`)
 const saving = ref(false)
+const formRef = ref<{ markSaved: (enableLeave?: boolean) => void } | null>(null)
 
 // Keputusan D3: tanpa blog.publish, artikel terbit/terjadwal tidak bisa diubah.
 const { can } = useAdminAuth()
-const isLocked = computed(() => !can('blog.publish') && !!article.value && article.value.status !== 'draft')
+const isLocked = computed(() =>
+  !can('blog.publish')
+  && !!article.value
+  && article.value.status !== 'draft'
+  && article.value.status !== 'in_review',
+)
+const isPubliclyVisible = computed(() => {
+  const item = article.value
+  if (!item) return false
+  if (item.status === 'published') return true
+  if (item.status === 'scheduled' && item.publishedAt) {
+    return new Date(item.publishedAt).getTime() <= Date.now()
+  }
+  return false
+})
 const forbiddenMessage = computed(() =>
   error.value?.statusCode === 403 ? error.value.data?.statusMessage || 'Anda tidak memiliki akses ke artikel ini.' : ''
 )
 
-async function saveArticle(payload: FormData) {
+async function saveArticle({ payload, stay }: { payload: FormData; stay: boolean }) {
   saving.value = true
   try {
-    await $fetch(`/api/admin/blog/${id}`, { method: 'PUT', body: payload })
+    const updated = await $fetch<Record<string, any>>(`/api/admin/blog/${id}`, { method: 'PUT', body: payload })
+    if (stay && updated) {
+      article.value = updated
+      formRef.value?.markSaved(false)
+      toast.success('Perubahan disimpan. Anda dapat melanjutkan penyuntingan.')
+      return
+    }
+    formRef.value?.markSaved(true)
     toast.success('Perubahan artikel berhasil disimpan.')
     await router.push('/admin/blog')
   } catch (fetchError: any) {
@@ -34,17 +56,27 @@ async function saveArticle(payload: FormData) {
 
 <template>
   <div class="space-y-6">
-    <header class="flex flex-wrap items-center gap-4">
-      <NuxtLink to="/admin/blog" class="admin-btn-ghost !px-3" aria-label="Kembali ke daftar artikel">
-        <Icon name="ph:arrow-left-bold" />
-      </NuxtLink>
-      <div>
-        <h1 class="text-2xl font-extrabold text-black dark:text-white">Edit artikel</h1>
-        <p class="mt-1 text-sm text-gray">Perbarui konten, SEO, dan pengaturan publikasi.</p>
+    <header class="flex flex-wrap items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-4">
+        <NuxtLink to="/admin/blog" class="admin-btn-ghost !px-3" aria-label="Kembali ke daftar artikel">
+          <Icon name="ph:arrow-left-bold" />
+        </NuxtLink>
+        <div>
+          <h1 class="text-2xl font-extrabold text-black dark:text-white">Edit artikel</h1>
+          <p class="mt-1 text-sm text-gray">Perbarui konten, SEO, dan pengaturan publikasi.</p>
+        </div>
       </div>
+      <NuxtLink
+        v-if="isPubliclyVisible && article?.slug"
+        :to="`/blog/${article.slug}`"
+        target="_blank"
+        class="admin-btn-ghost"
+      >
+        <Icon name="ph:arrow-square-out-bold" /> Lihat di website
+      </NuxtLink>
     </header>
 
-    <div v-if="pending" class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]" aria-label="Memuat artikel">
+    <div v-if="pending" class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]" aria-label="Memuat artikel">
       <div class="h-96 animate-pulse rounded-2xl bg-white dark:bg-gray-dark"></div>
       <div class="h-72 animate-pulse rounded-2xl bg-white dark:bg-gray-dark"></div>
     </div>
@@ -61,6 +93,6 @@ async function saveArticle(payload: FormData) {
       </p>
       <NuxtLink :to="`/blog/${article.slug}`" target="_blank" class="admin-btn-ghost mt-5">Lihat di website</NuxtLink>
     </div>
-    <BlogPostForm v-else :initial-value="article" :saving="saving" submit-label="Simpan perubahan" @submit="saveArticle" />
+    <BlogPostForm v-else ref="formRef" :initial-value="article" :saving="saving" submit-label="Simpan perubahan" @submit="saveArticle" />
   </div>
 </template>

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import { BlogPost } from '~/server/models/BlogPost'
 import { assertBlogPublicationUnlocked } from '~/server/utils/blog-access'
+import { cleanupOrphanBlogContentImages } from '~/server/utils/blog-media'
 import { connectDB } from '~/server/utils/db'
 import { deleteAsset } from '~/server/utils/media-storage'
 import { assertCanManageRecord } from '~/server/utils/ownership'
@@ -25,5 +26,6 @@ export default defineEventHandler(async (event) => {
       console.error('Gagal membersihkan cover artikel yang dihapus:', cleanupError)
     })
   }
+  await cleanupOrphanBlogContentImages(post.content || '', '', id)
   return { success: true, message: 'Artikel berhasil dihapus.' }
 })

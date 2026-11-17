@@ -17,8 +17,10 @@ import {
 import {
   assertBlogPublicationUnlocked,
   resolveBlogAuthor,
+  resolveBlogEditorialNote,
   resolveBlogPublication,
 } from '~/server/utils/blog-access'
+import { cleanupOrphanBlogContentImages } from '~/server/utils/blog-media'
 import { processUploadedBlogImage } from '~/server/utils/image'
 import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
 import { assertCanManageRecord } from '~/server/utils/ownership'
@@ -58,6 +60,14 @@ export default defineEventHandler(async (event) => {
 
     const { leaderId, author: authorName } = await resolveBlogAuthor(user, body)
     const publication = resolveBlogPublication(user, body, existing.toObject())
+    const editorialNote = resolveBlogEditorialNote(user, body, existing.toObject())
+
+    const existingPreviousSlugs = Array.isArray(existing.previousSlugs) ? existing.previousSlugs : []
+    const wasPublished = existing.status === 'published' || existing.isPublished || Boolean(existing.publishedAt)
+    const nextPreviousSlugs = new Set(existingPreviousSlugs.filter((item) => item && item !== slug))
+    if (wasPublished && existing.slug && existing.slug !== slug) {
+      nextPreviousSlugs.add(existing.slug)
+    }
 
     const removeCover = parseBoolean(body.removeCover)
     if (file && !removeCover) {
@@ -74,6 +84,7 @@ export default defineEventHandler(async (event) => {
     const updates: Record<string, any> = {
       title,
       slug,
+      previousSlugs: [...nextPreviousSlugs].slice(-10),
       content,
       excerpt: sanitizePlainText(body.excerpt, 400) || createExcerpt(content),
       tags: normalizeTags(body.tags),
@@ -87,6 +98,7 @@ export default defineEventHandler(async (event) => {
       metaTitle: sanitizePlainText(body.metaTitle, 70),
       metaDescription: sanitizePlainText(body.metaDescription, 180),
       author: authorName,
+      editorialNote,
       updatedBy: user.id,
       ...publication,
     }
@@ -107,6 +119,7 @@ export default defineEventHandler(async (event) => {
         console.error('Gagal membersihkan cover blog lama:', cleanupError)
       })
     }
+    await cleanupOrphanBlogContentImages(existing.content || '', content, id)
     return toBlogPostDto(updated.toObject())
   } catch (error: any) {
     if (newCoverImageUrl && !didPersistUpdate) {

@@ -14,7 +14,11 @@ import {
   stripHtml,
   toBlogPostDto,
 } from '~/server/utils/blog'
-import { resolveBlogAuthor, resolveBlogPublication } from '~/server/utils/blog-access'
+import {
+  resolveBlogAuthor,
+  resolveBlogEditorialNote,
+  resolveBlogPublication,
+} from '~/server/utils/blog-access'
 import { processUploadedBlogImage } from '~/server/utils/image'
 import { deleteAsset, storeAsset } from '~/server/utils/media-storage'
 import { hasPermission, requireAuth } from '~/server/utils/require-auth'
@@ -44,6 +48,7 @@ export default defineEventHandler(async (event) => {
 
     const { leaderId, author: authorName } = await resolveBlogAuthor(user, body)
     const publication = resolveBlogPublication(user, body)
+    const editorialNote = resolveBlogEditorialNote(user, body)
     let coverImageUrl = ''
     if (file) {
       const filename = `${path.parse(file.filename).name}.webp`
@@ -73,6 +78,7 @@ export default defineEventHandler(async (event) => {
       metaTitle: sanitizePlainText(body.metaTitle, 70),
       metaDescription: sanitizePlainText(body.metaDescription, 180),
       author: authorName,
+      editorialNote,
       createdBy: user.id,
       updatedBy: user.id,
       ...publication,
