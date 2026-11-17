@@ -101,6 +101,24 @@ function formatServiceCode(index: number) {
             </div>
           </NuxtLink>
         </div>
+
+        <!-- Internal Links to FAQ, Contact & Regional Pages -->
+        <div class="mt-16 rounded-2xl border border-gray/15 bg-stone-50 p-8 text-center dark:border-white/10 dark:bg-gray-dark">
+          <h2 class="text-2xl font-extrabold text-black dark:text-white">
+            Konsultasi Kebutuhan Penilaian di Palembang, Sumatera Selatan &amp; Sumatera
+          </h2>
+          <p class="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+            Pelajari prosedur, estimasi waktu, dan dokumen yang perlu disiapkan melalui halaman <NuxtLink to="/faq" class="font-bold text-primary hover:underline">Tanya Jawab (FAQ)</NuxtLink>, atau tinjau cakupan wilayah kami di <NuxtLink to="/kjpp-palembang" class="font-bold text-primary hover:underline">Palembang</NuxtLink>, <NuxtLink to="/kjpp-sumatera-selatan" class="font-bold text-primary hover:underline">Sumatera Selatan</NuxtLink>, dan <NuxtLink to="/kjpp-sumatera" class="font-bold text-primary hover:underline">Pulau Sumatera</NuxtLink>.
+          </p>
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-4">
+            <NuxtLink to="/contact-us" class="btn !rounded-xl">
+              Hubungi Kami untuk Penawaran
+            </NuxtLink>
+            <NuxtLink to="/faq" class="inline-flex items-center gap-2 rounded-xl border border-gray/25 bg-white px-6 py-4 text-sm font-extrabold uppercase text-black transition hover:border-primary hover:text-primary dark:border-white/15 dark:bg-black dark:text-white">
+              Baca FAQ Penilaian
+            </NuxtLink>
+          </div>
+        </div>
       </div>
     </div>
   </div>

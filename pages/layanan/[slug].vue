@@ -11,6 +11,7 @@ if (error.value) {
 import lightGallery from 'lightgallery'
 import lgZoom from 'lightgallery/plugins/zoom'
 import { sanitizeJsonLd } from '~/shared/company-data'
+import { SERVICE_CONTENT_CATALOG } from '~/shared/service-content'
 
 const serviceRef = ref<HTMLElement | null>(null)
 
@@ -43,7 +44,9 @@ const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').repla
 const { company } = useCompanyProfile()
 
 const serviceHtml = computed(() => {
-  const raw = String(service.value?.content || '')
+  const dbContent = String(service.value?.content || '').trim()
+  const catalogContent = SERVICE_CONTENT_CATALOG[slug]?.content || ''
+  const raw = dbContent.length >= 600 ? dbContent : catalogContent || dbContent
   return raw.replace(/<(\/?)h1(\b[^>]*)>/gi, '<$1h2$2>')
 })
 

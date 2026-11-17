@@ -75,6 +75,9 @@ export default defineEventHandler(async () => {
     { loc: '/karir', lastmod: careerLastmod },
     { loc: '/faq', lastmod: faqLastmod },
     { loc: '/contact-us', lastmod: contactLastmod },
+    { loc: '/kjpp-palembang', lastmod: servicesLastmod },
+    { loc: '/kjpp-sumatera-selatan', lastmod: servicesLastmod },
+    { loc: '/kjpp-sumatera', lastmod: servicesLastmod },
   ]
 
   return [...staticUrls, ...serviceUrls, ...postUrls, ...leaderUrls]

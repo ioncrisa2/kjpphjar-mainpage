@@ -298,8 +298,31 @@ function formatServiceCode(index: number) {
               Pengalaman &amp; <span class="text-primary">Kredibilitas</span>
             </h2>
             <p class="mt-[18px] text-lg leading-relaxed text-gray-300">
-              Berdiri sejak 28 November 2013 dan beroperasi sesuai Standar Penilaian Indonesia (SPI) serta Kode Etik Penilai Indonesia (KEPI), kami menjadi mitra independen bagi sektor perbankan, BUMN, dan korporasi di seluruh Indonesia.
+              Berdiri sejak 28 November 2013 dan beroperasi sesuai Standar Penilaian Indonesia (SPI) serta Kode Etik Penilai Indonesia (KEPI), kami menjadi mitra independen bagi sektor perbankan, BUMN, BUMD, pemerintah daerah, dan korporasi di seluruh Indonesia.
             </p>
+            <div class="mt-6 grid gap-3 sm:grid-cols-3 text-left">
+              <NuxtLink
+                to="/kjpp-palembang"
+                class="group rounded-xl border border-white/15 bg-white/5 p-3.5 transition hover:border-primary hover:bg-white/10"
+              >
+                <span class="block text-sm font-extrabold text-primary group-hover:underline">KJPP Palembang →</span>
+                <span class="mt-1 block text-xs text-gray-300">Layanan langsung dari Kantor Pusat di Kota Palembang.</span>
+              </NuxtLink>
+              <NuxtLink
+                to="/kjpp-sumatera-selatan"
+                class="group rounded-xl border border-white/15 bg-white/5 p-3.5 transition hover:border-primary hover:bg-white/10"
+              >
+                <span class="block text-sm font-extrabold text-primary group-hover:underline">KJPP Sumatera Selatan →</span>
+                <span class="mt-1 block text-xs text-gray-300">Jangkauan 17 kabupaten/kota di Provinsi Sumsel.</span>
+              </NuxtLink>
+              <NuxtLink
+                to="/kjpp-sumatera"
+                class="group rounded-xl border border-white/15 bg-white/5 p-3.5 transition hover:border-primary hover:bg-white/10"
+              >
+                <span class="block text-sm font-extrabold text-primary group-hover:underline">KJPP Sumatera →</span>
+                <span class="mt-1 block text-xs text-gray-300">Layanan lintas provinsi di seluruh Pulau Sumatera.</span>
+              </NuxtLink>
+            </div>
             <div class="mt-6 flex flex-wrap justify-center gap-4 lg:justify-start">
               <NuxtLink to="/contact-us" class="btn rounded-md !bg-primary !text-black font-extrabold hover:!bg-white hover:!text-black">
                 Contact Us

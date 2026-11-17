@@ -229,6 +229,34 @@ function formatDate(value: string) {
           <NuxtLink v-for="tag in article.tags" :key="tag" :to="{ path: '/blog', query: { tag } }" class="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-800 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-blue-400/15 dark:hover:text-blue-200">#{{ tag }}</NuxtLink>
         </div>
 
+        <!-- Tautan Internal ke Layanan Terkait -->
+        <section class="mt-10 rounded-2xl border border-primary/25 bg-stone-50 p-6 dark:border-white/10 dark:bg-slate-900/60" aria-labelledby="related-services-heading">
+          <h2 id="related-services-heading" class="text-lg font-extrabold text-black dark:text-white">
+            Layanan Penilaian &amp; Konsultasi Terkait di KJPP HJA'R
+          </h2>
+          <p class="mt-1.5 text-sm text-gray-700 dark:text-slate-300">
+            Butuh bantuan profesional terkait topik artikel ini? Pelajari ruang lingkup layanan kami atau <NuxtLink to="/contact-us" class="font-bold text-primary hover:underline">hubungi Kantor Pusat Palembang</NuxtLink>:
+          </p>
+          <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            <NuxtLink to="/layanan/penilaian-properti" class="flex items-center justify-between rounded-xl border border-gray/15 bg-white px-4 py-3 text-sm font-bold text-black transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-slate-800 dark:text-white">
+              <span>Penilaian Properti (Tanah, Bangunan &amp; Mesin)</span>
+              <Icon name="ph:arrow-right-bold" class="shrink-0 text-primary" aria-hidden="true" />
+            </NuxtLink>
+            <NuxtLink to="/layanan/penilaian-bisnis" class="flex items-center justify-between rounded-xl border border-gray/15 bg-white px-4 py-3 text-sm font-bold text-black transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-slate-800 dark:text-white">
+              <span>Penilaian Bisnis &amp; Saham</span>
+              <Icon name="ph:arrow-right-bold" class="shrink-0 text-primary" aria-hidden="true" />
+            </NuxtLink>
+            <NuxtLink to="/layanan/studi-kelayakan" class="flex items-center justify-between rounded-xl border border-gray/15 bg-white px-4 py-3 text-sm font-bold text-black transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-slate-800 dark:text-white">
+              <span>Studi Kelayakan Proyek (Feasibility Study)</span>
+              <Icon name="ph:arrow-right-bold" class="shrink-0 text-primary" aria-hidden="true" />
+            </NuxtLink>
+            <NuxtLink to="/layanan/pengawasan-proyek" class="flex items-center justify-between rounded-xl border border-gray/15 bg-white px-4 py-3 text-sm font-bold text-black transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-slate-800 dark:text-white">
+              <span>Pengawasan Proyek (Project Monitoring)</span>
+              <Icon name="ph:arrow-right-bold" class="shrink-0 text-primary" aria-hidden="true" />
+            </NuxtLink>
+          </div>
+        </section>
+
         <section class="mt-10 flex flex-col gap-4 border-y border-gray/10 py-6 dark:border-white/10 sm:flex-row sm:items-center sm:justify-between" aria-labelledby="share-heading">
           <div>
             <h2 id="share-heading" class="font-extrabold text-black dark:text-white">Bagikan artikel</h2>

@@ -7,6 +7,8 @@ import { SUPER_ADMIN_ROLE_KEY, type Permission } from '~/shared/permissions'
 import { Branch } from '~/server/models/Branch'
 import { Service } from '~/server/models/Service'
 import { Leader } from '~/server/models/Leader'
+import { SERVICE_CONTENT_CATALOG } from '~/shared/service-content'
+import { COMPANY_DATA } from '~/shared/company-data'
 
 // Contoh role untuk Penilai Publik / Pimpinan Cabang. Hanya dibuat sekali saat
 // koleksi role masih kosong, sehingga perubahan atau penghapusan oleh admin
@@ -92,89 +94,38 @@ export default defineNitroPlugin(async () => {
     // 2. Seed Services
     const serviceCount = await Service.countDocuments()
     if (serviceCount === 0) {
-      await Service.insertMany([
-        {
-          title: 'Penilaian Properti',
-          titleEn: 'Property Valuation',
-          slug: 'penilaian-properti',
-          description: 'Layanan penilaian aset properti meliputi tanah, bangunan, mesin, peralatan, dan aset tetap lainnya untuk berbagai keperluan seperti jual beli, agunan, asuransi, dan pelaporan keuangan.',
-          icon: 'fas fa-building',
-          content: '<p>Layanan penilaian aset properti meliputi tanah, bangunan, mesin, peralatan, dan aset tetap lainnya untuk berbagai keperluan seperti jual beli, agunan, asuransi, dan pelaporan keuangan. Kami memberikan opini nilai yang independen dan obyektif berdasarkan Standar Penilaian Indonesia (SPI).</p>',
+      await Service.insertMany(
+        Object.values(SERVICE_CONTENT_CATALOG).map((item) => ({
+          title: item.title,
+          titleEn: item.titleEn,
+          slug: item.slug,
+          description: item.description,
+          icon: item.icon,
+          content: item.content,
           isActive: true,
-          order: 1
-        },
-        {
-          title: 'Penilaian Bisnis',
-          titleEn: 'Business Valuation',
-          slug: 'penilaian-bisnis',
-          description: 'Penilaian atas entitas bisnis, penyertaan saham, surat berharga, dan aktiva tak berwujud untuk keperluan merger, akuisisi, restrukturisasi, dan privatisasi.',
-          icon: 'fas fa-chart-line',
-          content: '<p>Penilaian atas entitas bisnis, penyertaan saham, surat berharga, dan aktiva tak berwujud (intangible assets) untuk berbagai keperluan, antara lain merger, akuisisi, restrukturisasi, privatisasi, dan pelaporan keuangan.</p>',
-          isActive: true,
-          order: 2
-        },
-        {
-          title: 'Studi Kelayakan',
-          titleEn: 'Feasibility Study',
-          slug: 'studi-kelayakan',
-          description: 'Layanan jasa konsultasi berupa kajian komprehensif terkait kelayakan suatu proyek investasi dari aspek pasar, teknis, manajemen, lingkungan, dan keuangan.',
-          icon: 'fas fa-project-diagram',
-          content: '<p>Layanan jasa konsultasi berupa kajian komprehensif terkait kelayakan suatu proyek investasi dari aspek pasar, teknis, manajemen, lingkungan, hukum, dan keuangan. Hasil kajian digunakan sebagai referensi bagi investor atau pihak perbankan.</p>',
-          isActive: true,
-          order: 3
-        },
-        {
-          title: 'Pengawasan Proyek',
-          titleEn: 'Project Monitoring',
-          slug: 'pengawasan-proyek',
-          description: 'Layanan pemantauan pelaksanaan proyek pembangunan untuk memastikan kesesuaian antara progres fisik di lapangan dengan jadwal dan rencana anggaran biaya.',
-          icon: 'fas fa-hard-hat',
-          content: '<p>Layanan pemantauan pelaksanaan proyek pembangunan (Project Monitoring) untuk memastikan kesesuaian antara kemajuan fisik di lapangan dengan jadwal waktu penyelesaian dan rencana anggaran biaya. Sangat bermanfaat bagi pihak perbankan dalam pencairan termin pinjaman.</p>',
-          isActive: true,
-          order: 4
-        }
-      ])
+          order: item.order,
+        }))
+      )
       console.log('✅ Default services created')
     }
 
     // 3. Seed Branches
     const branchCount = await Branch.countDocuments()
     if (branchCount === 0) {
-      await Branch.insertMany([
-        {
-          name: 'Kantor Pusat Jakarta',
-          city: 'Jakarta',
-          address: 'Gedung Perkantoran Pusat, Jl. Jend. Sudirman No. 1, Jakarta Pusat',
-          phone: '(021) 1234567',
-          email: 'pusat@kjpphjar.com',
-          latitude: -6.2235,
-          longitude: 106.8123,
+      await Branch.insertMany(
+        COMPANY_DATA.branches.map((b) => ({
+          name: b.name,
+          city: b.city,
+          address: b.address,
+          phone: b.phone,
+          email: b.email,
+          latitude: b.latitude,
+          longitude: b.longitude,
+          mapsUrl: b.mapsUrl,
           isActive: true,
-          order: 1
-        },
-        {
-          name: 'Cabang Surabaya',
-          city: 'Surabaya',
-          address: 'Jl. Pemuda No. 10, Surabaya',
-          phone: '(031) 7654321',
-          email: 'surabaya@kjpphjar.com',
-          latitude: -7.2656,
-          longitude: 112.7483,
-          isActive: true,
-          order: 2
-        },
-        {
-          name: 'Cabang Medan',
-          city: 'Medan',
-          address: 'Jl. Diponegoro No. 20, Medan',
-          phone: '(061) 9876543',
-          email: 'medan@kjpphjar.com',
-          latitude: 3.5852,
-          longitude: 98.6756,
-          isActive: true,
-          order: 3
-        }
-      ])
+          order: b.order,
+        }))
+      )
       console.log('✅ Default branches created')
     }
 
