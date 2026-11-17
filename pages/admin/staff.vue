@@ -34,6 +34,7 @@ interface BranchGroup {
   staff: StaffItem[]
   activeCount: number
   totalCount: number
+  matchingCount: number
   hasMatches: boolean
 }
 
@@ -56,11 +57,14 @@ const form = reactive({
   isActive: true
 })
 
+// Filter state
 const search = ref('')
 const branchFilter = ref('')
+const statusFilter = ref<'all' | 'active' | 'inactive'>('all')
 const expandedBranches = ref<Set<string>>(new Set())
 
 const isSearching = computed(() => Boolean(search.value.trim()))
+const isFilterActive = computed(() => Boolean(search.value.trim() || branchFilter.value || statusFilter.value !== 'all'))
 
 const branchOptions = computed(() => {
   const list = [...(branches.value || [])]
@@ -77,7 +81,7 @@ const groupedBranches = computed<BranchGroup[]>(() => {
 
   // Map data kantor yang terdaftar
   const groups: BranchGroup[] = branchData.map((branch) => {
-    const branchStaff = staff.filter((s) => {
+    let branchStaff = staff.filter((s) => {
       const bId = s.branchId?._id || s.branchId
       return String(bId) === String(branch._id)
     })
@@ -90,8 +94,15 @@ const groupedBranches = computed<BranchGroup[]>(() => {
       return String(a.createdAt || '').localeCompare(String(b.createdAt || ''))
     })
 
-    const activeCount = branchStaff.filter((s) => s.isActive !== false).length
     const totalCount = branchStaff.length
+    const activeCount = branchStaff.filter((s) => s.isActive !== false).length
+
+    // Filter berdasarkan status jika dipilih
+    if (statusFilter.value === 'active') {
+      branchStaff = branchStaff.filter((s) => s.isActive !== false)
+    } else if (statusFilter.value === 'inactive') {
+      branchStaff = branchStaff.filter((s) => s.isActive === false)
+    }
 
     // Jika sedang mencari, filter staff di dalam cabang
     const matchingStaff = keyword
@@ -101,21 +112,24 @@ const groupedBranches = computed<BranchGroup[]>(() => {
         )
       : branchStaff
 
+    const finalStaff = matchingStaff
+
     return {
       id: String(branch._id),
       name: branch.name,
       city: branch.city,
       isActive: branch.isActive !== false,
-      staff: keyword ? matchingStaff : branchStaff,
+      staff: finalStaff,
       activeCount,
       totalCount,
-      hasMatches: keyword ? matchingStaff.length > 0 : true
+      matchingCount: finalStaff.length,
+      hasMatches: finalStaff.length > 0
     }
   })
 
   // Periksa apakah ada staff dengan kantor yang terhapus atau belum ditentukan
   const knownBranchIds = new Set(branchData.map((b) => String(b._id)))
-  const orphanStaff = staff.filter((s) => {
+  let orphanStaff = staff.filter((s) => {
     const bId = s.branchId?._id || s.branchId
     return !bId || !knownBranchIds.has(String(bId))
   })
@@ -127,6 +141,15 @@ const groupedBranches = computed<BranchGroup[]>(() => {
       if (orderA !== orderB) return orderA - orderB
       return String(a.createdAt || '').localeCompare(String(b.createdAt || ''))
     })
+
+    const totalCount = orphanStaff.length
+    const activeCount = orphanStaff.filter((s) => s.isActive !== false).length
+
+    if (statusFilter.value === 'active') {
+      orphanStaff = orphanStaff.filter((s) => s.isActive !== false)
+    } else if (statusFilter.value === 'inactive') {
+      orphanStaff = orphanStaff.filter((s) => s.isActive === false)
+    }
 
     const matchingOrphan = keyword
       ? orphanStaff.filter((s) =>
@@ -141,10 +164,11 @@ const groupedBranches = computed<BranchGroup[]>(() => {
       city: '-',
       isActive: false,
       isOrphan: true,
-      staff: keyword ? matchingOrphan : orphanStaff,
-      activeCount: orphanStaff.filter((s) => s.isActive !== false).length,
-      totalCount: orphanStaff.length,
-      hasMatches: keyword ? matchingOrphan.length > 0 : true
+      staff: matchingOrphan,
+      activeCount,
+      totalCount,
+      matchingCount: matchingOrphan.length,
+      hasMatches: matchingOrphan.length > 0
     })
   }
 
@@ -154,9 +178,9 @@ const groupedBranches = computed<BranchGroup[]>(() => {
     filtered = filtered.filter((g) => g.id === branchFilter.value)
   }
 
-  // Jika sedang mencari, hanya tampilkan grup yang memiliki hasil cocok atau nama kantor cocok
-  if (keyword) {
-    filtered = filtered.filter((g) => g.hasMatches || g.name.toLowerCase().includes(keyword))
+  // Jika sedang mencari atau memfilter status, sembunyikan cabang kosong tanpa hasil cocok
+  if (keyword || statusFilter.value !== 'all') {
+    filtered = filtered.filter((g) => g.hasMatches || (keyword && g.name.toLowerCase().includes(keyword)))
   }
 
   return filtered
@@ -164,10 +188,44 @@ const groupedBranches = computed<BranchGroup[]>(() => {
 
 const totalStaffCount = computed(() => (staffList.value || []).length)
 const totalBranchesCount = computed(() => groupedBranches.value.length)
+const totalMatchingStaffCount = computed(() => {
+  return groupedBranches.value.reduce((acc, g) => acc + g.staff.length, 0)
+})
 
-// Otomatis buka grup cabang yang cocok saat admin melakukan pencarian
-watch(search, (newVal) => {
-  if (newVal.trim()) {
+// Highlight text helper (safe from XSS via HTML escaping before mark insertion)
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+}
+
+function highlightMatch(text: string | undefined | null): string {
+  const raw = String(text ?? '')
+  if (!raw) return '-'
+  const query = search.value.trim()
+  if (!query) return escapeHtml(raw)
+
+  const escapedRaw = escapeHtml(raw)
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const regex = new RegExp(`(${escapedQuery})`, 'gi')
+  return escapedRaw.replace(
+    regex,
+    '<mark class="bg-primary/25 text-primary font-bold px-0.5 rounded dark:bg-primary/30 dark:text-sky-300">$1</mark>'
+  )
+}
+
+function resetAllFilters() {
+  search.value = ''
+  branchFilter.value = ''
+  statusFilter.value = 'all'
+}
+
+// Otomatis buka grup cabang yang cocok saat filter atau pencarian berubah
+watch([search, branchFilter, statusFilter], ([newSearch, newBranch, newStatus]) => {
+  if (newSearch.trim() || newBranch || newStatus !== 'all') {
     const matchingIds = groupedBranches.value
       .filter((g) => g.staff.length > 0)
       .map((g) => g.id)
@@ -211,7 +269,7 @@ const dragContext = reactive<{
 })
 
 function canReorder(branchId: string) {
-  return can('staff.update') && !isSearching.value && !dragContext.isSaving
+  return can('staff.update') && !isFilterActive.value && !dragContext.isSaving
 }
 
 function onStaffDragStart(branchId: string, index: number, event: DragEvent) {
@@ -421,14 +479,31 @@ async function deleteItem(staff: any) {
       </div>
     </div>
 
-    <!-- Filter -->
+    <!-- Filter & Pencarian (Fase 4) -->
     <section class="admin-card" aria-label="Filter staff">
-      <div class="grid gap-3 md:grid-cols-[minmax(240px,1fr)_240px]">
-        <label class="relative">
+      <div class="grid gap-3 md:grid-cols-[minmax(240px,1fr)_200px_160px]">
+        <!-- Input Pencarian dengan tombol hapus (clear) -->
+        <div class="relative">
           <span class="sr-only">Cari staff</span>
           <Icon name="ph:magnifying-glass-bold" class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray" />
-          <input v-model="search" type="search" class="admin-input !pl-11" placeholder="Cari nama, jabatan, atau nomor MAPPI...">
-        </label>
+          <input
+            v-model="search"
+            type="search"
+            class="admin-input !pl-11 !pr-10"
+            placeholder="Cari nama, jabatan, atau nomor MAPPI..."
+          >
+          <button
+            v-if="search"
+            type="button"
+            @click="search = ''"
+            class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-gray-400 hover:text-black dark:hover:text-white transition"
+            title="Hapus kata kunci pencarian"
+          >
+            <Icon name="ph:x-circle-fill" class="h-4 w-4" />
+          </button>
+        </div>
+
+        <!-- Filter Kantor Cabang -->
         <label>
           <span class="sr-only">Filter kantor</span>
           <select v-model="branchFilter" class="admin-input">
@@ -436,10 +511,39 @@ async function deleteItem(staff: any) {
             <option v-for="branch in branches" :key="branch._id" :value="branch._id">{{ branch.name }}</option>
           </select>
         </label>
+
+        <!-- Filter Status Keaktifan -->
+        <label>
+          <span class="sr-only">Filter status staf</span>
+          <select v-model="statusFilter" class="admin-input">
+            <option value="all">Semua Status</option>
+            <option value="active">Hanya Aktif</option>
+            <option value="inactive">Hanya Nonaktif</option>
+          </select>
+        </label>
       </div>
-      <div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gray/10 pt-3 text-xs text-gray">
-        <span>Menampilkan {{ totalBranchesCount }} kantor · Total {{ totalStaffCount }} staff terdaftar</span>
-        <span v-if="isSearching" class="text-primary font-medium">Pencarian aktif: menampilkan staf yang cocok</span>
+
+      <!-- Baris Status Filter & Tombol Reset -->
+      <div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-gray/10 pt-3 text-xs">
+        <div class="flex flex-wrap items-center gap-2 text-gray">
+          <span>Menampilkan {{ totalBranchesCount }} kantor · {{ totalMatchingStaffCount }} dari {{ totalStaffCount }} staff terdaftar</span>
+          <span
+            v-if="isFilterActive"
+            class="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 font-semibold text-primary dark:bg-primary/20"
+          >
+            Filter aktif
+          </span>
+        </div>
+
+        <button
+          v-if="isFilterActive"
+          type="button"
+          @click="resetAllFilters"
+          class="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
+        >
+          <Icon name="ph:arrow-counter-clockwise-bold" class="h-3.5 w-3.5" />
+          <span>Reset Filter</span>
+        </button>
       </div>
     </section>
 
@@ -449,9 +553,19 @@ async function deleteItem(staff: any) {
       <p class="mt-2 text-sm">Memuat data staff dan kantor...</p>
     </div>
     <div v-else-if="!groupedBranches.length" class="admin-card p-8 text-center text-gray-500">
-      <Icon name="ph:users-three-bold" class="mx-auto h-10 w-10 text-gray-400" />
-      <p class="mt-2 font-semibold text-black dark:text-white">Tidak ada data kantor atau staff</p>
-      <p class="mt-1 text-xs text-gray">Periksa filter pencarian Anda atau tambahkan kantor di menu Cabang.</p>
+      <Icon name="ph:magnifying-glass-bold" class="mx-auto h-10 w-10 text-gray-400" />
+      <p class="mt-2 font-semibold text-black dark:text-white">Tidak ada data staf atau kantor yang cocok</p>
+      <p class="mt-1 text-xs text-gray">
+        {{ isFilterActive ? 'Tidak ada staf yang sesuai dengan kriteria filter atau pencarian Anda.' : 'Belum ada data kantor atau staf terdaftar.' }}
+      </p>
+      <button
+        v-if="isFilterActive"
+        type="button"
+        @click="resetAllFilters"
+        class="admin-btn-primary mt-4 !py-1.5 !text-xs"
+      >
+        Reset Semua Filter
+      </button>
     </div>
 
     <!-- TABLE VIEW (Master-Detail Collapsible) -->
@@ -513,7 +627,13 @@ async function deleteItem(staff: any) {
                     <span class="inline-flex items-center rounded-md bg-stone-100 px-2.5 py-1 text-xs font-bold tabular-nums text-gray-800 dark:bg-gray-800 dark:text-gray-200">
                       {{ group.totalCount }} Staff
                     </span>
-                    <span v-if="group.activeCount !== group.totalCount" class="text-xs text-gray">
+                    <span
+                      v-if="isFilterActive && group.matchingCount !== group.totalCount"
+                      class="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary dark:bg-primary/20"
+                    >
+                      {{ group.matchingCount }} cocok
+                    </span>
+                    <span v-else-if="group.activeCount !== group.totalCount" class="text-xs text-gray">
                       ({{ group.activeCount }} aktif)
                     </span>
                   </div>
@@ -557,14 +677,14 @@ async function deleteItem(staff: any) {
                     <div class="flex flex-wrap items-center justify-between gap-3">
                       <div class="flex flex-wrap items-center gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-                          Daftar Staff {{ group.name }}:
+                          Daftar Staff {{ group.name }} ({{ group.staff.length }} orang):
                         </span>
                         <span v-if="canReorder(group.id) && group.staff.length > 1" class="inline-flex items-center gap-1 rounded bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
                           <Icon name="ph:arrows-down-up-bold" class="h-3.5 w-3.5" />
                           Seret ikon baris (drag &amp; drop) untuk mengatur posisi nama di website
                         </span>
-                        <span v-else-if="isSearching" class="text-[11px] text-gray italic">
-                          (Drag &amp; drop dinonaktifkan saat pencarian aktif)
+                        <span v-else-if="isFilterActive" class="text-[11px] text-gray italic">
+                          (Drag &amp; drop dinonaktifkan saat filter atau pencarian aktif)
                         </span>
                       </div>
                       <button
@@ -581,10 +701,12 @@ async function deleteItem(staff: any) {
                     <!-- Empty state jika belum ada staff di kantor ini -->
                     <div v-if="!group.staff.length" class="rounded-xl border border-dashed border-gray/25 p-8 text-center bg-white/60 dark:bg-gray-dark/60">
                       <Icon name="ph:user-plus-bold" class="mx-auto h-8 w-8 text-gray-400" />
-                      <p class="mt-2 text-sm font-semibold text-black dark:text-white">Belum ada staff di kantor ini</p>
-                      <p class="mt-1 text-xs text-gray">Tambahkan data staff untuk ditampilkan pada profil cabang {{ group.name }}.</p>
+                      <p class="mt-2 text-sm font-semibold text-black dark:text-white">Tidak ada data staf</p>
+                      <p class="mt-1 text-xs text-gray">
+                        {{ isFilterActive ? 'Tidak ada staf yang sesuai dengan filter pencarian di cabang ini.' : `Tambahkan data staff untuk ditampilkan pada profil cabang ${group.name}.` }}
+                      </p>
                       <button
-                        v-if="can('staff.create') && !group.isOrphan"
+                        v-if="can('staff.create') && !group.isOrphan && !isFilterActive"
                         type="button"
                         @click="openAddForBranch(group.id)"
                         class="admin-btn-primary mt-3 !py-1.5 !text-xs"
@@ -593,7 +715,7 @@ async function deleteItem(staff: any) {
                       </button>
                     </div>
 
-                    <!-- Staff Detail Table with Drag and Drop -->
+                    <!-- Staff Detail Table with Drag and Drop & Highlight -->
                     <div v-else class="overflow-hidden rounded-xl border border-gray/15 bg-white shadow-sm dark:border-white/10 dark:bg-gray-dark">
                       <table class="min-w-full divide-y divide-gray/10">
                         <thead class="bg-gray/5">
@@ -635,15 +757,9 @@ async function deleteItem(staff: any) {
                             <td class="px-3 py-3 text-center text-xs font-bold tabular-nums text-gray-500">
                               {{ sIndex + 1 }}
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-black dark:text-white">
-                              {{ staff.name }}
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-200">
-                              {{ staff.position }}
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray">
-                              {{ staff.mappiNumber || '-' }}
-                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-black dark:text-white" v-html="highlightMatch(staff.name)"></td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700 dark:text-gray-200" v-html="highlightMatch(staff.position)"></td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray" v-html="highlightMatch(staff.mappiNumber)"></td>
                             <td class="px-4 py-3 whitespace-nowrap text-center text-sm tabular-nums text-gray">
                               {{ staff.order ?? sIndex }}
                             </td>
@@ -689,7 +805,12 @@ async function deleteItem(staff: any) {
                 <span v-if="group.isActive" class="inline-flex rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
                 <span v-else class="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
               </div>
-              <p class="text-xs text-gray">{{ group.city }} · {{ group.totalCount }} staff ({{ group.activeCount }} aktif)</p>
+              <p class="text-xs text-gray">
+                {{ group.city }} · {{ group.totalCount }} staff ({{ group.activeCount }} aktif)
+                <span v-if="isFilterActive && group.matchingCount !== group.totalCount" class="font-semibold text-primary">
+                  · {{ group.matchingCount }} cocok
+                </span>
+              </p>
             </div>
           </div>
           <div class="flex items-center gap-2" @click.stop>
@@ -699,7 +820,7 @@ async function deleteItem(staff: any) {
               class="inline-flex items-center gap-1.5 rounded-lg border border-gray/20 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition hover:bg-gray/10 hover:text-black dark:border-white/10 dark:bg-gray-dark dark:text-gray-200 dark:hover:bg-white/10"
             >
               <Icon name="ph:users-three-bold" class="h-4 w-4 text-primary" />
-              <span>Detail Staff ({{ group.totalCount }})</span>
+              <span>Detail Staff ({{ group.staff.length }})</span>
               <Icon
                 name="ph:caret-down-bold"
                 class="h-3 w-3 transition-transform duration-200"
@@ -721,9 +842,9 @@ async function deleteItem(staff: any) {
         <!-- Expanded Card Content -->
         <div v-if="isExpanded(group.id)" class="border-t border-gray/10 bg-stone-50/60 p-5 dark:bg-stone-900/30">
           <div v-if="!group.staff.length" class="p-6 text-center text-sm text-gray">
-            Belum ada staff di kantor ini.
+            {{ isFilterActive ? 'Tidak ada staf yang sesuai dengan filter di cabang ini.' : 'Belum ada staff di kantor ini.' }}
             <button
-              v-if="can('staff.create') && !group.isOrphan"
+              v-if="can('staff.create') && !group.isOrphan && !isFilterActive"
               type="button"
               @click="openAddForBranch(group.id)"
               class="ml-2 font-bold text-primary hover:underline"
@@ -733,9 +854,12 @@ async function deleteItem(staff: any) {
           </div>
           <div v-else class="space-y-3">
             <div class="flex items-center justify-between text-xs text-gray">
-              <span>Daftar staff di {{ group.name }}</span>
+              <span>Daftar staff di {{ group.name }} ({{ group.staff.length }} orang)</span>
               <span v-if="canReorder(group.id) && group.staff.length > 1" class="text-primary font-medium">
                 Seret kartu untuk mengatur urutan
+              </span>
+              <span v-else-if="isFilterActive" class="text-gray italic">
+                (Drag &amp; drop dinonaktifkan saat filter aktif)
               </span>
             </div>
             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -758,13 +882,13 @@ async function deleteItem(staff: any) {
                   <div class="flex items-center gap-2 min-w-0">
                     <Icon v-if="canReorder(group.id)" name="ph:dots-six-vertical-bold" class="h-4 w-4 shrink-0 text-gray-400" />
                     <span class="rounded bg-gray/10 px-1.5 py-0.5 text-[11px] font-bold tabular-nums text-gray">#{{ sIndex + 1 }}</span>
-                    <h3 class="truncate text-sm font-extrabold text-black dark:text-white" :title="staff.name">{{ staff.name }}</h3>
+                    <h3 class="truncate text-sm font-extrabold text-black dark:text-white" :title="staff.name" v-html="highlightMatch(staff.name)"></h3>
                   </div>
                   <UiActionMenu v-if="staffActions(staff).length" :items="staffActions(staff)" :label="`Aksi untuk ${staff.name}`" />
                 </div>
-                <p class="truncate text-xs font-semibold text-gray pl-6" :title="staff.position">{{ staff.position }}</p>
+                <p class="truncate text-xs font-semibold text-gray pl-6" :title="staff.position" v-html="highlightMatch(staff.position)"></p>
                 <div class="mt-auto flex items-center justify-between border-t border-gray/10 pt-2 text-xs">
-                  <span v-if="staff.mappiNumber" class="text-gray">MAPPI: {{ staff.mappiNumber }}</span>
+                  <span v-if="staff.mappiNumber" class="text-gray" v-html="'MAPPI: ' + highlightMatch(staff.mappiNumber)"></span>
                   <span v-else class="text-gray/50">-</span>
                   <span v-if="staff.isActive !== false" class="inline-flex rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-800 dark:bg-green-500/20 dark:text-green-300">Aktif</span>
                   <span v-else class="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-800 dark:bg-red-500/20 dark:text-red-300">Nonaktif</span>
