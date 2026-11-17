@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const config = useRuntimeConfig()
 const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace('://www.', '://').replace(/\/$/, '')
-const { company, headOffice, otherBranches, buildProfessionalServiceJsonLd } = useCompanyProfile()
+const { company, headOffice, otherBranches, buildProfessionalServiceJsonLd, hasValue } = useCompanyProfile()
 
 const pageTitle = "KJPP Sumatera – Jasa Penilai Publik & Konsultan Independen | HJA'R"
 const pageDescription =
@@ -104,11 +104,21 @@ useHead({
             Koordinasi Penugasan Wilayah Sumatera &amp; Nasional
           </h2>
           <p class="mt-3 text-[16px] leading-[1.7] text-[var(--muted)] [&_strong]:text-[var(--ink)]">
-            <strong>Kantor Pusat Palembang:</strong> {{ headOffice.fullAddress }}<br />
-            <strong>Telepon:</strong> <a :href="`tel:${headOffice.phoneE164}`" class="pub-link font-bold tabular-nums">{{ headOffice.phone }}</a> ·
-            <strong>WhatsApp:</strong> <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="pub-link font-bold tabular-nums">{{ headOffice.whatsapp }}</a> ·
-            <strong>Email:</strong> <a :href="`mailto:${headOffice.email}`" class="pub-link font-bold tabular-nums">{{ headOffice.email }}</a><br />
-            <strong>Jaringan Cabang Pendukung:</strong> {{ otherBranches.map(b => b.city).join(', ') }}
+            <template v-if="hasValue(headOffice.fullAddress)">
+              <strong>Kantor Pusat Palembang:</strong> {{ headOffice.fullAddress }}<br />
+            </template>
+            <template v-if="hasValue(headOffice.phone)">
+              <strong>Telepon:</strong> <a :href="`tel:${headOffice.phoneE164}`" class="pub-link font-bold tabular-nums">{{ headOffice.phone }}</a>
+            </template>
+            <template v-if="hasValue(headOffice.whatsapp)">
+              · <strong>WhatsApp:</strong> <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="pub-link font-bold tabular-nums">{{ headOffice.whatsapp }}</a>
+            </template>
+            <template v-if="hasValue(headOffice.email)">
+              · <strong>Email:</strong> <a :href="`mailto:${headOffice.email}`" class="pub-link font-bold tabular-nums">{{ headOffice.email }}</a><br />
+            </template>
+            <template v-if="otherBranches.length">
+              <strong>Jaringan Cabang Pendukung:</strong> {{ otherBranches.map(b => b.city).join(', ') }}
+            </template>
           </p>
           <div class="mt-6 flex flex-wrap gap-4">
             <NuxtLink to="/contact-us" class="pub-btn">

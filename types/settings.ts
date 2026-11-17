@@ -97,8 +97,8 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
     kjppDecreeNumber: 'Keputusan Menteri Keuangan RI No. 31/KM.1/2020 (20 Januari 2020)',
     managingPartnerValuerLicense: 'P-1.13.0380 (Henricus Judi Adrianto)',
     mappiMembership: 'Masyarakat Profesi Penilai Indonesia (MAPPI) – Pimpinan Rekan No. MAPPI 96-S-00827',
-    ojkRegistration: '[PERLU KONFIRMASI]',
-    operatingHours: 'Senin – Jumat: 08.00 – 17.00 WIB [PERLU KONFIRMASI]',
+    ojkRegistration: '',
+    operatingHours: 'Senin – Jumat: 08.00 – 17.00 WIB',
   },
   copyrightText: 'KJPP Henricus Judi Adrianto & Rekan',
   maintenanceMode: {

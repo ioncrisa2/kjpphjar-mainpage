@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PublicStaffGroup } from '~/types/staff'
 
-const { company, headOffice, branches } = useCompanyProfile()
+const { company, headOffice, branches, hasValue } = useCompanyProfile()
 
 const aboutTitle = "Tentang Kami – Profil & Tim Penilai Publik Palembang | KJPP HJA'R"
 const aboutDescription =
@@ -77,19 +77,22 @@ const missions = [
               Seluruh penugasan dilaksanakan secara independen sesuai Kode Etik Penilai Indonesia (KEPI) dan Standar Penilaian Indonesia (SPI).
             </p>
             <dl class="mt-6 border-t border-[var(--rule)] text-[16px]">
-              <div class="flex flex-col gap-1 border-b border-[var(--rule)] py-4 sm:flex-row sm:justify-between sm:gap-6">
+              <div v-if="hasValue(company.licenses.kjppLicenseNumber)" class="flex flex-col gap-1 border-b border-[var(--rule)] py-4 sm:flex-row sm:justify-between sm:gap-6">
                 <dt class="text-[var(--muted)]">Nomor Izin Usaha KJPP (Kemenkeu)</dt>
-                <dd class="font-bold tabular-nums text-[var(--ink)] sm:text-right">{{ company.licenses.kjppLicenseNumber }} ({{ company.licenses.kjppDecreeNumber }})</dd>
+                <dd class="font-bold tabular-nums text-[var(--ink)] sm:text-right">
+                  {{ company.licenses.kjppLicenseNumber }}
+                  <template v-if="hasValue(company.licenses.kjppDecreeNumber)"> ({{ company.licenses.kjppDecreeNumber }})</template>
+                </dd>
               </div>
-              <div class="flex flex-col gap-1 border-b border-[var(--rule)] py-4 sm:flex-row sm:justify-between sm:gap-6">
+              <div v-if="hasValue(company.licenses.managingPartnerValuerLicense)" class="flex flex-col gap-1 border-b border-[var(--rule)] py-4 sm:flex-row sm:justify-between sm:gap-6">
                 <dt class="text-[var(--muted)]">Izin Penilai Publik Pimpinan Rekan</dt>
                 <dd class="font-bold tabular-nums text-[var(--ink)] sm:text-right">{{ company.licenses.managingPartnerValuerLicense }}</dd>
               </div>
-              <div class="flex flex-col gap-1 border-b border-[var(--rule)] py-4 sm:flex-row sm:justify-between sm:gap-6">
+              <div v-if="hasValue(company.licenses.mappiMembership)" class="flex flex-col gap-1 border-b border-[var(--rule)] py-4 sm:flex-row sm:justify-between sm:gap-6">
                 <dt class="text-[var(--muted)]">Keanggotaan Asosiasi Profesi</dt>
                 <dd class="font-bold tabular-nums text-[var(--ink)] sm:text-right">{{ company.licenses.mappiMembership }}</dd>
               </div>
-              <div class="flex flex-col gap-1 border-b border-[var(--rule)] py-4 sm:flex-row sm:justify-between sm:gap-6">
+              <div v-if="hasValue(company.licenses.ojkRegistration)" class="flex flex-col gap-1 border-b border-[var(--rule)] py-4 sm:flex-row sm:justify-between sm:gap-6">
                 <dt class="text-[var(--muted)]">Pendaftaran OJK (STTD)</dt>
                 <dd class="font-bold tabular-nums text-[var(--ink)] sm:text-right">{{ company.licenses.ojkRegistration }}</dd>
               </div>
@@ -205,8 +208,8 @@ const missions = [
                 class="border-b border-[var(--rule)] py-4"
               >
                 <p class="font-bold leading-snug text-[var(--ink)]">{{ member.name }}</p>
-                <p class="mt-0.5 text-[14px] text-[var(--muted)]">{{ member.position }}</p>
-                <p v-if="member.mappiNumber" class="mt-1 text-[14px] tabular-nums text-[var(--brand-navy)]">
+                <p v-if="hasValue(member.position)" class="mt-0.5 text-[14px] text-[var(--muted)]">{{ member.position }}</p>
+                <p v-if="hasValue(member.mappiNumber)" class="mt-1 text-[14px] tabular-nums text-[var(--brand-navy)]">
                   No. MAPPI {{ member.mappiNumber }}
                 </p>
               </li>

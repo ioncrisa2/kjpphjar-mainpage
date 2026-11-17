@@ -324,28 +324,28 @@ function normalizeSettings(value?: UnknownRecord | null): PublicAppSettings {
     },
     legalInfo: {
       kjppLicenseNumber:
-        typeof legalInfo.kjppLicenseNumber === 'string' && legalInfo.kjppLicenseNumber
+        typeof legalInfo.kjppLicenseNumber === 'string'
           ? legalInfo.kjppLicenseNumber
           : defaults.legalInfo.kjppLicenseNumber,
       kjppDecreeNumber:
-        typeof legalInfo.kjppDecreeNumber === 'string' && legalInfo.kjppDecreeNumber
+        typeof legalInfo.kjppDecreeNumber === 'string'
           ? legalInfo.kjppDecreeNumber
           : defaults.legalInfo.kjppDecreeNumber,
       managingPartnerValuerLicense:
-        typeof legalInfo.managingPartnerValuerLicense === 'string' && legalInfo.managingPartnerValuerLicense
+        typeof legalInfo.managingPartnerValuerLicense === 'string'
           ? legalInfo.managingPartnerValuerLicense
           : defaults.legalInfo.managingPartnerValuerLicense,
       mappiMembership:
-        typeof legalInfo.mappiMembership === 'string' && legalInfo.mappiMembership
+        typeof legalInfo.mappiMembership === 'string'
           ? legalInfo.mappiMembership
           : defaults.legalInfo.mappiMembership,
       ojkRegistration:
-        typeof legalInfo.ojkRegistration === 'string' && legalInfo.ojkRegistration
-          ? legalInfo.ojkRegistration
+        typeof legalInfo.ojkRegistration === 'string'
+          ? (legalInfo.ojkRegistration.includes('[PERLU KONFIRMASI]') ? '' : legalInfo.ojkRegistration)
           : defaults.legalInfo.ojkRegistration,
       operatingHours:
-        typeof legalInfo.operatingHours === 'string' && legalInfo.operatingHours
-          ? legalInfo.operatingHours
+        typeof legalInfo.operatingHours === 'string'
+          ? (legalInfo.operatingHours.includes('[PERLU KONFIRMASI]') ? '' : legalInfo.operatingHours)
           : defaults.legalInfo.operatingHours,
     },
     copyrightText:

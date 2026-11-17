@@ -2,7 +2,7 @@
 const { data: contacts } = await useFetch('/api/contact-persons', {
   query: { activeOnly: 'true' }
 })
-const { company, settings, headOffice, otherBranches, formatPhoneHref } = useCompanyProfile()
+const { company, settings, headOffice, otherBranches, formatPhoneHref, hasValue } = useCompanyProfile()
 
 const socialIcons = {
   instagram: 'ph:instagram-logo',
@@ -26,9 +26,14 @@ function telephoneHref(phone: string) {
   return formatPhoneHref(phone)
 }
 
-const hasConfirmedOjk = computed(() => {
-  const val = String(company.value.licenses.ojkRegistration || '').trim()
-  return Boolean(val && !val.includes('[PERLU KONFIRMASI]'))
+const hasAnyLicense = computed(() => {
+  const lic = company.value.licenses
+  return Boolean(
+    hasValue(lic.kjppLicenseNumber) ||
+    hasValue(lic.managingPartnerValuerLicense) ||
+    hasValue(lic.mappiMembership) ||
+    hasValue(lic.ojkRegistration)
+  )
 })
 </script>
 
@@ -47,13 +52,22 @@ const hasConfirmedOjk = computed(() => {
           <p class="mt-4 text-[14px] leading-[1.6] tabular-nums text-[var(--muted)]">
             Kantor Jasa Penilai Publik (KJPP) independen berkantor pusat di Palembang sejak {{ company.foundedYear }}.
           </p>
-          <div class="mt-4 border-t border-[var(--rule)] pt-4 text-[13px] leading-[1.6] tabular-nums text-[var(--muted)]">
+          <div v-if="hasAnyLicense" class="mt-4 border-t border-[var(--rule)] pt-4 text-[13px] leading-[1.6] tabular-nums text-[var(--muted)]">
             <p class="font-bold text-[var(--ink)]">Izin &amp; Keanggotaan Resmi:</p>
             <ul class="mt-1.5 space-y-1">
-              <li><strong class="text-[var(--ink)]">Izin Usaha KJPP (Kemenkeu):</strong> No. {{ company.licenses.kjppLicenseNumber }} ({{ company.licenses.kjppDecreeNumber }})</li>
-              <li><strong class="text-[var(--ink)]">Izin Penilai Publik:</strong> {{ company.licenses.managingPartnerValuerLicense }}</li>
-              <li><strong class="text-[var(--ink)]">Keanggotaan:</strong> {{ company.licenses.mappiMembership }}</li>
-              <li v-if="hasConfirmedOjk"><strong class="text-[var(--ink)]">Terdaftar OJK:</strong> {{ company.licenses.ojkRegistration }}</li>
+              <li v-if="hasValue(company.licenses.kjppLicenseNumber)">
+                <strong class="text-[var(--ink)]">Izin Usaha KJPP (Kemenkeu):</strong> No. {{ company.licenses.kjppLicenseNumber }}
+                <template v-if="hasValue(company.licenses.kjppDecreeNumber)"> ({{ company.licenses.kjppDecreeNumber }})</template>
+              </li>
+              <li v-if="hasValue(company.licenses.managingPartnerValuerLicense)">
+                <strong class="text-[var(--ink)]">Izin Penilai Publik:</strong> {{ company.licenses.managingPartnerValuerLicense }}
+              </li>
+              <li v-if="hasValue(company.licenses.mappiMembership)">
+                <strong class="text-[var(--ink)]">Keanggotaan:</strong> {{ company.licenses.mappiMembership }}
+              </li>
+              <li v-if="hasValue(company.licenses.ojkRegistration)">
+                <strong class="text-[var(--ink)]">Terdaftar OJK:</strong> {{ company.licenses.ojkRegistration }}
+              </li>
             </ul>
           </div>
           <div v-if="socialLinks.length" class="mt-6">
@@ -78,15 +92,15 @@ const hasConfirmedOjk = computed(() => {
         <div>
           <p class="pub-serif mb-4 text-[20px] text-[var(--ink)]">Kantor Pusat</p>
           <ul class="flex flex-col gap-3 text-[14px] leading-[1.6] text-[var(--muted)]">
-            <li class="whitespace-pre-line">
+            <li v-if="hasValue(headOffice.fullAddress)" class="whitespace-pre-line">
               <strong class="text-[var(--ink)]">{{ headOffice.name }}:</strong><br />
               {{ headOffice.fullAddress }}
             </li>
-            <li class="tabular-nums">
+            <li v-if="hasValue(company.operatingHours.display)" class="tabular-nums">
               <strong class="text-[var(--ink)]">Jam Operasional:</strong><br />
               {{ company.operatingHours.display }}
             </li>
-            <li v-if="headOffice.googleMapsUrl">
+            <li v-if="hasValue(headOffice.googleMapsUrl)">
               <a
                 :href="headOffice.googleMapsUrl"
                 target="_blank"
@@ -117,12 +131,12 @@ const hasConfirmedOjk = computed(() => {
         <div>
           <p class="pub-serif mb-4 text-[20px] text-[var(--ink)]">Kontak Resmi</p>
           <ul class="flex flex-col gap-2 text-[14px] leading-[1.6] tabular-nums text-[var(--muted)]">
-            <li v-if="headOffice.phone">
+            <li v-if="hasValue(headOffice.phone)">
               <a :href="telephoneHref(headOffice.phone)" class="pub-link font-bold">
                 Telp Kantor Pusat: {{ headOffice.phone }}
               </a>
             </li>
-            <li v-if="headOffice.email">
+            <li v-if="hasValue(headOffice.email)">
               <a :href="`mailto:${headOffice.email}`" class="pub-link">
                 Email: {{ headOffice.email }}
               </a>

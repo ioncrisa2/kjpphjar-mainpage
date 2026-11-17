@@ -47,8 +47,8 @@ export const COMPANY_DATA = {
       'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3984.5997561!2d104.7884349!3d-2.9309659!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMsKwNTUnNTEuNSJTIDEwNMKwNDcnMjYuMiJF!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid',
   },
   operatingHours: {
-    display: 'Senin – Jumat: 08.00 – 17.00 WIB [PERLU KONFIRMASI]',
-    weekendDisplay: 'Sabtu, Minggu & Hari Libur Nasional: Tutup [PERLU KONFIRMASI]',
+    display: 'Senin – Jumat: 08.00 – 17.00 WIB',
+    weekendDisplay: 'Sabtu, Minggu & Hari Libur Nasional: Tutup',
     specification: [
       {
         '@type': 'OpeningHoursSpecification',
@@ -65,7 +65,7 @@ export const COMPANY_DATA = {
     managingPartnerValuerLicense: 'P-1.13.0380 (Henricus Judi Adrianto)',
     mappiMembership:
       'Masyarakat Profesi Penilai Indonesia (MAPPI) – Pimpinan Rekan No. MAPPI 96-S-00827',
-    ojkRegistration: '[PERLU KONFIRMASI]',
+    ojkRegistration: '',
   },
   socialMedia: {
     instagram: 'https://www.instagram.com/kjpphenricusdanrekan/',
@@ -212,6 +212,14 @@ export function normalizeBranchDisplay(rawBranch: Record<string, any>): OfficeBr
     isHeadOffice: Boolean(canonical?.isHeadOffice || rawBranch.order === 1),
     order: Number(rawBranch.order ?? canonical?.order ?? 99),
   }
+}
+
+export function hasValue(val: unknown): boolean {
+  if (val === null || val === undefined) return false
+  const str = String(val).trim()
+  if (!str) return false
+  if (str.includes('[PERLU KONFIRMASI]')) return false
+  return true
 }
 
 export function sanitizeJsonLd<T>(input: T): T {

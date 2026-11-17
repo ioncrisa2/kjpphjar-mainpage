@@ -4,7 +4,7 @@ import { useAppStore } from '~/stores/app'
 const store = useAppStore()
 const config = useRuntimeConfig()
 const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace('://www.', '://').replace(/\/$/, '')
-const { branches, buildProfessionalServiceJsonLd } = useCompanyProfile()
+const { company, branches, buildProfessionalServiceJsonLd, hasValue } = useCompanyProfile()
 
 const homeTitle = "KJPP Palembang – Jasa Penilai Publik Sumatera Selatan | HJA'R"
 const homeDescription =
@@ -99,6 +99,30 @@ const regionalLinks = [
     desc: 'Layanan lintas provinsi di seluruh Pulau Sumatera.',
   },
 ]
+
+const heroFacts = computed(() => {
+  const parts: string[] = []
+  if (hasValue(company.value.licenses.kjppLicenseNumber)) {
+    parts.push(`Izin Usaha KJPP No. ${company.value.licenses.kjppLicenseNumber}`)
+  }
+  if (hasValue(company.value.licenses.mappiMembership)) {
+    parts.push('Anggota MAPPI')
+  }
+  if (hasValue(company.value.licenses.ojkRegistration)) {
+    parts.push(`Terdaftar OJK: ${company.value.licenses.ojkRegistration}`)
+  }
+  parts.push(`Berdiri 28 November ${company.value.foundedYear}`)
+  return parts
+})
+
+const leaderCaption = computed(() => {
+  const parts = ['Henricus Judi Adrianto', 'Pimpinan Rekan']
+  if (hasValue(company.value.licenses.managingPartnerValuerLicense)) {
+    const lic = company.value.licenses.managingPartnerValuerLicense.replace(/\s*\(.*?\)\s*/, '')
+    parts.push(`Izin Penilai Publik ${lic}`)
+  }
+  return parts.join(' · ')
+})
 </script>
 
 <template>
@@ -128,8 +152,8 @@ const regionalLinks = [
               dan Indonesia.
             </p>
 
-            <p class="mt-6 border-t border-[#47BDFF]/25 pt-4 text-[14px] font-normal leading-[1.6] tabular-nums text-[#CBD5E1]">
-              Izin Usaha KJPP No. 2.20.0166 · Anggota MAPPI · Berdiri 28 November 2013
+            <p v-if="heroFacts.length" class="mt-6 border-t border-[#47BDFF]/25 pt-4 text-[14px] font-normal leading-[1.6] tabular-nums text-[#CBD5E1]">
+              {{ heroFacts.join(' · ') }}
             </p>
 
             <div class="mt-8 flex flex-wrap items-center gap-6">
@@ -161,7 +185,7 @@ const regionalLinks = [
               />
             </div>
             <figcaption class="mt-3 text-left text-[14px] font-normal leading-[1.5] tabular-nums text-[#CBD5E1]">
-              Henricus Judi Adrianto · Pimpinan Rekan · Izin Penilai Publik P-1.13.0380
+              {{ leaderCaption }}
             </figcaption>
           </figure>
         </div>

@@ -72,7 +72,12 @@ function hydrateForm(value: PublicAppSettings) {
   Object.assign(form.footerAddress, value.footerAddress)
   Object.assign(form.socialMedia, value.socialMedia)
   Object.assign(form.generalContacts, value.generalContacts)
-  if (value.legalInfo) Object.assign(form.legalInfo, value.legalInfo)
+  if (value.legalInfo) {
+    Object.assign(form.legalInfo, value.legalInfo)
+    if (form.legalInfo.ojkRegistration.includes('[PERLU KONFIRMASI]')) {
+      form.legalInfo.ojkRegistration = ''
+    }
+  }
   form.copyrightText = value.copyrightText
   Object.assign(form.maintenanceMode, value.maintenanceMode)
   expectedEndLocal.value = toLocalDateTime(value.maintenanceMode.expectedEndTime)
@@ -369,12 +374,15 @@ async function commitRestore() {
             </p>
             <div class="mt-5 grid gap-5 md:grid-cols-2">
               <div>
-                <label for="legal-ojk" class="admin-label">Nomor Pendaftaran / STTD OJK</label>
+                <label for="legal-ojk" class="admin-label">
+                  Nomor Pendaftaran / STTD OJK
+                  <span class="ml-1 text-xs font-normal text-gray-500">(Opsional, kosongkan jika belum terdaftar)</span>
+                </label>
                 <input
                   id="legal-ojk"
                   v-model="form.legalInfo.ojkRegistration"
                   maxlength="200"
-                  placeholder="Contoh: S-xxx/PM.22/20xx"
+                  placeholder="Kosongkan jika belum terdaftar / belum ada"
                   class="admin-input"
                 />
               </div>

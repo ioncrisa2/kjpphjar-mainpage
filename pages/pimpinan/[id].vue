@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { COMPANY_DATA, sanitizeJsonLd } from '~/shared/company-data'
+import { COMPANY_DATA, sanitizeJsonLd, hasValue } from '~/shared/company-data'
 
 const route = useRoute()
 const id = route.params.id as string
@@ -24,7 +24,7 @@ const totalArticles = computed(() => articlesData.value?.total || 0)
 const credentials = computed(() => [
   { label: 'Nomor MAPPI', value: leader.value?.mappiNumber, icon: 'ph:identification-card-bold' },
   { label: 'No. Ijin Penilai Publik', value: leader.value?.publicValuerLicense, icon: 'ph:seal-check-bold' },
-].filter((item) => item.value))
+].filter((item) => hasValue(item.value)))
 
 const config = useRuntimeConfig()
 const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace('://www.', '://').replace(/\/$/, '')
@@ -142,7 +142,7 @@ useHead({
               </div>
             </dl>
 
-            <div v-if="leader.bio" class="mt-8">
+            <div v-if="hasValue(leader.bio)" class="mt-8">
               <h3 class="text-[18px] font-bold text-[var(--ink)]">Profil Singkat</h3>
               <p class="mt-3 max-w-[68ch] whitespace-pre-line text-[17px] leading-[1.6] text-[var(--ink)]">{{ leader.bio }}</p>
             </div>

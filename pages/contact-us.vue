@@ -3,7 +3,7 @@ import type { PublicStaffGroup, PublicStaffMember } from '~/types/staff'
 
 const config = useRuntimeConfig()
 const baseUrl = String(config.public.baseUrl || 'https://kjpp-hjar.co.id').replace('://www.', '://').replace(/\/$/, '')
-const { company, headOffice, branches, buildProfessionalServiceJsonLd } = useCompanyProfile()
+const { company, headOffice, branches, buildProfessionalServiceJsonLd, hasValue } = useCompanyProfile()
 
 const contactTitle = "Hubungi Kami – Kantor Pusat Palembang & Cabang | KJPP HJA'R"
 const contactDescription =
@@ -295,31 +295,33 @@ function resetFormToNewMessage() {
                 {{ company.name }}
               </h3>
               <dl class="mt-5 border-t border-[var(--rule)] text-[16px]">
-                <div class="border-b border-[var(--rule)] py-3">
+                <div v-if="hasValue(headOffice.fullAddress)" class="border-b border-[var(--rule)] py-3">
                   <dt class="text-[14px] text-[var(--muted)]">Alamat</dt>
                   <dd class="mt-1 leading-[1.6] text-[var(--ink)]">{{ headOffice.fullAddress }}</dd>
                 </div>
-                <div class="border-b border-[var(--rule)] py-3">
+                <div v-if="hasValue(headOffice.phone)" class="border-b border-[var(--rule)] py-3">
                   <dt class="text-[14px] text-[var(--muted)]">Telepon</dt>
                   <dd class="mt-1 tabular-nums">
                     <a :href="`tel:${headOffice.phoneE164}`" class="pub-link font-bold">{{ headOffice.phone }}</a>
-                    <span class="mx-1.5 text-[var(--muted)]">·</span>
-                    <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="pub-link font-bold">WhatsApp {{ headOffice.whatsapp }}</a>
+                    <template v-if="hasValue(headOffice.whatsapp)">
+                      <span class="mx-1.5 text-[var(--muted)]">·</span>
+                      <a :href="`https://wa.me/${headOffice.whatsappDigits}`" target="_blank" rel="noopener noreferrer" class="pub-link font-bold">WhatsApp {{ headOffice.whatsapp }}</a>
+                    </template>
                   </dd>
                 </div>
-                <div class="border-b border-[var(--rule)] py-3">
+                <div v-if="hasValue(headOffice.email)" class="border-b border-[var(--rule)] py-3">
                   <dt class="text-[14px] text-[var(--muted)]">Email</dt>
                   <dd class="mt-1"><a :href="`mailto:${headOffice.email}`" class="pub-link font-bold">{{ headOffice.email }}</a></dd>
                 </div>
-                <div class="border-b border-[var(--rule)] py-3">
+                <div v-if="hasValue(company.operatingHours.display)" class="border-b border-[var(--rule)] py-3">
                   <dt class="text-[14px] text-[var(--muted)]">Jam Operasional Kantor</dt>
                   <dd class="mt-1 font-bold tabular-nums text-[var(--ink)]">{{ company.operatingHours.display }}</dd>
-                  <dd class="text-[14px] text-[var(--muted)]">{{ company.operatingHours.weekendDisplay }}</dd>
+                  <dd v-if="hasValue(company.operatingHours.weekendDisplay)" class="text-[14px] text-[var(--muted)]">{{ company.operatingHours.weekendDisplay }}</dd>
                 </div>
               </dl>
             </div>
 
-            <div>
+            <div v-if="hasValue(headOffice.googleMapsEmbedUrl)">
               <h4 class="mb-3 text-[14px] font-bold text-[var(--ink)]">Peta Google Maps Kantor Pusat Palembang</h4>
               <iframe
                 :src="headOffice.googleMapsEmbedUrl"
@@ -332,6 +334,7 @@ function resetFormToNewMessage() {
                 class="h-64 w-full rounded-[2px] border border-[var(--rule)]"
               />
               <a
+                v-if="hasValue(headOffice.googleMapsUrl)"
                 :href="headOffice.googleMapsUrl"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -401,7 +404,8 @@ function resetFormToNewMessage() {
                   <li v-for="member in branchStaff(branch.id).slice(0, STAFF_PREVIEW_LIMIT)" :key="member._id" class="text-[14px]">
                     <p class="font-bold text-[var(--ink)]">{{ member.name }}</p>
                     <p class="text-[var(--muted)]">
-                      {{ member.position }}<template v-if="member.mappiNumber"> · <span class="tabular-nums">No. MAPPI {{ member.mappiNumber }}</span></template>
+                      <span v-if="hasValue(member.position)">{{ member.position }}</span>
+                      <template v-if="hasValue(member.mappiNumber)"><template v-if="hasValue(member.position)"> · </template><span class="tabular-nums">No. MAPPI {{ member.mappiNumber }}</span></template>
                     </p>
                   </li>
                 </ul>
