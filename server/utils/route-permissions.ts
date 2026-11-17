@@ -118,6 +118,7 @@ const RULES: readonly RouteRule[] = [
   ...crud('/api/leaders', 'leaders'),
 
   rule(GET, '/api/staff', 'staff.view', { admin: 'true' }),
+  rule(['PUT'], '/api/staff/reorder', 'staff.update'),
   ...crud('/api/staff', 'staff'),
 
   ...crud('/api/branches', 'branches'),

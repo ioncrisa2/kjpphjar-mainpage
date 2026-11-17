@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   if (getQuery(event).admin === 'true') {
     return Staff.find()
       .populate({ path: 'branchId', model: Branch, select: 'name city' })
-      .sort({ order: 1, name: 1 })
+      .sort({ order: 1, createdAt: 1 })
       .lean()
   }
 

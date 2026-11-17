@@ -37,7 +37,7 @@ export async function listPublicStaffByBranch(): Promise<PublicStaffGroup[]> {
     // Data lama belum punya isActive: anggap aktif.
     Staff.find({ isActive: { $ne: false } })
       .select('name position mappiNumber branchId')
-      .sort({ order: 1, name: 1 })
+      .sort({ order: 1, createdAt: 1 })
       .lean(),
   ])
 

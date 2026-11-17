@@ -81,6 +81,7 @@ describe('rute privat dipetakan ke permission yang benar', () => {
     ['DELETE', '/api/leaders/123', 'leaders.delete'],
     ['GET', '/api/staff?admin=true', 'staff.view'],
     ['POST', '/api/staff', 'staff.create'],
+    ['PUT', '/api/staff/reorder', 'staff.update'],
     ['PUT', '/api/staff/123', 'staff.update'],
     ['DELETE', '/api/staff/123', 'staff.delete'],
     ['POST', '/api/branches', 'branches.create'],
