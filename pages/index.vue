@@ -103,45 +103,45 @@ const regionalLinks = [
 
 <template>
   <div class="home-page overflow-x-hidden" :class="{ 'is-dark': store.theme === 'dark' }">
-    <!-- 1. Hero -->
-    <section class="hp-section border-b border-[var(--rule)] pt-[112px] pb-16 lg:pt-[136px] lg:pb-24">
+    <!-- 1. Hero (Latar Biru Navy Khas Website) -->
+    <section class="hp-hero-section border-b border-[#1E3A6E] pt-[112px] pb-16 lg:pt-[136px] lg:pb-24">
       <div class="container">
         <div class="grid grid-cols-1 items-start gap-10 lg:grid-cols-12 lg:gap-12">
           <div class="text-left lg:col-span-8">
-            <h1 class="hp-serif text-[32px] leading-[1.2] text-[var(--ink)] lg:text-[48px] lg:leading-[1.15]">
+            <h1 class="hp-serif text-[32px] leading-[1.2] text-white lg:text-[48px] lg:leading-[1.15]">
               KJPP di Palembang, Sumatera Selatan – Henricus Judi Adrianto &amp; Rekan
             </h1>
 
-            <p class="mt-6 max-w-[68ch] text-[18px] font-normal leading-[1.6] text-[var(--ink)] lg:text-[20px]">
+            <p class="mt-6 max-w-[68ch] text-[18px] font-normal leading-[1.6] text-[#F1F5F9] lg:text-[20px]">
               KJPP HJA'R merupakan perusahaan jasa penilai publik dan konsultan independen yang
               menawarkan berbagai layanan profesional.
             </p>
 
-            <p class="mt-4 max-w-[68ch] text-[16px] font-normal leading-[1.6] text-[var(--muted)]">
+            <p class="mt-4 max-w-[68ch] text-[16px] font-normal leading-[1.6] text-[#CBD5E1]">
               Berkantor pusat di
-              <NuxtLink to="/kjpp-palembang" class="hp-link underline underline-offset-4">Palembang</NuxtLink>
+              <NuxtLink to="/kjpp-palembang" class="hp-dark-link font-bold text-[#47BDFF] underline decoration-[#47BDFF]/70 underline-offset-4 hover:text-white">Palembang</NuxtLink>
               sejak tahun 2013, KJPP Henricus Judi Adrianto &amp; Rekan melayani kebutuhan penilaian
               properti, penilaian bisnis, studi kelayakan, dan pengawasan proyek di seluruh kabupaten/kota
-              <NuxtLink to="/kjpp-sumatera-selatan" class="hp-link underline underline-offset-4">Sumatera Selatan</NuxtLink>
+              <NuxtLink to="/kjpp-sumatera-selatan" class="hp-dark-link font-bold text-[#47BDFF] underline decoration-[#47BDFF]/70 underline-offset-4 hover:text-white">Sumatera Selatan</NuxtLink>
               serta berbagai provinsi di pulau
-              <NuxtLink to="/kjpp-sumatera" class="hp-link underline underline-offset-4">Sumatera</NuxtLink>
+              <NuxtLink to="/kjpp-sumatera" class="hp-dark-link font-bold text-[#47BDFF] underline decoration-[#47BDFF]/70 underline-offset-4 hover:text-white">Sumatera</NuxtLink>
               dan Indonesia.
             </p>
 
-            <p class="mt-6 border-t border-[var(--rule)] pt-4 text-[14px] font-normal leading-[1.6] tabular-nums text-[var(--muted)]">
+            <p class="mt-6 border-t border-[#47BDFF]/25 pt-4 text-[14px] font-normal leading-[1.6] tabular-nums text-[#CBD5E1]">
               Izin Usaha KJPP No. 2.20.0166 · Anggota MAPPI · Berdiri 28 November 2013
             </p>
 
             <div class="mt-8 flex flex-wrap items-center gap-6">
               <NuxtLink
                 to="/contact-us"
-                class="hp-btn-primary inline-flex items-center justify-center rounded-[2px] px-6 py-3 text-[16px] font-bold transition-colors duration-150"
+                class="hp-btn-sky inline-flex items-center justify-center rounded-[2px] bg-[#47BDFF] px-6 py-3 text-[16px] font-bold text-[#08111F] transition-colors duration-150 hover:bg-[#74CEFF]"
               >
                 Hubungi Kantor Palembang
               </NuxtLink>
               <NuxtLink
                 to="/layanan"
-                class="hp-link inline-flex items-center text-[16px] font-bold transition-colors duration-150"
+                class="hp-dark-link inline-flex items-center text-[16px] font-bold text-[#47BDFF] transition-colors duration-150 hover:text-white"
               >
                 Layanan kami →
               </NuxtLink>
@@ -149,7 +149,7 @@ const regionalLinks = [
           </div>
 
           <figure class="mx-auto w-full max-w-[360px] lg:col-span-4 lg:mx-0 lg:ml-auto">
-            <div class="overflow-hidden rounded-[2px] border border-[var(--rule)] bg-[var(--paper)]">
+            <div class="overflow-hidden rounded-[2px] border border-[#47BDFF]/30 bg-[#08111F]/60">
               <img
                 src="/assets/images/pak-henricus.png"
                 alt="Henricus Judi Adrianto, Pimpinan Rekan KJPP HJA'R di Palembang"
@@ -160,7 +160,7 @@ const regionalLinks = [
                 class="h-auto w-full rounded-[2px] object-cover"
               />
             </div>
-            <figcaption class="mt-3 text-left text-[14px] font-normal leading-[1.5] tabular-nums text-[var(--muted)]">
+            <figcaption class="mt-3 text-left text-[14px] font-normal leading-[1.5] tabular-nums text-[#CBD5E1]">
               Henricus Judi Adrianto · Pimpinan Rekan · Izin Penilai Publik P-1.13.0380
             </figcaption>
           </figure>
@@ -274,7 +274,7 @@ const regionalLinks = [
           </figure>
 
           <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-7">
-            <div v-for="item in chooseUs" :key="item.title">
+            <div v-for="item in chooseUs" :key="item.title" class="border-l-2 border-[var(--accent-rule)] pl-4">
               <h3 class="text-[18px] font-bold leading-[1.4] text-[var(--ink)]">
                 {{ item.title }}
               </h3>
@@ -309,15 +309,15 @@ const regionalLinks = [
       </div>
     </section>
 
-    <!-- 6. Pengalaman & Kredibilitas (satu-satunya section gelap) -->
+    <!-- 6. Pengalaman & Kredibilitas (Section Biru Navy Gelap) -->
     <section class="hp-navy-section py-16 lg:py-24">
       <div class="container">
         <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
           <div class="lg:col-span-7">
-            <h2 class="hp-serif text-[32px] leading-[1.2] text-[#F7F5F0]">
+            <h2 class="hp-serif text-[32px] leading-[1.2] text-white">
               Pengalaman &amp; Kredibilitas
             </h2>
-            <p class="mt-4 max-w-[68ch] text-[17px] font-normal leading-[1.6] text-[#EDEAE3]">
+            <p class="mt-4 max-w-[68ch] text-[17px] font-normal leading-[1.6] text-[#E2E8F0]">
               Berdiri sejak 28 November 2013 dan beroperasi sesuai Standar Penilaian Indonesia (SPI)
               serta Kode Etik Penilai Indonesia (KEPI), kami menjadi mitra independen bagi sektor
               perbankan, BUMN, BUMD, pemerintah daerah, dan korporasi di seluruh Indonesia.
@@ -326,13 +326,13 @@ const regionalLinks = [
             <div class="mt-8 flex flex-wrap items-center gap-6">
               <NuxtLink
                 to="/contact-us"
-                class="hp-btn-paper inline-flex items-center justify-center rounded-[2px] bg-[#F7F5F0] px-6 py-3 text-[16px] font-bold text-[#141B2D] transition-colors duration-150 hover:bg-[#EDEAE3]"
+                class="hp-btn-sky inline-flex items-center justify-center rounded-[2px] bg-[#47BDFF] px-6 py-3 text-[16px] font-bold text-[#08111F] transition-colors duration-150 hover:bg-[#74CEFF]"
               >
                 Hubungi Kami
               </NuxtLink>
               <NuxtLink
                 to="/about-us"
-                class="hp-navy-link inline-flex items-center text-[16px] font-bold text-[#F7F5F0] underline decoration-[#F7F5F0]/50 underline-offset-4 transition-colors duration-150 hover:text-white"
+                class="hp-dark-link inline-flex items-center text-[16px] font-bold text-[#47BDFF] underline decoration-[#47BDFF]/60 underline-offset-4 transition-colors duration-150 hover:text-white"
               >
                 Profil &amp; tim kami →
               </NuxtLink>
@@ -340,19 +340,19 @@ const regionalLinks = [
           </div>
 
           <div class="lg:col-span-5">
-            <ul class="border-t border-[#D9D3C7]/25">
+            <ul class="border-t border-[#47BDFF]/25">
               <li
                 v-for="region in regionalLinks"
                 :key="region.to"
-                class="border-b border-[#D9D3C7]/25 py-4"
+                class="border-b border-[#47BDFF]/25 py-4"
               >
                 <NuxtLink
                   :to="region.to"
-                  class="hp-navy-link block text-[16px] font-bold text-[#F7F5F0] transition-colors duration-150 hover:underline"
+                  class="hp-dark-link block text-[16px] font-bold text-[#47BDFF] transition-colors duration-150 hover:text-white hover:underline"
                 >
                   {{ region.label }}
                 </NuxtLink>
-                <p class="mt-1 text-[14px] font-normal leading-[1.5] text-[#D9D3C7]">
+                <p class="mt-1 text-[14px] font-normal leading-[1.5] text-[#CBD5E1]">
                   {{ region.desc }}
                 </p>
               </li>
@@ -361,31 +361,31 @@ const regionalLinks = [
         </div>
 
         <!-- Statistik satu baris 3 angka dipisah garis vertikal -->
-        <div class="mt-12 border-t border-[#D9D3C7]/25 pt-8">
+        <div class="mt-12 border-t border-[#47BDFF]/25 pt-8">
           <div class="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-0">
             <div class="md:pr-8">
-              <span class="hp-serif block text-[40px] leading-[1.1] tabular-nums text-[#F7F5F0]">
+              <span class="hp-serif block text-[40px] leading-[1.1] tabular-nums text-[#47BDFF]">
                 2013
               </span>
-              <p class="mt-2 text-[14px] font-normal leading-[1.5] text-[#D9D3C7]">
+              <p class="mt-2 text-[14px] font-normal leading-[1.5] text-[#E2E8F0]">
                 Tahun berdiri
               </p>
             </div>
 
-            <div class="border-t border-[#D9D3C7]/25 pt-6 md:border-t-0 md:border-l md:px-8 md:pt-0">
-              <span class="hp-serif block text-[40px] leading-[1.1] tabular-nums text-[#F7F5F0]">
+            <div class="border-t border-[#47BDFF]/25 pt-6 md:border-t-0 md:border-l md:px-8 md:pt-0">
+              <span class="hp-serif block text-[40px] leading-[1.1] tabular-nums text-[#47BDFF]">
                 {{ officeCountLabel }}
               </span>
-              <p class="mt-2 text-[14px] font-normal leading-[1.5] tabular-nums text-[#D9D3C7]">
+              <p class="mt-2 text-[14px] font-normal leading-[1.5] tabular-nums text-[#E2E8F0]">
                 Kantor layanan (Palembang, Surabaya, Balikpapan, Tangerang Selatan)
               </p>
             </div>
 
-            <div class="border-t border-[#D9D3C7]/25 pt-6 md:border-t-0 md:border-l md:pl-8 md:pt-0">
-              <span class="hp-serif block text-[40px] leading-[1.1] tabular-nums text-[#F7F5F0]">
+            <div class="border-t border-[#47BDFF]/25 pt-6 md:border-t-0 md:border-l md:pl-8 md:pt-0">
+              <span class="hp-serif block text-[40px] leading-[1.1] tabular-nums text-[#47BDFF]">
                 {{ clientCountLabel }}
               </span>
-              <p class="mt-2 text-[14px] font-normal leading-[1.5] tabular-nums text-[#D9D3C7]">
+              <p class="mt-2 text-[14px] font-normal leading-[1.5] tabular-nums text-[#E2E8F0]">
                 Klien &amp; rekanan
               </p>
             </div>
@@ -398,14 +398,14 @@ const regionalLinks = [
 
 <style scoped>
 .home-page {
-  --paper: #F7F5F0;
-  --ink: #141B2D;
-  --muted: #5B6470;
-  --rule: #D9D3C7;
-  --brand-red: #900F13;
+  --paper: #F8FAFC;
+  --ink: #08111F;
+  --muted: #475569;
+  --rule: #CBD5E1;
   --brand-navy: #011987;
+  --brand-navy-hover: #0369A1;
+  --accent-rule: #011987;
   --navy-deep: #0B1640;
-  --btn-fg: #FFFFFF;
   background-color: var(--paper);
   color: var(--ink);
 }
@@ -413,14 +413,19 @@ const regionalLinks = [
 .home-page.is-dark,
 :global(body.dark) .home-page,
 :global(html.dark) .home-page {
-  --paper: #0D1222;
-  --ink: #EDEAE3;
-  --muted: #A4ACBA;
-  --rule: #273049;
-  --brand-red: #F08A8E;
-  --brand-navy: #8FA3FF;
+  --paper: #08111F;
+  --ink: #F1F5F9;
+  --muted: #94A3B8;
+  --rule: #1E293B;
+  --brand-navy: #47BDFF;
+  --brand-navy-hover: #74CEFF;
+  --accent-rule: #47BDFF;
   --navy-deep: #0B1640;
-  --btn-fg: #141B2D;
+}
+
+.hp-hero-section {
+  background-color: #0B1640;
+  color: #F8FAFC;
 }
 
 .hp-section {
@@ -430,7 +435,7 @@ const regionalLinks = [
 
 .hp-navy-section {
   background-color: var(--navy-deep);
-  color: #F7F5F0;
+  color: #F8FAFC;
 }
 
 .hp-serif {
@@ -444,27 +449,18 @@ const regionalLinks = [
 }
 
 .hp-link:hover {
-  color: var(--brand-red);
+  color: var(--brand-navy-hover);
+  text-decoration: underline;
 }
 
-.hp-btn-primary {
-  background-color: var(--brand-red);
-  color: var(--btn-fg);
-}
-
-.hp-btn-primary:hover {
-  opacity: 0.92;
-}
-
-.hp-link:focus-visible,
-.hp-btn-primary:focus-visible {
+.hp-link:focus-visible {
   outline: 2px solid var(--brand-navy);
   outline-offset: 2px;
 }
 
-.hp-navy-link:focus-visible,
-.hp-btn-paper:focus-visible {
-  outline: 2px solid #F7F5F0;
+.hp-dark-link:focus-visible,
+.hp-btn-sky:focus-visible {
+  outline: 2px solid #47BDFF;
   outline-offset: 2px;
 }
 
@@ -478,22 +474,5 @@ const regionalLinks = [
 :global(body.dark) .home-page .hp-client-logo:hover,
 :global(html.dark) .home-page .hp-client-logo:hover {
   filter: none;
-}
-
-/* Pastikan teks navigasi header di atas hero --paper mode terang tetap terbaca jelas (WCAG AA) */
-@media (min-width: 1024px) {
-  :global(body:not(.dark):has(.home-page) header.bg-transparent) {
-    background-color: #F7F5F0;
-    border-bottom: 1px solid #D9D3C7;
-  }
-  :global(body:not(.dark):has(.home-page) header.bg-transparent ul li a) {
-    color: #141B2D;
-  }
-  :global(body:not(.dark):has(.home-page) header.bg-transparent ul li a.router-link-active) {
-    color: #900F13;
-  }
-  :global(body:not(.dark):has(.home-page) header.bg-transparent ul li a:hover) {
-    color: #011987;
-  }
 }
 </style>
