@@ -144,6 +144,7 @@ export function sanitizeSettingsInput(value: unknown): PersistedSettingsInput {
       'footerAddress',
       'socialMedia',
       'generalContacts',
+      'legalInfo',
       'copyrightText',
       'maintenanceMode',
       'updatedAt',
@@ -160,9 +161,15 @@ export function sanitizeSettingsInput(value: unknown): PersistedSettingsInput {
   if (!isRecord(value.generalContacts)) {
     throw createError({ statusCode: 400, statusMessage: 'Data kontak umum tidak valid.' })
   }
+  if (value.legalInfo !== undefined && !isRecord(value.legalInfo)) {
+    throw createError({ statusCode: 400, statusMessage: 'Data legalitas & izin tidak valid.' })
+  }
   if (!isRecord(value.maintenanceMode)) {
     throw createError({ statusCode: 400, statusMessage: 'Data maintenance tidak valid.' })
   }
+
+  const defaults = createDefaultAppSettings()
+  const rawLegalInfo = isRecord(value.legalInfo) ? value.legalInfo : {}
 
   assertAllowedKeys(
     value.footerAddress,
@@ -175,6 +182,18 @@ export function sanitizeSettingsInput(value: unknown): PersistedSettingsInput {
     'media sosial'
   )
   assertAllowedKeys(value.generalContacts, ['email', 'phone', 'whatsapp'], 'kontak umum')
+  assertAllowedKeys(
+    rawLegalInfo,
+    [
+      'kjppLicenseNumber',
+      'kjppDecreeNumber',
+      'managingPartnerValuerLicense',
+      'mappiMembership',
+      'ojkRegistration',
+      'operatingHours',
+    ],
+    'legalitas & izin'
+  )
   assertAllowedKeys(
     value.maintenanceMode,
     ['isActive', 'message', 'expectedEndTime'],
@@ -206,6 +225,38 @@ export function sanitizeSettingsInput(value: unknown): PersistedSettingsInput {
       phone: readPhone(value.generalContacts.phone, 'Nomor telepon'),
       whatsapp: readPhone(value.generalContacts.whatsapp, 'Nomor WhatsApp', true),
     },
+    legalInfo: {
+      kjppLicenseNumber: readString(
+        rawLegalInfo.kjppLicenseNumber ?? defaults.legalInfo.kjppLicenseNumber,
+        'Nomor Izin Usaha KJPP',
+        120
+      ),
+      kjppDecreeNumber: readString(
+        rawLegalInfo.kjppDecreeNumber ?? defaults.legalInfo.kjppDecreeNumber,
+        'SK Menteri Keuangan',
+        300
+      ),
+      managingPartnerValuerLicense: readString(
+        rawLegalInfo.managingPartnerValuerLicense ?? defaults.legalInfo.managingPartnerValuerLicense,
+        'Izin Penilai Publik Pimpinan Rekan',
+        200
+      ),
+      mappiMembership: readString(
+        rawLegalInfo.mappiMembership ?? defaults.legalInfo.mappiMembership,
+        'Keanggotaan MAPPI',
+        300
+      ),
+      ojkRegistration: readString(
+        rawLegalInfo.ojkRegistration ?? defaults.legalInfo.ojkRegistration,
+        'Nomor Pendaftaran OJK',
+        200
+      ),
+      operatingHours: readString(
+        rawLegalInfo.operatingHours ?? defaults.legalInfo.operatingHours,
+        'Jam Operasional',
+        300
+      ),
+    },
     copyrightText: readString(value.copyrightText, 'Teks copyright', 300),
     maintenanceMode: {
       isActive,
@@ -220,6 +271,7 @@ function normalizeSettings(value?: UnknownRecord | null): PublicAppSettings {
   const footerAddress = isRecord(value?.footerAddress) ? value.footerAddress : {}
   const socialMedia = isRecord(value?.socialMedia) ? value.socialMedia : {}
   const generalContacts = isRecord(value?.generalContacts) ? value.generalContacts : {}
+  const legalInfo = isRecord(value?.legalInfo) ? value.legalInfo : {}
   const maintenanceMode = isRecord(value?.maintenanceMode) ? value.maintenanceMode : {}
   const expectedEndTime = maintenanceMode.expectedEndTime
   const updatedAt = value?.updatedAt
@@ -269,6 +321,32 @@ function normalizeSettings(value?: UnknownRecord | null): PublicAppSettings {
         typeof generalContacts.whatsapp === 'string'
           ? generalContacts.whatsapp
           : defaults.generalContacts.whatsapp,
+    },
+    legalInfo: {
+      kjppLicenseNumber:
+        typeof legalInfo.kjppLicenseNumber === 'string' && legalInfo.kjppLicenseNumber
+          ? legalInfo.kjppLicenseNumber
+          : defaults.legalInfo.kjppLicenseNumber,
+      kjppDecreeNumber:
+        typeof legalInfo.kjppDecreeNumber === 'string' && legalInfo.kjppDecreeNumber
+          ? legalInfo.kjppDecreeNumber
+          : defaults.legalInfo.kjppDecreeNumber,
+      managingPartnerValuerLicense:
+        typeof legalInfo.managingPartnerValuerLicense === 'string' && legalInfo.managingPartnerValuerLicense
+          ? legalInfo.managingPartnerValuerLicense
+          : defaults.legalInfo.managingPartnerValuerLicense,
+      mappiMembership:
+        typeof legalInfo.mappiMembership === 'string' && legalInfo.mappiMembership
+          ? legalInfo.mappiMembership
+          : defaults.legalInfo.mappiMembership,
+      ojkRegistration:
+        typeof legalInfo.ojkRegistration === 'string' && legalInfo.ojkRegistration
+          ? legalInfo.ojkRegistration
+          : defaults.legalInfo.ojkRegistration,
+      operatingHours:
+        typeof legalInfo.operatingHours === 'string' && legalInfo.operatingHours
+          ? legalInfo.operatingHours
+          : defaults.legalInfo.operatingHours,
     },
     copyrightText:
       typeof value?.copyrightText === 'string' ? value.copyrightText : defaults.copyrightText,
@@ -326,6 +404,7 @@ export async function updatePublicSettings(input: unknown) {
         footerAddress: settings.footerAddress,
         socialMedia: settings.socialMedia,
         generalContacts: settings.generalContacts,
+        legalInfo: settings.legalInfo,
         copyrightText: settings.copyrightText,
         maintenanceMode: settings.maintenanceMode,
       },

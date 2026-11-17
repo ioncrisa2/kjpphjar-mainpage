@@ -68,15 +68,8 @@ const allCategories: NavCategory[] = [
     label: 'Sistem',
     icon: 'ph:sliders-horizontal-bold',
     items: [
-      {
-        label: 'Pengaturan',
-        icon: 'ph:gear-six-bold',
-        to: '/admin/settings',
-        permission: ['settings.manage', 'settings.backup', 'settings.restore'],
-      },
       { label: 'Pengguna', icon: 'ph:users-bold', to: '/admin/users', superAdminOnly: true },
       { label: 'Role & Hak Akses', icon: 'ph:shield-check-bold', to: '/admin/roles', superAdminOnly: true },
-      { label: 'Profil Saya', icon: 'ph:user-gear-bold', to: '/admin/profile' },
     ],
   },
 ]

@@ -37,8 +37,36 @@ export function useCompanyProfile() {
 
   const otherBranches = computed(() => branches.value.filter((b) => !b.isHeadOffice))
 
+  const company = computed(() => ({
+    ...COMPANY_DATA,
+    name: settings.value?.siteName || COMPANY_DATA.name,
+    operatingHours: {
+      ...COMPANY_DATA.operatingHours,
+      display:
+        settings.value?.legalInfo?.operatingHours || COMPANY_DATA.operatingHours.display,
+    },
+    licenses: {
+      ...COMPANY_DATA.licenses,
+      kjppLicenseNumber:
+        settings.value?.legalInfo?.kjppLicenseNumber ||
+        COMPANY_DATA.licenses.kjppLicenseNumber,
+      kjppDecreeNumber:
+        settings.value?.legalInfo?.kjppDecreeNumber ||
+        COMPANY_DATA.licenses.kjppDecreeNumber,
+      managingPartnerValuerLicense:
+        settings.value?.legalInfo?.managingPartnerValuerLicense ||
+        COMPANY_DATA.licenses.managingPartnerValuerLicense,
+      mappiMembership:
+        settings.value?.legalInfo?.mappiMembership ||
+        COMPANY_DATA.licenses.mappiMembership,
+      ojkRegistration:
+        settings.value?.legalInfo?.ojkRegistration ||
+        COMPANY_DATA.licenses.ojkRegistration,
+    },
+  }))
+
   return {
-    company: COMPANY_DATA,
+    company,
     settings,
     headOffice,
     branches,

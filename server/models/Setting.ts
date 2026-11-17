@@ -20,6 +20,14 @@ export interface ISetting extends Document {
     phone: string
     whatsapp: string
   }
+  legalInfo: {
+    kjppLicenseNumber: string
+    kjppDecreeNumber: string
+    managingPartnerValuerLicense: string
+    mappiMembership: string
+    ojkRegistration: string
+    operatingHours: string
+  }
   copyrightText: string
   maintenanceMode: {
     isActive: boolean
@@ -108,6 +116,48 @@ const GeneralContactsSchema = new Schema(
   { _id: false }
 )
 
+const LegalInfoSchema = new Schema(
+  {
+    kjppLicenseNumber: {
+      type: String,
+      trim: true,
+      maxlength: 120,
+      default: DEFAULT_APP_SETTINGS.legalInfo.kjppLicenseNumber,
+    },
+    kjppDecreeNumber: {
+      type: String,
+      trim: true,
+      maxlength: 300,
+      default: DEFAULT_APP_SETTINGS.legalInfo.kjppDecreeNumber,
+    },
+    managingPartnerValuerLicense: {
+      type: String,
+      trim: true,
+      maxlength: 200,
+      default: DEFAULT_APP_SETTINGS.legalInfo.managingPartnerValuerLicense,
+    },
+    mappiMembership: {
+      type: String,
+      trim: true,
+      maxlength: 300,
+      default: DEFAULT_APP_SETTINGS.legalInfo.mappiMembership,
+    },
+    ojkRegistration: {
+      type: String,
+      trim: true,
+      maxlength: 200,
+      default: DEFAULT_APP_SETTINGS.legalInfo.ojkRegistration,
+    },
+    operatingHours: {
+      type: String,
+      trim: true,
+      maxlength: 300,
+      default: DEFAULT_APP_SETTINGS.legalInfo.operatingHours,
+    },
+  },
+  { _id: false }
+)
+
 const MaintenanceModeSchema = new Schema(
   {
     isActive: { type: Boolean, default: false },
@@ -142,6 +192,7 @@ const SettingSchema = new Schema<ISetting>(
     footerAddress: { type: FooterAddressSchema, default: () => ({}) },
     socialMedia: { type: SocialMediaSchema, default: () => ({}) },
     generalContacts: { type: GeneralContactsSchema, default: () => ({}) },
+    legalInfo: { type: LegalInfoSchema, default: () => ({}) },
     copyrightText: {
       type: String,
       trim: true,

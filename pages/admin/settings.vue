@@ -72,6 +72,7 @@ function hydrateForm(value: PublicAppSettings) {
   Object.assign(form.footerAddress, value.footerAddress)
   Object.assign(form.socialMedia, value.socialMedia)
   Object.assign(form.generalContacts, value.generalContacts)
+  if (value.legalInfo) Object.assign(form.legalInfo, value.legalInfo)
   form.copyrightText = value.copyrightText
   Object.assign(form.maintenanceMode, value.maintenanceMode)
   expectedEndLocal.value = toLocalDateTime(value.maintenanceMode.expectedEndTime)
@@ -96,6 +97,7 @@ async function saveSettings() {
         footerAddress: { ...form.footerAddress },
         socialMedia: { ...form.socialMedia },
         generalContacts: { ...form.generalContacts },
+        legalInfo: { ...form.legalInfo },
         copyrightText: form.copyrightText,
         maintenanceMode: {
           ...form.maintenanceMode,
@@ -352,6 +354,77 @@ async function commitRestore() {
                   type="tel"
                   inputmode="tel"
                   placeholder="628117101066"
+                  class="admin-input"
+                />
+              </div>
+            </div>
+          </section>
+
+          <section class="border-t border-gray/10 pt-8" aria-labelledby="legal-heading">
+            <h2 id="legal-heading" class="text-base font-extrabold text-black dark:text-white">
+              Legalitas, Izin Resmi (Kemenkeu, MAPPI, OJK) &amp; Jam Operasional
+            </h2>
+            <p class="mt-1 text-sm text-gray">
+              Ditampilkan secara otomatis di halaman Tentang Kami, Contact Us, dan Footer website.
+            </p>
+            <div class="mt-5 grid gap-5 md:grid-cols-2">
+              <div>
+                <label for="legal-ojk" class="admin-label">Nomor Pendaftaran / STTD OJK</label>
+                <input
+                  id="legal-ojk"
+                  v-model="form.legalInfo.ojkRegistration"
+                  maxlength="200"
+                  placeholder="Contoh: S-xxx/PM.22/20xx"
+                  class="admin-input"
+                />
+              </div>
+              <div>
+                <label for="legal-kjpp" class="admin-label">Nomor Izin Usaha KJPP (Kemenkeu)</label>
+                <input
+                  id="legal-kjpp"
+                  v-model="form.legalInfo.kjppLicenseNumber"
+                  maxlength="120"
+                  placeholder="Contoh: 2.20.0166"
+                  class="admin-input"
+                />
+              </div>
+              <div>
+                <label for="legal-decree" class="admin-label">Keputusan Menteri Keuangan (KMK)</label>
+                <input
+                  id="legal-decree"
+                  v-model="form.legalInfo.kjppDecreeNumber"
+                  maxlength="300"
+                  placeholder="Contoh: Keputusan Menteri Keuangan RI No. 31/KM.1/2020 (20 Januari 2020)"
+                  class="admin-input"
+                />
+              </div>
+              <div>
+                <label for="legal-valuer" class="admin-label">Izin Penilai Publik Pimpinan Rekan</label>
+                <input
+                  id="legal-valuer"
+                  v-model="form.legalInfo.managingPartnerValuerLicense"
+                  maxlength="200"
+                  placeholder="Contoh: P-1.13.0380 (Henricus Judi Adrianto)"
+                  class="admin-input"
+                />
+              </div>
+              <div>
+                <label for="legal-mappi" class="admin-label">Keanggotaan MAPPI</label>
+                <input
+                  id="legal-mappi"
+                  v-model="form.legalInfo.mappiMembership"
+                  maxlength="300"
+                  placeholder="Contoh: Masyarakat Profesi Penilai Indonesia (MAPPI) – No. MAPPI 96-S-00827"
+                  class="admin-input"
+                />
+              </div>
+              <div>
+                <label for="legal-hours" class="admin-label">Jam Operasional Kantor</label>
+                <input
+                  id="legal-hours"
+                  v-model="form.legalInfo.operatingHours"
+                  maxlength="300"
+                  placeholder="Contoh: Senin – Jumat: 08.00 – 17.00 WIB"
                   class="admin-input"
                 />
               </div>

@@ -83,16 +83,16 @@ useHead({
                 provider: {
                   '@type': 'ProfessionalService',
                   '@id': `${baseUrl}/#organization`,
-                  name: company.name,
+                  name: company.value.name,
                   url: baseUrl,
-                  telephone: company.headOffice.phone,
+                  telephone: company.value.headOffice.phone,
                   address: {
                     '@type': 'PostalAddress',
-                    streetAddress: company.headOffice.streetAddress,
-                    addressLocality: company.headOffice.locality,
-                    addressRegion: company.headOffice.region,
-                    postalCode: company.headOffice.postalCode,
-                    addressCountry: company.headOffice.country,
+                    streetAddress: company.value.headOffice.streetAddress,
+                    addressLocality: company.value.headOffice.locality,
+                    addressRegion: company.value.headOffice.region,
+                    postalCode: company.value.headOffice.postalCode,
+                    addressCountry: company.value.headOffice.country,
                   },
                 },
                 areaServed: [

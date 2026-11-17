@@ -17,6 +17,15 @@ export interface GeneralContactSettings {
   whatsapp: string
 }
 
+export interface LegalInfoSettings {
+  kjppLicenseNumber: string
+  kjppDecreeNumber: string
+  managingPartnerValuerLicense: string
+  mappiMembership: string
+  ojkRegistration: string
+  operatingHours: string
+}
+
 export interface MaintenanceModeSettings {
   isActive: boolean
   message: string
@@ -28,6 +37,7 @@ export interface AppSettings {
   footerAddress: FooterAddressSettings
   socialMedia: SocialMediaSettings
   generalContacts: GeneralContactSettings
+  legalInfo: LegalInfoSettings
   copyrightText: string
   maintenanceMode: MaintenanceModeSettings
 }
@@ -82,6 +92,14 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
     phone: '(0711) 5615793',
     whatsapp: '628117101066',
   },
+  legalInfo: {
+    kjppLicenseNumber: '2.20.0166',
+    kjppDecreeNumber: 'Keputusan Menteri Keuangan RI No. 31/KM.1/2020 (20 Januari 2020)',
+    managingPartnerValuerLicense: 'P-1.13.0380 (Henricus Judi Adrianto)',
+    mappiMembership: 'Masyarakat Profesi Penilai Indonesia (MAPPI) – Pimpinan Rekan No. MAPPI 96-S-00827',
+    ojkRegistration: '[PERLU KONFIRMASI]',
+    operatingHours: 'Senin – Jumat: 08.00 – 17.00 WIB [PERLU KONFIRMASI]',
+  },
   copyrightText: 'KJPP Henricus Judi Adrianto & Rekan',
   maintenanceMode: {
     isActive: false,
@@ -97,6 +115,7 @@ export function createDefaultAppSettings(): AppSettings {
     footerAddress: { ...DEFAULT_APP_SETTINGS.footerAddress },
     socialMedia: { ...DEFAULT_APP_SETTINGS.socialMedia },
     generalContacts: { ...DEFAULT_APP_SETTINGS.generalContacts },
+    legalInfo: { ...DEFAULT_APP_SETTINGS.legalInfo },
     maintenanceMode: { ...DEFAULT_APP_SETTINGS.maintenanceMode },
   }
 }

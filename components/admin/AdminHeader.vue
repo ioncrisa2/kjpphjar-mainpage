@@ -205,6 +205,17 @@ async function logout() {
               <span>Profil Saya &amp; Password</span>
             </NuxtLink>
 
+            <NuxtLink
+              v-if="can(['settings.manage', 'settings.backup', 'settings.restore'])"
+              to="/admin/settings"
+              role="menuitem"
+              class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-black transition hover:bg-stone-100 dark:text-gray-200 dark:hover:bg-gray-800"
+              @click="accountMenuOpen = false"
+            >
+              <Icon name="ph:gear-six-bold" class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" />
+              <span>Pengaturan Aplikasi</span>
+            </NuxtLink>
+
             <button
               type="button"
               role="menuitem"

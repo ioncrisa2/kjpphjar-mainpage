@@ -18,7 +18,7 @@ const socialLinks = computed(() =>
       network,
       href,
       icon: socialIcons[network],
-      label: `${network.charAt(0).toUpperCase()}${network.slice(1)} ${company.name}`,
+      label: `${network.charAt(0).toUpperCase()}${network.slice(1)} ${company.value.name}`,
     }))
 )
 
