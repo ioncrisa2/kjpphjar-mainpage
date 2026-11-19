@@ -36,6 +36,11 @@ describe('rute publik tetap terbuka', () => {
     ['GET', '/api/settings'],
     ['GET', '/api/auth/me'],
     ['POST', '/api/auth/login'],
+    ['GET', '/robots.txt'],
+    ['HEAD', '/robots.txt'],
+    ['GET', '/sitemap.xml'],
+    ['HEAD', '/sitemap.xml'],
+    ['GET', '/api/_sitemap-urls'],
   ]
 
   for (const [method, url] of publicRoutes) {

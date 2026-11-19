@@ -4,6 +4,7 @@ import { requireAuth } from '~/server/utils/require-auth'
 const STATIC_PREFIXES = [
   '/_nuxt/',
   '/_ipx/',
+  '/__sitemap__/',
   '/assets/',
   '/uploads/',
   '/favicon',
@@ -20,6 +21,7 @@ function isAlwaysAllowedPath(pathname: string, method: string) {
     pathname === '/api/auth' ||
     pathname.startsWith('/api/auth/') ||
     (pathname === '/api/settings' && (method === 'GET' || method === 'HEAD')) ||
+    (pathname === '/api/_sitemap-urls' && (method === 'GET' || method === 'HEAD')) ||
     STATIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))
   )
 }
